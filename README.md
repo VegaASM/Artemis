@@ -16,7 +16,7 @@ I have boot.dol ready. How do I run Artemis?
 
 You need to compile it from Source. View the COMPILING_and_DEBUG.txt for instructions on how to compile and launch Artemis.
 
-After compilation, launch Artemis. Follow the on-screen instructions. Artemis/www contains the two files you can look at (refresh) after every instruction simulation. artemis.txt holds the Registers. memory.txt holds Memory ofc (note this file is BIG..)
+After compilation, launch Artemis. Please NOTE that this current Repo revision will most likely just Fault (no testing/debug has been performed)! Once Artemis launches, follow the on-screen instructions. Artemis/www contains the two files you can look at (refresh) after every instruction simulation. artemis.txt holds the Registers. memory.txt holds Memory ofc (note this file is BIG..)
 
 -----
 
