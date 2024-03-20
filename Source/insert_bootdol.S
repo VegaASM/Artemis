@@ -34,8 +34,8 @@ stp x23, x24, [sp, 0x30]
 mov x19, x0
 mov x20, x0
 
-/*Note that no BSS action (nulling selected parts of memory) is needed because we already cleared out memory
-Set Outer/Main Loop Counter in non-volatile register*/
+/*TODO put in code for BSS stuff*/
+/*Set Outer/Main Loop Counter in non-volatile register*/
 mov w21, 18 /*There are 7 Text sections and 11 Data sections*/
 
 /*Set a register to point at boot.dol's loading addr for text0 section size*/
