@@ -14,13 +14,9 @@ You will also need a boot.dol file placed in the Artemis/dol folder. For more in
 
 I have boot.dol ready. How do I run Artemis?
 
-You need to compile it from Source. View the COMPILING_and_DEBUG.txt for instructions. After compiling, move the main executable to the Repo Root directory, make it executable, and launch it...
+You need to compile it from Source. View the COMPILING_and_DEBUG.txt for instructions on how to compile and launch Artemis.
 
-chmod +x ./main
-
-./main
-
-Follow the on-screen instructions. Artemis/www contains the two files you can look at (refresh) after every instruction simulation.
+After compilation, launch Artemis. Follow the on-screen instructions. Artemis/www contains the two files you can look at (refresh) after every instruction simulation. artemis.txt holds the Registers. memory.txt holds Memory ofc (note this file is BIG..)
 
 -----
 

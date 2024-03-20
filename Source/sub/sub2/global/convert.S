@@ -25,7 +25,7 @@ beq fix_high_exp_addr
 
 /*See if we are converting via mem1/2*/
 /*Place base sim ptr into w1*/
-and w1, w0, 0x10000000
+and w1, w0, 0x10000000 /*Do NOT remove w1 from and instruction (don't change to andS), we need its value*/
 cmp w1, 0
 beq mem1addr
 

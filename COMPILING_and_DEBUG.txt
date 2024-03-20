@@ -9,15 +9,15 @@ Step 3: Build from Source Code
 cd Source
 aarch64-linux-gnu-gcc -ggdb3 -o main -static main.S
 
+Step 4: Move file to Project Root directory
+mv main ..
+
 Step 4: Make file executable
+cd ..
 chmod +x ./main
 
-Step 5: Delete pre-compiled main
-cd Artemis
-rm main
-
-Step 6: Final step
-Move newly compiled main file into Artemis folder. Congratz.
+You can now launch Artemis!
+./main
 
 --
 
