@@ -15,7 +15,7 @@ ubfx w13, w18, 31, 1 //N
 ubfx w14, w18, 30, 1 //Z
 ubfx w15, w18, 28, 1 //V
 //Does N == V, if so set cr0 LT, other clear cr0 LT
-orn w12, w13, w15 //eqv
+eor w12, w13, w15 //eqv
 bfi w16, w12, 31, 1
 //Is Z low && N == V? If so set cr0 GT, otherwise clear cr0 GT
 cmp w14, 0
