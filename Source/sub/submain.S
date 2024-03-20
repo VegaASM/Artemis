@@ -73,7 +73,7 @@ beq 0x14 /*Time to simulate!*/
 cmp w0, 0x65 /*e*/
 bne input_error
 
-/*User wants to terminate Artemis, close file, free the two malloc's, end program*/
+/*User wants to terminate Artemis, end program*/
 adr x0, program_killed
 b submain_epilogue
 
