@@ -17,6 +17,7 @@ I have boot.dol ready. How do I run Artemis?
 You need to compile it from Source. View the COMPILING_and_DEBUG.txt for instructions. After compiling, move the main executable to the Repo Root directory, make it executable, and launch it...
 
 chmod +x ./main
+
 ./main
 
 Follow the on-screen instructions. Artemis/www contains the two files you can look at (refresh) after every instruction simulation.
@@ -28,5 +29,5 @@ Version: n/a at this time
 Status: Compiles, doesn't really work
 
 Artemis can *ONLY* do the following at the moment...
-- Execute a handful of integer instructions
-- Execute in physical memory
+*Execute a handful of integer instructions
+*Execute in physical memory
