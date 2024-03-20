@@ -36,7 +36,7 @@ dar
 dma u & l
 */
 
-mov w1, 0 /*will set upper bits to null as well (entire FPR null)*/
+mov w1, 0
 str w1, [x0, lrppc]
 str w1, [x0, cr]
 str w1, [x0, ctr]
