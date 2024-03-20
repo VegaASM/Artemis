@@ -1,0 +1,43 @@
+.set rDoff, 0
+.set rSoff, 0
+.set BOoff, 0
+.set crbDoff, 0
+.set fDoff, 0
+.set fSoff, 0
+.set TOoff, 0
+.set crfDoff, 4
+.set crfSoff, 8
+.set rAoff, 0xC
+.set BIoff, 0xC
+.set crbAoff, 0xC
+.set fAoff, 0xC
+.set rBoff, 0x10
+.set fBoff, 0x10
+.set NBoff, 0x10
+.set crbBoff, 0x10
+.set SHoff, 0x10
+.set fCoff, 0x14
+.set MBoff, 0x14
+.set MEoff, 0x18
+.set SIMMoff, 0x1C
+.set doff, 0x1C
+.set UIMMoff, 0x20
+.set LI_SIMMoff, 0x24
+.set BDoff, 0x28
+.set ps_SIMMoff, 0x2C
+.set IMMoff, 0x30
+.set SPRoff, 0x34
+.set TBRoff, 0x34
+.set SRoff, 0x38
+.set CRMoff, 0x3C
+.set FMoff, 0x40
+.set W_nonxoff, 0x44
+.set I_nonxoff, 0x48
+.set W_xoff, 0x4C
+.set I_xoff, 0x50
+.set BO_nohintoff, 0x54
+.set BO_onlyhintoff, 0x58
+.set BO_onlyhint_bcXoff, 0x5C
+
+
+

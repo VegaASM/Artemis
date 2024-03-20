@@ -1,0 +1,21 @@
+
+array struct
+0x0 = boot.bin pointer
+0x8 = boot.bin size
+0x10 = boot.dol pointer
+0x18 = boot.dol size
+0x20 = register bank pointer
+0x28 = mem1 base pointer
+0x30 = mem2 base pointer
+0x38 = artemis.txt contents ptr
+0x40 = memory.txt contents ptr
+0x48 = L1 ins cache pointer
+0x50 = L2 ins cache pointer
+
+
+
+x27 = array pointer (aptr)
+from emumain
+
+
+
