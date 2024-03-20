@@ -28,7 +28,7 @@ input_error_msg:
 program_killed:
 .asciz "You've exited the simulation. Thank you for using Artemis.\n\n"
 successOUTPUT:
-.asciz "Instruction has been simulated/stepped. View localhost/artemis.txt in your web browser to see the changes.\n\n"
+.asciz "Instruction has been simulated/stepped. View/refresh www/artemis.txt & www/memory txt for changes.\n\n"
 welcomeMSG:
 .asciz "Welcome to Artemis!\n\nVersion: 0.1\n\nRelease Date: Mar 1, 2024\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
 fgets_error:
