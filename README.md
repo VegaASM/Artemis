@@ -14,9 +14,8 @@ You will also need a boot.dol file placed in the Artemis/dol folder. For more in
 
 I have boot.dol ready. How do I run Artemis?
 
-Launch the main executable. It's in the Artemis/simulator folder.
+You need to compile it from Source. View the COMPILING_and_DEBUG.txt for instructions. After compiling, move the main executable to the Repo Root directory, make it executable, and launch it...
 
-cd ./Simulator
 chmod +x ./main
 ./main
 
