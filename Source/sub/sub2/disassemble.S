@@ -393,7 +393,7 @@ ubfx \register, w19, 1, 5
 sbfx \register, w19, 0, 16
 .endm
 
-.macro d register
+.macro d register /*if weird bugs happen this macro name may not be accepted!*/
 sbfx \register, w19, 0, 16
 .endm
 
@@ -670,6 +670,267 @@ chkOpcode
 mov w1, andisRC
 bl first_check
 cbnz w0, andisRCfound
+/*bX*/
+chkOpcode
+mov w1, bX
+bl first_check
+cbnz w0, bXfound
+/*bcX*/
+chkOpcode
+mov w1, bcX
+bl first_check
+cbnz w0, bcXfound
+/*bcctrX*/
+b21_30
+movz w1, :abs_g1:bcctrX
+movk w1, :abs_g0_nc:bcctrX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, bcctrXfound
+/*bclr*/
+b21_30
+movz w1, :abs_g1:bclrX
+movk w1, :abs_g0_nc:bclrX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, bclrXfound
+/*cmpw*/
+chkOpcode
+mov w1, cmpw
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cmps1
+movk w0, :abs_g0_nc:check_cmps1
+bl second_check
+cbnz w0, cmpwfound
+/*cmpwi*/
+chkOpcode
+mov w1, cmpwi
+bl first_check
+cbz w0, 0xC
+check_cmpXwi
+cbz w0, cmpwifound
+/*cmplw*/
+b21_30
+movz w1, :abs_g1:cmplw
+movk w1, :abs_g0_nc:cmplw
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cmps2
+movk w0, :abs_g0_nc:check_cmps2
+bl second_check
+cbnz w0, cmplwfound
+/*cmplwi*/
+chkOpcode
+mov w1, cmplwi
+bl first_check
+cbz w0, 0xC
+check_cmpXwi
+cbz w0, cmplwifound
+/*cntlzwX*/
+b21_30
+movz w1, :abs_g1:cntlzwX
+movk w1, :abs_g0_nc:cntlzwX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, cntlzwXfound
+/*crand*/
+b21_30
+movz w1, :abs_g1:crand
+movk w1, :abs_g0_nc:crand
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crandfound
+/*crandc*/
+b21_30
+movz w1, :abs_g1:crandc
+movk w1, :abs_g0_nc:crandc
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crandcfound
+/*creqv*/
+b21_30
+movz w1, :abs_g1:creqv
+movk w1, :abs_g0_nc:creqv
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, creqvfound
+/*crnand*/
+b21_30
+movz w1, :abs_g1:crnand
+movk w1, :abs_g0_nc:crnand
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crnandfound
+/*crnor*/
+b21_30
+movz w1, :abs_g1:crnor
+movk w1, :abs_g0_nc:crnor
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crnorfound
+/*cror*/
+b21_30
+movz w1, :abs_g1:cror
+movk w1, :abs_g0_nc:cror
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crorfound
+/*crorc*/
+b21_30
+movz w1, :abs_g1:crorc
+movk w1, :abs_g0_nc:crorc
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crorcfound
+/*crxor*/
+b21_30
+movz w1, :abs_g1:crxor
+movk w1, :abs_g0_nc:crxor
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, crxorfound
+/*dcbf*/
+b21_30
+movz w1, :abs_g1:dcbf
+movk w1, :abs_g0_nc:dcbf
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbffound
+/*dcbi*/
+b21_30
+movz w1, :abs_g1:dcbi
+movk w1, :abs_g0_nc:dcbi
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbifound
+/*dcbst*/
+b21_30
+movz w1, :abs_g1:dcbst
+movk w1, :abs_g0_nc:dcbst
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbstfound
+/*dcbt*/
+b21_30
+movz w1, :abs_g1:dcbt
+movk w1, :abs_g0_nc:dcbt
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbtfound
+/*dcbtst*/
+b21_30
+movz w1, :abs_g1:dcbtst
+movk w1, :abs_g0_nc:dcbtst
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbtstfound
+/*dcbz*/
+b21_30
+movz w1, :abs_g1:dcbz
+movk w1, :abs_g0_nc:dcbz
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbzfound
+/*dcbz_l*/
+b21_30
+movz w1, :abs_g1:dcbz_l
+movk w1, :abs_g0_nc:dcbz_l
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, dcbz_lfound
+/*divwX*/
+b22_30
+movz w1, :abs_g1:divwX
+movk w1, :abs_g0_nc:divwX
+bl first_check
+cbnz w0, divwXfound
+/*divwuX*/
+b22_30
+movz w1, :abs_g1:divwuX
+movk w1, :abs_g0_nc:divwuX
+bl first_check
+cbnz w0, divwuXfound
+/*eciwx*/
+b21_30
+movz w1, :abs_g1:eciwx
+movk w1, :abs_g0_nc:eciwx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, eciwxfound
+/*ecowx*/
+b21_30
+movz w1, :abs_g1:ecowx
+movk w1, :abs_g0_nc:ecowx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, ecowxfound
+/*eieio*/
+b21_30
+movz w1, :abs_g1:eieio
+movk w1, :abs_g0_nc:eieio
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_syncs
+movk w0, :abs_g0_nc:check_syncs
+bl second_check
+cbnz w0, eieiofound
+/*eqvX*/
+b21_30
+movz w1, :abs_g1:eqvX
+movk w1, :abs_g0_nc:eqvX
+bl first_check
+cbnz w0, eqvXfound
+/*extsbX*/
+b21_30
+movz w1, :abs_g1:extsbX
+movk w1, :abs_g0_nc:extsbX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, extsbXfound
+/*extshX*/
+b21_30
+movz w1, :abs_g1:extshX
+movk w1, :abs_g0_nc:extshX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, extshXfound
 
 
 /*Found ill instruction*/
@@ -722,14 +983,38 @@ add x1, x1, :lo12: ins_addi
 b do_sprintf
 
 addicfound:
+rD w2
+rA w3
+SIMM w4
+cmp w4, 0
 mov w27, addic_ident
+blt 0x10
+adrp x1, ins_addic
+add x1, x1, :lo12: ins_addic
+b do_sprintf
+neg w4, w4
+adrp x1, ins_subic
+add x1, x1, :lo12: ins_subic
+b do_sprintf
 
 addicRCfound:
+rD w2
+rA w3
+SIMM w4
+cmp w4, 0
 mov w27, addicRC_ident
+blt 0x10
+adrp x1, ins_addic_
+add x1, x1, :lo12: ins_addic_
+b do_sprintf
+neg w4, w4
+adrp x1, ins_subic_
+add x1, x1, :lo12: ins_subic_
+b do_sprintf
 
 addisfound:
 rD w2
-rD w3
+rA w3
 UIMM w4
 cmp w3, 0
 mov w27, addis_ident
@@ -744,157 +1029,622 @@ add x1, x1, :lo12: ins_addis
 b do_sprintf
 
 addmeXfound:
+rD w2
+rA w3
+adrp x1, ins_addme
+add x1, x1, :lo12: ins_addme
 mov w27, addme_ident
-
+b do_sprintf
 
 addzeXfound:
+rD w2
+rA w3
+adrp x1, ins_addze
+add x1, x1, :lo12: ins_addze
 mov w27, addze_ident
-
+b do_sprintf
 
 andXfound:
+rA w2
+rS w3
+rB w4
+adrp x1, ins_and
+add x1, x1, :lo12: ins_and
 mov w27, and_ident
+b do_sprintf
 
 andcXfound:
+rA w2
+rS w3
+rB w4
+adrp x1, ins_andc
+add x1, x1, :lo12: ins_andc
 mov w27, andc_ident
+b do_sprintf
 
 andiRCfound:
+rA w2
+rS w3
+UIMM w4
+adrp x1, ins_andi_
+add x1, x1, :lo12: ins_andi_
 mov w27, andiRC_ident
+b do_sprintf
 
 andisRCfound:
+rA w2
+rS w3
+UIMM w4
+adrp x1, ins_andis_
+add x1, x1, :lo12: ins_andis_
 mov w27, andisRC_ident
+b do_sprintf
 
 bXfound:
+LI_SIMM w2
+adrp x1, ins_b
+add x1, x1, :lo12: ins_b
 mov w27, b_ident
-
+b do_sprintf
 
 bcXfound:
+//TODO!
+adrp x1, ins_bc
+add x1, x1, :lo12: ins_bc
 mov w27, bc_ident
-
+b do_sprintf
 
 bcctrXfound:
+//TODO!
+adrp x1, ins_bcctr
+add x1, x1, :lo12: ins_bcctr
 mov w27, bcctr_ident
+b do_sprintf
 
 bclrXfound:
+//TODO!
+adrp x1, ins_bclr
+add x1, x1, :lo12: ins_bclr
 mov w27, bclr_ident
-
+b do_sprintf
 
 cmpwfound:
+//TODO!
+adrp x1, ins_cmpw
+add x1, x1, :lo12: ins_cmpw
+mov w27, cmp_ident
+b do_sprintf
 
 cmpwifound:
+//TODO!
+adrp x1, ins_cmpwi
+add x1, x1, :lo12: ins_cmpwi
+mov w27, cmpi_ident
+b do_sprintf
 
 cmplwfound:
+//TODO!
+adrp x1, ins_cmplw
+add x1, x1, :lo12: ins_cmplw
+mov w27, cmpl_ident
+b do_sprintf
 
 cmplwifound:
+//TODO!
+adrp x1, ins_cmplwi
+add x1, x1, :lo12: ins_cmplwi
+mov w27, cmpli_ident
+b do_sprintf
 
 cntlzwXfound:
+rA w2
+rS w3
+adrp x1, ins_cntlzw
+add x1, x1, :lo12: ins_cntlzw
+mov w27, cntlzw_ident
+b do_sprintf
 
 crandfound:
+crbD w2
+crbA w3
+crbB w4
+adrp x1, ins_crand
+add x1, x1, :lo12: ins_crand
+mov w27, crand_ident
+b do_sprintf
 
 crandcfound:
+crbD w2
+crbA w3
+crbB w4
+adrp x1, ins_crandc
+add x1, x1, :lo12: ins_crandc
+mov w27, crandc_ident
+b do_sprintf
 
 creqvfound:
+crbD w2
+crbA w3
+crbB w4
+cmp w2, w3
+mov w27, creqv_ident
+bne not_crset
+cmp w2, w4
+bne not_crset
+adrp x1, ins_crset
+add x1, x1, :lo12: ins_crset
+b do_sprintf
+not_crset:
+adrp x1, ins_creqv
+add x1, x1, :lo12: ins_creqv
+b do_sprintf
 
 crnandfound:
+crbD w2
+crbA w3
+crbB w4
+adrp x1, ins_crnand
+add x1, x1, :lo12: ins_crnand
+mov w27, crnand_ident
+b do_sprintf
 
 crnorfound:
+crbD w2
+crbA w3
+crbB w4
+cmp w3, w4
+mov w27, crnor_ident
+bne not_crnot
+adrp x1, ins_crnot
+add x1, x1, :lo12: ins_crnot
+b do_sprintf
+not_crnot:
+adrp x1, ins_crnor
+add x1, x1, :lo12: ins_crnor
+b do_sprintf
 
 crorfound:
+crbD w2
+crbA w3
+crbB w4
+cmp w3, w4
+mov w27, cror_ident
+bne not_crmove
+adrp x1, ins_crmove
+add x1, x1, :lo12: ins_crmove
+b do_sprintf
+not_crmove:
+adrp x1, ins_crmove
+add x1, x1, :lo12: ins_crmove
+b do_sprintf
 
 crorcfound:
+crbD w2
+crbA w3
+crbB w4
+adrp x1, ins_crorc
+add x1, x1, :lo12: ins_crorc
+mov w27, crorc_ident
+b do_sprintf
 
 crxorfound:
+crbD w2
+crbA w3
+crbB w4
+cmp w2, w3
+mov w27, crxor_ident
+bne not_crclr
+cmp w2, w4
+bne not_crclr
+adrp x1, ins_crclr
+add x1, x1, :lo12: ins_crclr
+b do_sprintf
+not_crclr:
+adrp x1, ins_crxor
+add x1, x1, :lo12: ins_crxor
+b do_sprintf
 
 dcbffound:
+rA w2
+rB w3
+adrp x1, ins_dcbf
+add x1, x1, :lo12: ins_dcbf
+mov w27, dcbf_ident
+b do_sprintf
 
 dcbifound:
+rA w2
+rB w3
+adrp x1, ins_dcbi
+add x1, x1, :lo12: ins_dcbi
+mov w27, dcbi_ident
+b do_sprintf
 
 dcbstfound:
+rA w2
+rB w3
+adrp x1, ins_dcbst
+add x1, x1, :lo12: ins_dcbst
+mov w27, dcbst_ident
+b do_sprintf
 
 dcbtfound:
+rA w2
+rB w3
+adrp x1, ins_dcbt
+add x1, x1, :lo12: ins_dcbt
+mov w27, dcbt_ident
+b do_sprintf
 
 dcbtstfound:
+rA w2
+rB w3
+adrp x1, ins_dcbtst
+add x1, x1, :lo12: ins_dcbtst
+mov w27, dcbtst_ident
+b do_sprintf
 
 dcbzfound:
+rA w2
+rB w3
+adrp x1, ins_dcbz
+add x1, x1, :lo12: ins_dcbz
+mov w27, dcbz_ident
+b do_sprintf
 
 dcbz_lfound:
+rA w2
+rB w3
+adrp x1, ins_dcbz_l
+add x1, x1, :lo12: ins_dcbz_l
+mov w27, dcbz_l_ident
+b do_sprintf
 
 divwXfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_divw
+add x1, x1, :lo12: ins_divw
+mov w27, divw_ident
+b do_sprintf
 
 divwuXfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_divwu
+add x1, x1, :lo12: ins_divwu
+mov w27, divwu_ident
+b do_sprintf
 
 eciwxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_eciwx
+add x1, x1, :lo12: ins_eciwx
+mov w27, eciwx_ident
+b do_sprintf
 
 ecowxfound:
+rS w2
+rA w3
+rB w4
+adrp x1, ins_ecowx
+add x1, x1, :lo12: ins_ecowx
+mov w27, ecowx_ident
+b do_sprintf
 
 eieiofound:
+adrp x1, ins_eieio
+add x1, x1, :lo12: ins_eieio
+mov w27, eieio_ident
+b do_sprintf
 
 eqvXfound:
+rA w2
+rS w3
+rB w4
+adrp x1, ins_eqv
+add x1, x1, :lo12: ins_eqv
+mov w27, eqv_ident
+b do_sprintf
 
 extsbXfound:
+rA w2
+rS w3
+adrp x1, ins_extsb
+add x1, x1, :lo12: ins_extsb
+mov w27, extsb_ident
+b do_sprintf
 
 extshXfound:
+rA w2
+rS w3
+adrp x1, ins_extsh
+add x1, x1, :lo12: ins_extsh
+mov w27, extsh_ident
+b do_sprintf
 
 fabsXfound:
+fD w2
+fB w3
+adrp x1, ins_fabs
+add x1, x1, :lo12: ins_fabs
+mov w27, fabs_ident
+b do_sprintf
 
 faddXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fadd
+add x1, x1, :lo12: ins_fadd
+mov w27, fadd_ident
+b do_sprintf
 
 faddsXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fadds
+add x1, x1, :lo12: ins_fadds
+mov w27, fadds_ident
+b do_sprintf
 
 fcmpofound:
+crfD w2
+fA w3
+fB w4
+adrp x1, ins_fcmpo
+add x1, x1, :lo12: ins_fcmpo
+mov w27, fcmpo_ident
+b do_sprintf
 
 fcmpufound:
+crfD w2
+fA w3
+fB w4
+adrp x1, ins_fcmpu
+add x1, x1, :lo12: ins_fcmpu
+mov w27, fcmpu_ident
+b do_sprintf
 
 fctiwXfound:
+fD w2
+fB w3
+adrp x1, ins_fctiw
+add x1, x1, :lo12: ins_fctiw
+mov w27, fctiw_ident
+b do_sprintf
 
 fctiwzXfound:
+fD w2
+fB w3
+adrp x1, ins_fctiwz
+add x1, x1, :lo12: ins_fctiwz
+mov w27, fctiwz_ident
+b do_sprintf
 
 fdivXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fdiv
+add x1, x1, :lo12: ins_fdiv
+mov w27, fdiv_ident
+b do_sprintf
 
 fdivsXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fdivs
+add x1, x1, :lo12: ins_fdivs
+mov w27, fdivs_ident
+b do_sprintf
 
 fmaddXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fmadd
+add x1, x1, :lo12: ins_fmadd
+mov w27, fmadd_ident
+b do_sprintf
 
-fmadsXfound:
+fmaddsXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fmadds
+add x1, x1, :lo12: ins_fmadds
+mov w27, fmadds_ident
+b do_sprintf
 
 fmrXfound:
+fD w2
+fB w3
+adrp x1, ins_fmr
+add x1, x1, :lo12: ins_fmr
+mov w27, fmr_ident
+b do_sprintf
 
 fmsubXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fmsub
+add x1, x1, :lo12: ins_fmsub
+mov w27, fmsub_ident
+b do_sprintf
 
 fmsubsXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fmsubs
+add x1, x1, :lo12: ins_fmsubs
+mov w27, fmsubs_ident
+b do_sprintf
 
 fmulXfound:
+fD w2
+fA w3
+fC w4
+adrp x1, ins_fmul
+add x1, x1, :lo12: ins_fmul
+mov w27, fmul_ident
+b do_sprintf
 
 fmulsXfound:
+fD w2
+fA w3
+fC w4
+adrp x1, ins_fmuls
+add x1, x1, :lo12: ins_fmuls
+mov w27, fmuls_ident
+b do_sprintf
 
 fnabsXfound:
+fD w2
+fB w3
+adrp x1, ins_fnabs
+add x1, x1, :lo12: ins_fnabs
+mov w27, fnabs_ident
+b do_sprintf
 
 fnegXfound:
+fD w2
+fB w3
+adrp x1, ins_fneg
+add x1, x1, :lo12: ins_fneg
+mov w27, fneg_ident
+b do_sprintf
 
 fnmaddXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fnmadd
+add x1, x1, :lo12: ins_fnmadd
+mov w27, fnmadd_ident
+b do_sprintf
 
 fnmaddsXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fnmadds
+add x1, x1, :lo12: ins_fnmadds
+mov w27, fnmadds_ident
+b do_sprintf
 
 fnmsubXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fnmsub
+add x1, x1, :lo12: ins_fnmsub
+mov w27, fnmsub_ident
+b do_sprintf
 
 fnmsubsXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fnmsubs
+add x1, x1, :lo12: ins_fnmsubs
+mov w27, fnmsubs_ident
+b do_sprintf
 
 fresXfound:
+fD w2
+fB w3
+adrp x1, ins_fres
+add x1, x1, :lo12: ins_fres
+mov w27, fres_ident
+b do_sprintf
 
 frspXfound:
+fD w2
+fB w3
+adrp x1, ins_frsp
+add x1, x1, :lo12: ins_frsp
+mov w27, frsp_ident
+b do_sprintf
 
 frsqrteXfound:
+fD w2
+fB w3
+adrp x1, ins_frsqrte
+add x1, x1, :lo12: ins_frsqrte
+mov w27, frsqrte_ident
+b do_sprintf
 
 fselXfound:
+fD w2
+fA w3
+fC w4
+fB w5
+adrp x1, ins_fsel
+add x1, x1, :lo12: ins_fsel
+mov w27, fsel_ident
+b do_sprintf
 
 fsubXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fsub
+add x1, x1, :lo12: ins_fsub
+mov w27, fsub_ident
+b do_sprintf
 
 fsubsXfound:
+fD w2
+fA w3
+fB w4
+adrp x1, ins_fsubs
+add x1, x1, :lo12: ins_fsubs
+mov w27, fsubs_ident
+b do_sprintf
 
 icbifound:
+rA w2
+rB w3
+adrp x1, ins_icbi
+add x1, x1, :lo12: ins_icbi
+mov w27, icbi_ident
+b do_sprintf
+
+isyncfound:
+adrp x1, ins_isync
+add x1, x1, :lo12: ins_isync
+mov w27, isync_ident
+b do_sprintf
 
 lbzfound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lbz
+add x1, x1, :lo12: ins_lbz
+mov w27, lbz_ident
+b do_sprintf
 
 lbzufound:
+//TODO idk if secondary check goes here or within initial checks
+
 
 lbzuxfound:
 

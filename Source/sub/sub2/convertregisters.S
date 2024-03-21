@@ -139,7 +139,7 @@ add x19, x19, x0 /*Move cursor forward*/
 /*sprintf MISC2 regs*/
 adr x1, MISC2
 mov x0, x19
-ldr x2, [x20, tb] /*extended register, double-word width*/
+ldr x2, [x20, tbu] /*extended register, double-word width*/
 ldr w3, [x20, fpscr]
 ldr w4, [x20, dsisr]
 ldr w5, [x20, dar]

@@ -55,8 +55,8 @@ ppc_idents:
 .set fctiwz_ident, 91
 .set fdiv_ident, 93
 .set fdivs_ident, 95
-.set fnmadd_ident, 97
-.set fnmadds_ident, 99
+.set fmadd_ident, 97
+.set fmadds_ident, 99
 .set fmr_ident, 101
 .set fmsub_ident, 103
 .set fmsubs_ident, 105

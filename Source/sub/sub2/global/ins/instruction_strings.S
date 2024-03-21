@@ -1,3 +1,5 @@
+/*There are plenty of strings here not used (i.e RC and OE versions), but might as well keep them just in case...*/
+
 ins_add:
 .asciz "add r%d, r%d, r%d"
 ins_add_:
@@ -27,15 +29,23 @@ ins_addeo_:
 
 ins_addi:
 .asciz "addi r%d, r%d, 0x%X"
+ins_subi:
+.asciz "subi r%d, r%d, 0x%X"
 
 ins_addic:
 .asciz "addic r%d, r%d, 0x%X"
+ins_subic:
+.asciz "subic r%d, r%d, 0x%X"
 
 ins_addic_:
 .asciz "addic. r%d, r%d, 0x%X"
+ins_subic_:
+.asciz "subic. r%d, r%d, 0x%X"
 
 ins_addis:
 .asciz "addis r%d, r%d, 0x%X"
+ins_subis:
+.asciz "subis r%d, r%d, 0x%X"
 
 ins_addme:
 .asciz "addme r%d, r%d"
@@ -81,20 +91,22 @@ ins_bla:
 .asciz "bla 0x%X"
 
 //Standard branch conditional mnemonics NOT needed in disassembler
-//ins_bc:
-//.asciz "bc %d, %d, 0x%X"
+
+//NOTE NOTE some of these temped uncommented so project can compile. recomment these out once we way in future, do all the branch simplified mnemonics
+ins_bc:
+.asciz "bc %d, %d, 0x%X"
 //ins_bca:
 //.asciz "bca %d, %d, 0x%X"
 //ins_bcl:
 //.asciz "bcl %d, %d, 0x%X"
 //ins_bcla:
 //.asciz "bcla %d, %d, 0x%X"
-//ins_bcctr:
-//.asciz "bcctr %d, %d"
+ins_bcctr:
+.asciz "bcctr %d, %d"
 //ins_bcctrl:
 //.asciz "bcctrl %d, %d"
-//ins_bclr:
-//.asciz "bclr %d, %d"
+ins_bclr:
+.asciz "bclr %d, %d"
 //ins_bclrl:
 //.asciz "bclrl %d, %d"
 
