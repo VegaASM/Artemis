@@ -73,7 +73,8 @@ registerbankmap:
 .set msr, 0x194
 .set srr0, 0x198
 .set srr1, 0x19C
-.set tb, 0x1A0
+.set tbu, 0x1A0
+.set tbl, 0x1A4
 .set fpscr, 0x1A8 /*cuz double width for TB*/
 .set dsisr, 0x1AC
 .set dar, 0x1B0

@@ -1,0 +1,21 @@
+Debugging (assumes you have packages installed from Step 1 of Compiling):
+
+Step 1: Run main with QEMU (process will stall, this is normal)
+qemu-aarch64 -g 1234 ./main
+
+Step 2: While leaving Step 1's Terminal intact, open a different terminal in same directory and run this GDB command
+gdb-multiarch -q --nh \
+  -ex 'set architecture aarch64' \
+  -ex 'file main' \
+  -ex 'target remote localhost:1234' \
+  -ex 'break main' \
+  -ex continue \
+  -ex 'layout split' \
+  -ex 'layout regs'
+
+GDB quick guide (use Google for help with other commands):
+stepi = step instruction
+break *0xX = breakpoint at address, X = address (i.e. break *0x100008FC)
+del X = delete breakpoint via its assigned number. whenever you set or hit a bp, GDB will show the BP's assigned number
+continue = run program after hitting break point
+quit = exits GDB and properly ends the QEMU emulation. Be sure to always quit GDB first before closing the qemu terminal

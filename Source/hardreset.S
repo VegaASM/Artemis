@@ -45,7 +45,7 @@ str w1, [x0, hid1]
 str w1, [x0, hid2]
 str w1, [x0, fpscr]
 str w1, [x0, xer]
-str x1, [x0, tb] /*Null out entire TBR*/
+str x1, [x0, tbu] /*Null out entire TBR*/
 str x1, [x0, srr0] /*Null out both srr's*/
 str w1, [x0, sdr1]
 str w1, [x0, sprg0] /*Null out all sprg's, Can no longer use doubleword store due to IMM limitations*/

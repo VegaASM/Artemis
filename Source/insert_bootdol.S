@@ -2,7 +2,6 @@
 /*#include "sub/sub2/global/registerbankmap.S" Already in hardreset.S*/
 
 /*
-x0 = boot.dol pointer
 x0 returns 0 = success
 x0 returns insertdolEC ptr for error
 */
@@ -18,6 +17,8 @@ x27 Array contents
 0x30 = Mem2 ptr
 */
 
+insertdolBSSec:
+.asciz "Error! Invalid BSS address found in the boot.dol!"
 insertdolEC:
 .asciz "Error! Invalid entry point found in the boot.dol!"
 .align 2
@@ -30,12 +31,40 @@ stp x19, x20, [sp, 0x10]
 stp x21, x22, [sp, 0x20]
 stp x23, x24, [sp, 0x30]
 
+/*Grab boot.dol ptr from x27 array*/
+ldr x0, [x27, 0x10]
+
 /*Save Arg 2 times*/
 mov x19, x0
 mov x20, x0
 
-/*TODO put in code for BSS stuff*/
+/*Get BSS size*/
+ldr w2, [x0, 0xDC]
+cmp w2, 0
+beq set_outermain_loopcounter
+
+/*Get & Verify BSS ppc mem address*/
+ldr w0, [x0, 0xD8]
+rev w0, w0
+cmp w0, 0
+blo invalid_bss_addr //unsigned less than
+tst w0, 3
+bne invalid_bss_addr //32-bit (word) alignment check
+movz w1, 0x017F, lsl 16
+movk w1, 0xFFFC
+cmp w0, w1
+bhs invalid_bss_addr //unsigned greater than or equal to
+/*Change fake ppc addr to real addr*/
+/*w0 already set; x0 returns real addr*/
+bl convert
+/*Do the BSS!*/
+mov w1, 0
+strb w1, [x0], 1
+subs w2, w2, 1
+bne -0x8
+
 /*Set Outer/Main Loop Counter in non-volatile register*/
+set_outermain_loopcounter:
 mov w21, 18 /*There are 7 Text sections and 11 Data sections*/
 
 /*Set a register to point at boot.dol's loading addr for text0 section size*/
@@ -96,14 +125,21 @@ ldr x1, [x27, 0x20]
 str w0, [x1, pc]
 
 /*Success, free boot.dol malloc'd memory and return 0*/
-ldr x0, [x27, 0x10]
+mov x0, x19
 bl free
 mov w0, 0
 b insert_dol_epilogue
 
 /*Error, free boot.dol malloc'd memory and return pointer for puts*/
+invalid_bss_addr:
+mov x0, x19
+bl free
+adr x0, insertdolBSSec
+b insert_dol_epilogue
+
+/*Error, free boot.dol malloc'd memory and return pointer for puts*/
 invalid_entry_point:
-ldr x0, [x27, 0x10]
+mov x0, x19
 bl free
 adr x0, insertdolEC
 

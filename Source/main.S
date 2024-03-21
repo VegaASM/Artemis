@@ -75,9 +75,7 @@ bne -0x8*/
 /*Do a hard reset*/
 bl hardreset /*Does *NOT* return an error, always works*/
 
-/*Attempt to place the boot.dol into simulated mem1
-x0 arg = ptr to boot.dol*/
-ldr x0, [x27, 0x10]
+/*Attempt to place the boot.dol into simulated mem1*/
 bl insert_bootdol
 cbnz x0, output_console
 

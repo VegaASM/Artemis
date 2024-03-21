@@ -210,7 +210,7 @@ addic_ppc:
 ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
-cmp w3, 0
+cmp w3, 0 //literal 0 rule for rA
 lsl w3, w3, 2
 ldr w4, [x0, SIMMoff] //get SIMM
 beq 0x8
@@ -231,7 +231,7 @@ addicRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
-cmp w3, 0
+cmp w3, 0 //literal 0 rule for rA
 lsl w3, w3, 2
 ldr w4, [x0, SIMMoff] //get SIMM
 beq 0x8
@@ -356,15 +356,30 @@ cmpli_ppc:
 pc_adjust 0x4
 ret
 
-//cntlzw
+//cntlzw rA, rS
 .globl cntlzw_ppc
 cntlzw_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+clz w3, w3 //cntlzw::ppc
+str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//cntlzw
+//cntlzw. rA, rS
 .globl cntlzwRC_ppc
 cntlzwRC_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+clz w3, w3 //cntlzwRC::ppc
+str w3, [x1, x2] //write rA
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -512,7 +527,136 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//neg
+//mulhw rD, rA, rB
+.globl mulhw_ppc
+mulhw_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+smull x3, w3, w4 //mulhw::ppc
+asr x3, x3, 32 //place upper 32-bits of 64-bit signed result into lower 32-bits of register
+str w3, [x1, x2] //write rD
+pc_adjust 0x4
+ret
+
+//mulhw. rD, rA, rB
+.globl mulhwRC_ppc
+mulhwRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+smull x3, w3, w4 //mulhw::ppc
+asr x3, x3, 32 //place upper 32-bits of 64-bit signed result into lower 32-bits of register
+str w3, [x1, x2] //write rD
+record_feature w3
+pc_adjust 0x4
+ret
+
+//mulhwu rD, rA, rB
+.globl mulhwu_ppc
+mulhwu_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+umull x3, w3, w4 //mulhwu::ppc
+lsr x3, x3, 32 //place upper 32-bits of 64-bit unsigned result into lower 32-bits of register
+str w3, [x1, x2] //write rD
+pc_adjust 0x4
+ret
+
+//mulhwu. rD, rA, rB
+.globl mulhwuRC_ppc
+mulhwuRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+umull x3, w3, w4 //mulhwu::ppc
+lsr x3, x3, 32 //place upper 32-bits of 64-bit unsigned result into lower 32-bits of register
+str w3, [x1, x2] //write rD
+record_feature w3
+pc_adjust 0x4
+ret
+
+//mulli rD, rA, SIMM
+.globl mulli_ppc
+mulli_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, SIMMoff] //get SIMM
+ldr w3, [x1, x3] //grab rA's value
+mul w3, w3, w4 //mulli::ppc
+str w3, [x1, x2] //write rD
+pc_adjust 0x4
+ret
+
+//mullw rD, rA, rB
+.globl mullw_ppc
+mullw_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mul w3, w3, w4 //mullw::ppc
+str w3, [x1, x2] //write rD
+pc_adjust 0x4
+ret
+
+//mullw. rD, rA, rB
+.globl mullwRC_ppc
+mullwRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mul w3, w3, w4 //mullwRC::ppc
+str w3, [x1, x2] //write rD
+record_feature w3
+pc_adjust 0x4
+ret
+
+//mullwo rD, rA, rB
+.globl mullwo_ppc
+mullwo_ppc:
+pc_adjust 0x4
+ret
+
+//mullwo. rD, rA, rB
+.globl mullwoRC_ppc
+mullwoRC_ppc:
+pc_adjust 0x4
+ret
+
+//neg rD, rA
 .globl neg_ppc
 neg_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -525,7 +669,7 @@ str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
-//neg.
+//neg. rD, rA
 .globl negRC_ppc
 negRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
