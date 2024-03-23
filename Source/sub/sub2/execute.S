@@ -9,6 +9,7 @@
 #include "global/ins/other.S"
 #include "global/ins/paired_singles.S"
 #include "global/ins/parameter.S"
+#include "global/ins/rotate_shift.S"
 
 func_table:
 .xword add_ppc
@@ -147,7 +148,6 @@ func_table:
 .xword fsubsRC_ppc
 .xword icbi_ppc
 .xword isync_ppc
-/*
 .xword lbz_ppc
 .xword lbzu_ppc
 .xword lbzux_ppc
@@ -191,9 +191,9 @@ func_table:
 .xword mftb_ppc
 .xword mtcrf_ppc
 .xword mtfsb0_ppc
-.xword mffsb0RC_ppc
+.xword mtfsb0RC_ppc
 .xword mtfsb1_ppc
-.xword mffsb1RC_ppc
+.xword mtfsb1RC_ppc
 .xword mtfsf_ppc
 .xword mtfsfRC_ppc
 .xword mtfsfi_ppc
@@ -360,8 +360,7 @@ func_table:
 .xword xorRC_ppc
 .xword xori_ppc
 .xword xoris_ppc
-*/
-
+.xword invalid_ppc
 
 ins_sim_EC:
 .asciz "Error! Something bad happened during the instruction execution. It's 1: A checkstop occurred on a Machine Check when Machine Checks were disabled. 2: A checkstop that bypasses Machine Checks occurred. 3: Unknown error occurred."

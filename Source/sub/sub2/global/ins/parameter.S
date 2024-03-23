@@ -335,6 +335,24 @@ ret
 //cmp
 .globl cmp_ppc
 cmp_ppc:
+ldr w2, [x0, rAoff] //Load rA number
+lsl w2, w2, 2
+ldr w3, [x0, rBoff] //Load rB number
+lsl w3, w3, 2
+ldr w2, [x1, x2] //Load rA Value
+ldr w3, [x1, x2] //Load rB Value
+ldr w4, [x0, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//crap here...
+cmp w2, w3
+mrs x6, nzcv
+ubfx w7, w6, 31, 1 //Get N flag
+ubfx w8, w6, 30, 1 //Get Z flag
+ubfx w9, w6, 29, 1 //Get C flag
+ubfx w10, w6, 28, 1 //Get V flag
+//figure out later...
+
+//TODO finish this!
 pc_adjust 0x4
 ret
 
@@ -697,5 +715,107 @@ negoRC_ppc:
 pc_adjust 0x4
 ret
 
+.globl subf_ppc
+subf_ppc:
+pc_adjust 0x4
+ret
 
+.globl subfRC_ppc
+subfRC_ppc:
+pc_adjust 0x4
+ret
 
+.globl subfo_ppc
+subfo_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfoRC_ppc
+subfoRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfc_ppc
+subfc_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfcRC_ppc
+subfcRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfco_ppc
+subfco_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfcoRC_ppc
+subfcoRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfe_ppc
+subfe_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfeRC_ppc
+subfeRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfeo_ppc
+subfeo_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfeoRC_ppc
+subfeoRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfic_ppc
+subfic_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfme_ppc
+subfme_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfmeRC_ppc
+subfmeRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfmeo_ppc
+subfmeo_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfmeoRC_ppc
+subfmeoRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfze_ppc
+subfze_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfzeRC_ppc
+subfzeRC_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfzeo_ppc
+subfzeo_ppc:
+pc_adjust 0x4
+ret
+
+.globl subfzeoRC_ppc
+subfzeoRC_ppc:
+pc_adjust 0x4
+ret

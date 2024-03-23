@@ -600,38 +600,45 @@ movz w1, :abs_g1: addX
 movk w1, :abs_g0_nc: addX
 bl first_check
 cbnz w0, addXfound
+
 /*addcX*/
 b22_30
 movz w1, :abs_g1: addcX
 movk w1, :abs_g0_nc: addcX
 bl first_check
 cbnz w0, addcXfound
+
 /*addeX*/
 b22_30
 movz w1, :abs_g1: addeX
 movk w1, :abs_g0_nc: addeX
 bl first_check
 cbnz w0, addeXfound
+
 /*addi*/
 chkOpcode
 mov w1, addi
 bl first_check
 cbnz w0, addifound
+
 /*addic*/
 chkOpcode
 mov w1, addic
 bl first_check
 cbnz w0, addicfound
+
 /*addicRC*/
 chkOpcode
 mov w1, addicRC
 bl first_check
 cbnz w0, addicRCfound
+
 /*addis*/
 chkOpcode
 mov w1, addis
 bl first_check
 cbnz w0, addisfound
+
 /*addmeX*/
 b22_30
 movz w1, :abs_g1:addmeX
@@ -640,6 +647,7 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, addmeXfound
+
 /*addzeX*/
 b22_30
 movz w1, :abs_g1:addzeX
@@ -648,38 +656,45 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, addzeXfound
+
 /*andX*/
 b21_30
 movz w1, :abs_g1:andX
 movk w1, :abs_g0_nc:andX
 bl first_check
 cbnz w0, andXfound
+
 /*andcX*/
 b21_30
 movz w1, :abs_g1:andcX
 movk w1, :abs_g0_nc:andcX
 bl first_check
 cbnz w0, andcXfound
+
 /*andi.*/
 chkOpcode
 mov w1, andiRC
 bl first_check
 cbnz w0, andiRCfound
+
 /*andis.*/
 chkOpcode
 mov w1, andisRC
 bl first_check
 cbnz w0, andisRCfound
+
 /*bX*/
 chkOpcode
 mov w1, bX
 bl first_check
 cbnz w0, bXfound
+
 /*bcX*/
 chkOpcode
 mov w1, bcX
 bl first_check
 cbnz w0, bcXfound
+
 /*bcctrX*/
 b21_30
 movz w1, :abs_g1:bcctrX
@@ -688,6 +703,7 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, bcctrXfound
+
 /*bclr*/
 b21_30
 movz w1, :abs_g1:bclrX
@@ -696,6 +712,7 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, bclrXfound
+
 /*cmpw*/
 chkOpcode
 mov w1, cmpw
@@ -705,6 +722,7 @@ movz w0, :abs_g1:check_cmps1
 movk w0, :abs_g0_nc:check_cmps1
 bl second_check
 cbnz w0, cmpwfound
+
 /*cmpwi*/
 chkOpcode
 mov w1, cmpwi
@@ -712,6 +730,7 @@ bl first_check
 cbz w0, 0xC
 check_cmpXwi
 cbz w0, cmpwifound
+
 /*cmplw*/
 b21_30
 movz w1, :abs_g1:cmplw
@@ -722,6 +741,7 @@ movz w0, :abs_g1:check_cmps2
 movk w0, :abs_g0_nc:check_cmps2
 bl second_check
 cbnz w0, cmplwfound
+
 /*cmplwi*/
 chkOpcode
 mov w1, cmplwi
@@ -729,6 +749,7 @@ bl first_check
 cbz w0, 0xC
 check_cmpXwi
 cbz w0, cmplwifound
+
 /*cntlzwX*/
 b21_30
 movz w1, :abs_g1:cntlzwX
@@ -737,6 +758,7 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, cntlzwXfound
+
 /*crand*/
 b21_30
 movz w1, :abs_g1:crand
@@ -745,6 +767,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crandfound
+
 /*crandc*/
 b21_30
 movz w1, :abs_g1:crandc
@@ -753,6 +776,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crandcfound
+
 /*creqv*/
 b21_30
 movz w1, :abs_g1:creqv
@@ -761,6 +785,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, creqvfound
+
 /*crnand*/
 b21_30
 movz w1, :abs_g1:crnand
@@ -769,6 +794,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crnandfound
+
 /*crnor*/
 b21_30
 movz w1, :abs_g1:crnor
@@ -777,6 +803,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crnorfound
+
 /*cror*/
 b21_30
 movz w1, :abs_g1:cror
@@ -785,6 +812,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crorfound
+
 /*crorc*/
 b21_30
 movz w1, :abs_g1:crorc
@@ -793,6 +821,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crorcfound
+
 /*crxor*/
 b21_30
 movz w1, :abs_g1:crxor
@@ -801,6 +830,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, crxorfound
+
 /*dcbf*/
 b21_30
 movz w1, :abs_g1:dcbf
@@ -811,6 +841,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbffound
+
 /*dcbi*/
 b21_30
 movz w1, :abs_g1:dcbi
@@ -821,6 +852,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbifound
+
 /*dcbst*/
 b21_30
 movz w1, :abs_g1:dcbst
@@ -831,6 +863,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbstfound
+
 /*dcbt*/
 b21_30
 movz w1, :abs_g1:dcbt
@@ -841,6 +874,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbtfound
+
 /*dcbtst*/
 b21_30
 movz w1, :abs_g1:dcbtst
@@ -851,6 +885,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbtstfound
+
 /*dcbz*/
 b21_30
 movz w1, :abs_g1:dcbz
@@ -861,6 +896,7 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbzfound
+
 /*dcbz_l*/
 b21_30
 movz w1, :abs_g1:dcbz_l
@@ -871,18 +907,21 @@ movz w0, :abs_g1:check_cache
 movk w0, :abs_g0_nc:check_cache
 bl second_check
 cbnz w0, dcbz_lfound
+
 /*divwX*/
 b22_30
 movz w1, :abs_g1:divwX
 movk w1, :abs_g0_nc:divwX
 bl first_check
 cbnz w0, divwXfound
+
 /*divwuX*/
 b22_30
 movz w1, :abs_g1:divwuX
 movk w1, :abs_g0_nc:divwuX
 bl first_check
 cbnz w0, divwuXfound
+
 /*eciwx*/
 b21_30
 movz w1, :abs_g1:eciwx
@@ -891,6 +930,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, eciwxfound
+
 /*ecowx*/
 b21_30
 movz w1, :abs_g1:ecowx
@@ -899,6 +939,7 @@ bl first_check
 cbz w0, 0xC
 check_b31
 cbz w0, ecowxfound
+
 /*eieio*/
 b21_30
 movz w1, :abs_g1:eieio
@@ -909,12 +950,14 @@ movz w0, :abs_g1:check_syncs
 movk w0, :abs_g0_nc:check_syncs
 bl second_check
 cbnz w0, eieiofound
+
 /*eqvX*/
 b21_30
 movz w1, :abs_g1:eqvX
 movk w1, :abs_g0_nc:eqvX
 bl first_check
 cbnz w0, eqvXfound
+
 /*extsbX*/
 b21_30
 movz w1, :abs_g1:extsbX
@@ -923,6 +966,7 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, extsbXfound
+
 /*extshX*/
 b21_30
 movz w1, :abs_g1:extshX
@@ -931,6 +975,480 @@ bl first_check
 cbz w0, 0xC
 check_nullrB
 cbz w0, extshXfound
+
+/*fabsX*/
+b21_30
+movz w1, :abs_g1:fabsX
+movk w1, :abs_g0_nc:fabsX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fabsXfound
+
+/*faddX*/
+b26_30
+movz w1, :abs_g1:faddX
+movk w1, :abs_g0_nc:faddX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, faddXfound
+
+/*faddsX*/
+b26_30
+movz w1, :abs_g1:faddsX
+movk w1, :abs_g0_nc:faddsX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, faddsXfound
+
+/*fcmpo*/
+b21_30
+movz w1, :abs_g1:fcmpo
+movk w1, :abs_g0_nc:fcmpo
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cmps2
+movk w0, :abs_g0_nc:check_cmps2
+bl second_check
+cbnz w0, fcmpofound
+
+/*fcmpu*/
+b21_30
+movz w1, :abs_g1:fcmpu
+movk w1, :abs_g0_nc:fcmpu
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cmps1
+movk w0, :abs_g0_nc:check_cmps1
+bl second_check
+cbnz w0, fcmpufound
+
+/*fctiwX*/
+b21_30
+movz w1, :abs_g1:fctiwX
+movk w1, :abs_g0_nc:fctiwX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fctiwXfound
+
+/*fctiwzX*/
+b21_30
+movz w1, :abs_g1:fctiwzX
+movk w1, :abs_g0_nc:fctiwzX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fctiwzXfound
+
+/*fdivX*/
+b26_30
+movz w1, :abs_g1:fdivX
+movk w1, :abs_g0_nc:fdivX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, fdivXfound
+
+/*fdivsX*/
+b26_30
+movz w1, :abs_g1:fdivsX
+movk w1, :abs_g0_nc:fdivsX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, fdivsXfound
+
+/*fmaddX*/
+b26_30
+movz w1, :abs_g1:fmaddX
+movk w1, :abs_g0_nc:fmaddX
+bl first_check
+cbnz w0, fmaddXfound
+
+/*fmaddsX*/
+b26_30
+movz w1, :abs_g1:fmaddsX
+movk w1, :abs_g0_nc:fmaddsX
+bl first_check
+cbnz w0, fmaddsXfound
+
+/*fmrX*/
+b21_30
+movz w1, :abs_g1:fmrX
+movk w1, :abs_g0_nc:fmrX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fmrXfound
+
+/*fmsubX*/
+b26_30
+movz w1, :abs_g1:fmsubX
+movk w1, :abs_g0_nc:fmsubX
+bl first_check
+cbnz w0, fmsubXfound
+
+/*fmsubsX*/
+b26_30
+movz w1, :abs_g1:fmsubsX
+movk w1, :abs_g0_nc:fmsubsX
+bl first_check
+cbnz w0, fmsubsXfound
+
+/*fmulX*/
+b26_30
+movz w1, :abs_g1:fmulX
+movk w1, :abs_g0_nc:fmulX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, fmulXfound
+
+/*fmuls*/
+b26_30
+movz w1, :abs_g1:fmulsX
+movk w1, :abs_g0_nc:fmulsX
+bl first_check
+cbz w0, 0xC
+check_nullrB
+cbz w0, fmulsXfound
+
+/*fnabsX*/
+b21_30
+movz w1, :abs_g1:fnabsX
+movk w1, :abs_g0_nc:fnabsX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fnabsXfound
+
+/*fnegX*/
+b21_30
+movz w1, :abs_g1:fnegX
+movk w1, :abs_g0_nc:fnegX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, fnegXfound
+
+/*fnmaddX*/
+b26_30
+movz w1, :abs_g1:fnmaddX
+movk w1, :abs_g0_nc:fnmaddX
+bl first_check
+cbnz w0, fnmaddXfound
+
+/*fnmaddsX*/
+b26_30
+movz w1, :abs_g1:fnmaddsX
+movk w1, :abs_g0_nc:fnmaddsX
+bl first_check
+cbnz w0, fnmaddsXfound
+
+/*fnmsubX*/
+b26_30
+movz w1, :abs_g1:fnmsubX
+movk w1, :abs_g0_nc:fnmsubX
+bl first_check
+cbnz w0, fnmsubXfound
+
+/*fnmsubsX*/
+b26_30
+movz w1, :abs_g1:fnmsubsX
+movk w1, :abs_g0_nc:fnmsubsX
+bl first_check
+cbnz w0, fnmsubsXfound
+
+/*fresX*/
+b26_30
+movz w1, :abs_g1:fresX
+movk w1, :abs_g0_nc:fresX
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_res_sqrt
+movk w0, :abs_g0_nc:check_res_sqrt
+bl second_check
+cbnz w0, fresXfound
+
+/*frspX*/
+b21_30
+movz w1, :abs_g1:frspX
+movk w1, :abs_g0_nc:frspX
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbz w0, frspXfound
+
+/*frsqrteX*/
+b26_30
+movz w1, :abs_g1:frsqrteX
+movk w1, :abs_g0_nc:frsqrteX
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_res_sqrt
+movk w0, :abs_g0_nc:check_res_sqrt
+bl second_check
+cbnz w0, frsqrteXfound
+
+/*fselX*/
+b26_30
+movz w1, :abs_g1:fselX
+movk w1, :abs_g0_nc:fselX
+bl first_check
+cbnz w0, fselXfound
+
+/*fsubX*/
+b26_30
+movz w1, :abs_g1:fsubX
+movk w1, :abs_g0_nc:fsubX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, fsubXfound
+
+/*fsubsX*/
+b26_30
+movz w1, :abs_g1:fsubsX
+movk w1, :abs_g0_nc:fsubsX
+bl first_check
+cbz w0, 0xC
+check_nullfC
+cbz w0, fsubsXfound
+
+/*icbi*/
+b21_30
+movz w1, :abs_g1:icbi
+movk w1, :abs_g0_nc:icbi
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_cache
+movk w0, :abs_g0_nc:check_cache
+bl second_check
+cbnz w0, icbifound
+
+/*isync*/
+b21_30
+movz w1, :abs_g1:isync
+movk w1, :abs_g0_nc:isync
+bl first_check
+cbz w0, 0x14
+movz w0, :abs_g1:check_syncs
+movk w0, :abs_g0_nc:check_syncs
+bl second_check
+cbnz w0, icbifound
+
+/*lbz*/
+chkOpcode
+mov w1, lbz
+bl first_check
+cbnz w0, lbzfound
+
+/*lbzu*/
+chkOpcode
+mov w1, lbzu
+bl first_check
+cbz w0, 0xC
+bl lXzu_lXzux_special_check
+cbnz w0, lbzufound
+
+/*lbzux*/
+b21_30
+movz w1, :abs_g1:lbzux
+movk w1, :abs_g0_nc:lbzux
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+bl lXzu_lXzux_special_check
+cbnz w0, lbzuxfound
+
+/*lbzx*/
+b21_30
+movz w1, :abs_g1:lbzx
+movk w1, :abs_g0_nc:lbzx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, lbzxfound
+
+/*lfd*/
+chkOpcode
+mov w1, lfd
+bl first_check
+cbnz w0, lfdfound
+
+/*lfdu*/
+chkOpcode
+mov w1, lfdu
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbnz w0, lfdufound
+
+/*lfdux*/
+b21_30
+movz w1, :abs_g1:lfdux
+movk w1, :abs_g0_nc:lfdux
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+check_nullrA
+cbnz w0, lfduxfound
+
+/*lfdx*/
+b21_30
+movz w1, :abs_g1:lfdx
+movk w1, :abs_g0_nc:lfdx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, lfdxfound
+
+/*lfs*/
+chkOpcode
+mov w1, lfs
+bl first_check
+cbnz w0, lfsfound
+
+/*lfsu*/
+chkOpcode
+mov w1, lfsu
+bl first_check
+cbz w0, 0xC
+check_nullrA
+cbnz w0, lfsufound
+
+/*lfsux*/
+b21_30
+movz w1, :abs_g1:lfsux
+movk w1, :abs_g0_nc:lfsux
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+check_nullrA
+cbnz w0, lfsuxfound
+
+/*lfsx*/
+b21_30
+movz w1, :abs_g1:lfsx
+movk w1, :abs_g0_nc:lfsx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, lfsxfound
+
+/*lha*/
+chkOpcode
+mov w1, lha
+bl first_check
+cbnz w0, lhafound
+
+/*lhau*/
+chkOpcode
+mov w1, lhau
+bl first_check
+cbz w0, 0xC
+bl lXzu_lXzux_special_check
+cbnz w0, lhaufound
+
+/*lhaux*/
+b21_30
+movz w1, :abs_g1:lhaux
+movk w1, :abs_g0_nc:lhaux
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+bl lXzu_lXzux_special_check
+cbnz w0, lhauxfound
+
+/*lhax*/
+b21_30
+movz w1, :abs_g1:lhax
+movk w1, :abs_g0_nc:lhax
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, lhaxfound
+
+/*lhbrx*/
+b21_30
+movz w1, :abs_g1:lhbrx
+movk w1, :abs_g0_nc:lhbrx
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+bl lXzu_lXzux_special_check
+cbnz w0, lhbrxfound
+
+/*lhz*/
+chkOpcode
+mov w1, lhz
+bl first_check
+cbnz w0, lhzfound
+
+/*lhzu*/
+chkOpcode
+mov w1, lhzu
+bl first_check
+cbz w0, 0xC
+bl lXzu_lXzux_special_check
+cbnz w0, lhzufound
+
+/*lhzux*/
+b21_30
+movz w1, :abs_g1:lhzux
+movk w1, :abs_g0_nc:lhzux
+bl first_check
+cbz w0, 0x14
+check_b31
+cbnz w0, 0XC
+bl lXzu_lXzux_special_check
+cbnz w0, lhzuxfound
+
+/*lhzx*/
+b21_30
+movz w1, :abs_g1:lhzx
+movk w1, :abs_g0_nc:lhzx
+bl first_check
+cbz w0, 0xC
+check_b31
+cbz w0, lhzxfound
+
+/*lmw*/
+chkOpcode
+mov w1, lmw
+bl first_check
+cbz w0, 0x14
+ubfx w1, w19, 21, 5 /*rD*/
+ubfx w0, w19, 16, 5 /*rA*/
+cmp w0, w1 /*rA cannot be >= to rD*/
+blo lmwfound
+
+/*lswi*/
+b21_30
+movz w1, :abs_g1:lswi
+movk w1, :abs_g0_nc:lswi
+cbz w0, 0x2C
+check_b31
+cbnz w0, 0X24
+ubfx w2, w19, 11, 5 /*NB*/
+ubfx w0, w19, 21, 5 /*rD,*/
+ubfx w1, w19, 16, 5 /*rA*/
+cbnz w2, 0x8 /*0 NB is treated as 32*/
+mov w2, 32
+sub w0, w1, w0 /*Calc NB spill limit [(rA - rD) x 4]*/
+cmp w2, w0, lsl 2 /*NB vs NB sl*/
+bls lswifound
+
+
+
 
 
 /*Found ill instruction*/
@@ -1643,50 +2161,211 @@ mov w27, lbz_ident
 b do_sprintf
 
 lbzufound:
-//TODO idk if secondary check goes here or within initial checks
-
+rD w2
+d w3
+rA w4
+adrp x1, ins_lbzu
+add x1, x1, :lo12: ins_lbzu
+mov w27, lbzu_ident
+b do_sprintf
 
 lbzuxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lbzux
+add x1, x1, :lo12: ins_lbzux
+mov w27, lbzux_ident
+b do_sprintf
 
 lbzxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lbzx
+add x1, x1, :lo12: ins_lbzx
+mov w27, lbzx_ident
+b do_sprintf
 
 lfdfound:
+fD w2
+d w3
+rA w4
+adrp x1, ins_lfd
+add x1, x1, :lo12: ins_lfd
+mov w27, lfd_ident
+b do_sprintf
 
 lfdufound:
+fD w2
+d w3
+rA w4
+adrp x1, ins_lfdu
+add x1, x1, :lo12: ins_lfdu
+mov w27, lfdu_ident
+b do_sprintf
 
 lfduxfound:
+fD w2
+rA w3
+rB w4
+adrp x1, ins_lfdux
+add x1, x1, :lo12: ins_lfdux
+mov w27, lfdux_ident
+b do_sprintf
 
 lfdxfound:
+fD w2
+rA w3
+rB w4
+adrp x1, ins_lfdx
+add x1, x1, :lo12: ins_lfdx
+mov w27, lfdx_ident
+b do_sprintf
 
 lfsfound:
+fD w2
+d w3
+rA w4
+adrp x1, ins_lfs
+add x1, x1, :lo12: ins_lfs
+mov w27, lfs_ident
+b do_sprintf
 
 lfsufound:
+fD w2
+d w3
+rA w4
+adrp x1, ins_lfsu
+add x1, x1, :lo12: ins_lfsu
+mov w27, lfsu_ident
+b do_sprintf
 
 lfsuxfound:
+fD w2
+rA w3
+rB w4
+adrp x1, ins_lfsux
+add x1, x1, :lo12: ins_lfsux
+mov w27, lfsux_ident
+b do_sprintf
 
 lfsxfound:
+fD w2
+rA w3
+rB w4
+adrp x1, ins_lfsx
+add x1, x1, :lo12: ins_lfsx
+mov w27, lfsx_ident
+b do_sprintf
 
 lhafound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lha
+add x1, x1, :lo12: ins_lha
+mov w27, lha_ident
+b do_sprintf
 
 lhaufound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lhau
+add x1, x1, :lo12: ins_lhau
+mov w27, lhau_ident
+b do_sprintf
 
 lhauxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lhaux
+add x1, x1, :lo12: ins_lhaux
+mov w27, lhaux_ident
+b do_sprintf
 
 lhaxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lhax
+add x1, x1, :lo12: ins_lhax
+mov w27, lhax_ident
+b do_sprintf
 
 lhbrxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lhbrx
+add x1, x1, :lo12: ins_lhbrx
+mov w27, lhbrx_ident
+b do_sprintf
 
 lhzfound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lhz
+add x1, x1, :lo12: ins_lhz
+mov w27, lhz_ident
+b do_sprintf
 
 lhzufound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lhzu
+add x1, x1, :lo12: ins_lhzu
+mov w27, lhzu_ident
+b do_sprintf
 
 lhzuxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lhzux
+add x1, x1, :lo12: ins_lhzux
+mov w27, lhzux_ident
+b do_sprintf
 
 lhzxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lhzx
+add x1, x1, :lo12: ins_lhzx
+mov w27, lhzx_ident
+b do_sprintf
 
 lmwfound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lmw
+add x1, x1, :lo12: ins_lmw
+mov w27, lmw_ident
+b do_sprintf
 
 lswifound:
+rD w2
+rA w3
+NB w4
+adrp x1, ins_lswi
+add x1, x1, :lo12: ins_lswi
+mov w27, lswi_ident
+b do_sprintf
+
+lswxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lswx
+add x1, x1, :lo12: ins_lswx
+mov w27, lswx_ident
+b do_sprintf
 
 do_sprintf:
 mov x0, x20
@@ -1832,12 +2511,39 @@ tst w0, w19 /*2nd Mask & PPCInstruction*/
 cset w0, eq
 ret
 
+/*Special check for lbzu, lbzux, lhau, lhaux, lhzu, lhzux, lwzu, and lwzux*/
+/*1 = True (good), 0 = False (bad)*/
 lXzu_lXzux_special_check:
 ubfx w1, w19, 16, 5 /*Extract rD, right justified*/
 ubfx w0, w19, 21, 5 /*Extract rA, right justified*/
 cmp w1, 0
 ccmp w0, w1, 4, ne
 cset w0, eq
+ret
+
+/*Special check for..
+// lfdu, lfsu, psq_lu, psq_stu, stbu, stfdu, stfsu, sthu, stwu
+// lfdux, lfsux, psq_lux, psq_stux, stbux, stfdux, stfsux, sthux, stwux*/
+/*1 = True *good), 0 = False (bad)*/
+float_ps_update_and_store_update_special_check:
+tst w19, 0x1F0000
+cset w0, ne
+ret
+
+lmw_special_check:
+ubfx w1, w19, 21, 5
+ubfx w0, w19, 16, 5
+cmp w1, w0
+cset w0, hi
+ret
+
+lswi_special_check:
+ubfx w2, w19, 11, 5
+ubfx w1, w19, 16, 5
+ubfx w0, w19, 21, 5
+sub w0, w1, w0
+cmp w2, w0, lsl 2
+cset w0, cs
 ret
 
 /*x0 = string

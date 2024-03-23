@@ -59,6 +59,21 @@ isync_ppc:
 pc_adjust 0x4
 ret
 
+.globl mcrf_ppc
+mcrf_ppc:
+pc_adjust 0x4
+ret
+
+.globl mcrfs_ppc
+mcrfs_ppc:
+pc_adjust 0x4
+ret
+
+.globl mcrxr_ppc
+mcrxr_ppc:
+pc_adjust 0x4
+ret
+
 //mfcr rD
 .globl mfcr_ppc
 mfcr_ppc:
@@ -266,5 +281,12 @@ ret
 
 .globl twi_ppc
 twi_ppc:
+pc_adjust 0x4
+ret
+
+.globl invalid_ppc
+invalid_ppc:
+//TODO put in routine here to disable address translation, and other crap
+mov w2, 0x700
 pc_adjust 0x4
 ret

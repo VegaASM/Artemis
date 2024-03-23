@@ -1,6 +1,3 @@
-
-.globl registerbankmap
-registerbankmap:
 .set gpr0, 0
 .set gpr1, 4
 .set gpr2, 8
@@ -75,7 +72,7 @@ registerbankmap:
 .set srr1, 0x19C
 .set tbu, 0x1A0
 .set tbl, 0x1A4
-.set fpscr, 0x1A8 /*cuz double width for TB*/
+.set fpscr, 0x1A8
 .set dsisr, 0x1AC
 .set dar, 0x1B0
 .set hid0, 0x1B4
