@@ -2,6 +2,7 @@
 lbz_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -23,6 +24,7 @@ ret
 lbzu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -55,6 +57,7 @@ ret
 lha_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -76,6 +79,7 @@ ret
 lhau_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -113,6 +117,7 @@ ret
 lhz_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -134,6 +139,7 @@ ret
 lhzu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -191,6 +197,7 @@ ret
 lwz_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -212,6 +219,7 @@ ret
 lwzu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value

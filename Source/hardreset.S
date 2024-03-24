@@ -106,7 +106,7 @@ str w2, [x0, iabr]
 /*Set dec, msr, and pc*/
 mov w1, -1
 str w1, [x0, dec]
-mov w1, 0x40
+mov w1, 0 /*TODO change back to 0x40 once we implement boot.bin fully*/
 str w1, [x0, msr]
 mov w1, 0x3400
 /*movz w1, 0xFFF0, lsl 16  TODO implement in future versions

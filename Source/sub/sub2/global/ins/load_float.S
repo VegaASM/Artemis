@@ -4,6 +4,7 @@
 lfd_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -26,6 +27,7 @@ ret
 lfdu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -59,6 +61,7 @@ ret
 lfs_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -82,6 +85,7 @@ ret
 lfsu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value

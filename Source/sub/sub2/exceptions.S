@@ -24,11 +24,18 @@ reset_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x100
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -46,11 +53,18 @@ machine_check_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x200
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: mcheck_msr_mask
@@ -68,11 +82,18 @@ dsi_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x300
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -90,11 +111,18 @@ isi_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x400
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -112,11 +140,18 @@ exinterrupt_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x500
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -134,11 +169,18 @@ alignment_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x600
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -156,11 +198,18 @@ program_exception_vector:
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x700
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -174,14 +223,22 @@ ret
 
 .globl fp_exception_vector
 fp_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x800
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -195,14 +252,22 @@ ret
 
 .globl decrementer_exception_vector
 decrementer_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x900
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -216,14 +281,22 @@ ret
 
 .globl syscall_exception_vector
 syscall_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0xC00
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -237,14 +310,22 @@ ret
 
 .globl trace_exception_vector
 trace_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0xD00
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -258,14 +339,22 @@ ret
 
 .globl pm_exception_vector
 pm_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0xF00
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask
@@ -279,14 +368,22 @@ ret
 
 .globl iabr_exception_vector
 iabr_exception_vector:
+//Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
-//Set new PC
-mov w1, 0x1300
-str w1, [x0, pc]
-//Copy MSR to srr1
+//Check IP bit of msr
 ldr w1, [x0, msr]
+tst w1, msr_ip
+bne 0xC
+mov w2, 0
+b 0x8
+//Set High Exception Bits
+movz w2, 0xFFF0, lsl 16
+//OR in new PC
+orr w2, w2, 0x100
+str w2, [x0, pc]
+//Copy MSR to srr1
 str w1, [x0, srr1]
 //Set new MSR
 movz w2, :abs_g1: allotherexceptions_msr_mask

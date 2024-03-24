@@ -253,9 +253,10 @@ ret //do NOT use PC adjust macro!
 
 .globl sc_ppc
 sc_ppc:
-//TODO put in routine here to disable address translation, and other crap
-mov w2, 0xC00
-str w2, [x1, pc]
+stp fp, lr, [sp, -0x10]!
+mov fp, sp
+bl syscall_exception_vector
+ldp fp, lr, [sp], 0x10
 ret
 
 .globl sync_ppc
@@ -287,6 +288,7 @@ ret
 .globl invalid_ppc
 invalid_ppc:
 stp fp, lr, [sp, -0x10]!
+mov fp, sp
 bl program_exception_vector
 ldp fp, lr, [sp], 0x10
 ret

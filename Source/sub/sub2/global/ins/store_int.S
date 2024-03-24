@@ -2,6 +2,7 @@
 stb_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -23,6 +24,7 @@ ret
 stbu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -55,6 +57,7 @@ ret
 sth_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -81,6 +84,7 @@ ret
 sthu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -128,6 +132,7 @@ ret
 stw_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -159,6 +164,7 @@ ret
 stwu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
+mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value

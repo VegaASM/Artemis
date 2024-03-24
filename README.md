@@ -32,7 +32,7 @@ To eventually be able to accurately simulate every Wii-Broadway register, and in
 
 -----
 
-Version: 0.0-r021
+Version: 0.0-r022
 
 Status: Compiles. Untested. Most likely will just fault.
 
