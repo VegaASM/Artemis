@@ -82,8 +82,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fadd v3.1s, v3.1s, v4.1s //fadds::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fadd v3.2s, v3.2s, v4.2s //fadds::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -100,8 +100,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fadd v3.1s, v3.1s, v4.1s //fadds::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fadd v3.2s, v3.2s, v4.2s //fadds::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in crap for cr1 FP bits
 pc_adjust 0x4
@@ -127,7 +127,7 @@ ldr w3, [x0, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
 //TODO put in code to tell single vs double float
-fcvta w3, d3 //or would it be fcvtn? check me in future
+fcvtas w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -142,7 +142,7 @@ ldr w3, [x0, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
 //TODO put in code to tell single vs double float
-fcvta w3, d3 //or would it be fcvtn? check me in future
+fcvtas w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 //TODO put in code for cr1 FP bits
 pc_adjust 0x4
@@ -158,7 +158,7 @@ ldr w3, [x0, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
 //TODO put in code to tell single vs double float
-fcvtz w3, d3 //or would it be fcvtn? check me in future
+fcvtzs w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -173,7 +173,7 @@ ldr w3, [x0, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
 //TODO put in code to tell single vs double float
-fcvtz w3, d3 //or would it be fcvtn? check me in future
+fcvtzs w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 //TODO put in code for cr1 FP bits
 pc_adjust 0x4
@@ -226,8 +226,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fdiv v3.1s, v3.1s, v4.1s //fdivs::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fdiv v3.2s, v3.2s, v4.2s //fdivs::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -244,8 +244,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fdiv v3.1s, v3.1s, v4.1s //fdivs::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fdiv v3.2s, v3.2s, v4.2s //fdivs::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in code for cr1 FP bits
 pc_adjust 0x4
@@ -307,9 +307,9 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fadd d3.1s, d3.1s, d5.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fadd v3.2s, v3.2s, v5.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -329,9 +329,9 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fadd d3.1s, d3.1s, d5.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fadd v3.2s, v3.2s, v5.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in code for cr1 FP bits
 pc_adjust 0x4
@@ -422,9 +422,9 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fsub d3.1s, d3.1s, d5.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fsub v3.2s, v3.2s, v5.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -444,9 +444,9 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fsub d3.1s, d3.1s, d5.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fsub v3.2s, v3.2s, v5.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in cr1 FP stuff
 pc_adjust 0x4
@@ -498,8 +498,8 @@ ldr w4, [x0, fCoff] //load fC number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
-fmul v3.1s, v3.1s, v4.1s //fmuls::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s //fmuls::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -515,8 +515,8 @@ ldr w4, [x0, fCoff] //load fC number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
-fmul v3.1s, v3.1s, v4.1s //fmulsRC::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s //fmulsRC::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in cr1 FP bits
 pc_adjust 0x4
@@ -593,10 +593,10 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fadd d3.1s, d3.1s, d5.1s
-fneg d3.1s, d3.1s, d3.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fadd v3.2s, v3.2s, v5.2s
+fneg v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -615,10 +615,10 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fadd d3.1s, d3.1s, d5.1s
-fneg d3.1s, d3.1s, d3.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fadd v3.2s, v3.2s, v5.2s
+fneg v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 FP bit stuff
 pc_adjust 0x4
@@ -675,10 +675,10 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fsub d3.1s, d3.1s, d5.1s
-fneg d3.1s, d3.1s, d3.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fsub v3.2s, v3.2s, v5.2s
+fneg v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -697,10 +697,10 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
-fmul d3.1s, d3.1s, d4.1s
-fsub d3.1s, d3.1s, d5.1s
-fneg d3.1s, d3.1s, d3.1s
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fmul v3.2s, v3.2s, v4.2s
+fsub v3.2s, v3.2s, v5.2s
+fneg v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 FP bit stuff
 pc_adjust 0x4
@@ -793,8 +793,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fsub v3.1s, v3.1s, v4.1s //fsubs::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fsub v3.2s, v3.2s, v4.2s //fsubs::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 ret
@@ -811,8 +811,8 @@ ldr w4, [x0, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fsub v3.1s, v3.1s, v4.1s //fsubs::ppc
-dup v3.0s, v3.s[1] //ps1 must get output as well
+fsub v3.2s, v3.2s, v4.2s //fsubs::ppc
+dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 FP bits
 pc_adjust 0x4

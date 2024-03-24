@@ -12,7 +12,7 @@ After learning ARM64, I wanted to complete a decent size project using the langu
 
 **What do I need to do before running Artemis?**
 
-You will also need a boot.dol file placed in the Artemis/dol folder. For more info about the DOL format, read this-->> https://wiibrew.org/wiki/DOL
+You will need a boot.dol file placed in the Artemis/dol folder. For more info about the DOL format, read this-->> https://wiibrew.org/wiki/DOL
 
 **I have boot.dol ready. How do I run Artemis?**
 
@@ -32,7 +32,7 @@ To eventually be able to accurately simulate every Wii-Broadway register, and in
 
 -----
 
-Version: 0.0-r020
+Version: 0.0-r021
 
 Status: Compiles. Untested. Most likely will just fault.
 

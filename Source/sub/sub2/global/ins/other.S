@@ -286,7 +286,7 @@ ret
 
 .globl invalid_ppc
 invalid_ppc:
-//TODO put in routine here to disable address translation, and other crap
-mov w2, 0x700
-pc_adjust 0x4
+stp fp, lr, [sp, -0x10]!
+bl program_exception_vector
+ldp fp, lr, [sp], 0x10
 ret

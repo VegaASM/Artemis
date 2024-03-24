@@ -1,4 +1,5 @@
-#include "global/ins/subfinal/pcrcoe.S" //Must be established before all other funcs below
+#include "global/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
+#include "exceptions.S" //Must be established before instruction funcs below
 #include "global/ins/branch.S"
 #include "global/ins/floats.S"
 #include "global/ins/load_float.S"
