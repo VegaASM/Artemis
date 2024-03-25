@@ -12,10 +12,8 @@ array struct
 0x48 = L1 ins cache pointer
 0x50 = L2 ins cache pointer
 
-
-
 x27 = array pointer (aptr)
-from emumain
+
 
 
 

@@ -1,5 +1,6 @@
 #include "global/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
 #include "exceptions.S" //Must be established before instruction funcs below
+#include "verify_ea.S" //Must be established before any load, store, or paired single file
 #include "global/ins/branch.S"
 #include "global/ins/floats.S"
 #include "global/ins/load_float.S"
@@ -364,7 +365,7 @@ func_table:
 .xword invalid_ppc
 
 ins_sim_EC:
-.asciz "Error! Something bad happened during the instruction execution. It's 1: A checkstop occurred on a Machine Check when Machine Checks were disabled. 2: A checkstop that bypasses Machine Checks occurred. 3: Unknown error occurred."
+.asciz "Notice! A checkstop has occurred. View www/artemis.txt for Register details."
 .align 2
 
 /*x0 = extracted PPC offsets ptr (holds register NUMBERS, not values, and holds IMMS)
@@ -383,9 +384,10 @@ adr x2, func_table
 ldr x2, [x2, x1]
 ldr x1, [x27, 0x20] /*Get Reg Bank ptr*/
 blr x2 /*x0 already set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
-mov w0, 0 /*TODO in way future, edit this for machine checks and checkstops*/
+mov w0, 0 /*TODO in way future, edit this for within all instructions appropriately*/
 
 /*Epilogue*/
+.globl execute_epilogue /*HACKY need this for now to do checkstop from MCE if HID0 bit0 is high. Eventually have to write "mov 0" for all other funcs, but maybe its better this way....*/
 execute_epilogue:
 ldp fp, lr, [sp], 0x10
 ret

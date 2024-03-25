@@ -10,12 +10,18 @@ ldr w3, [x0, rAoff] //get rA number
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
+bl verify_ea
+cbnz w0, 0xC
+//NOTE w1 is arg, todo fix this to be w0
+bl dsi_exception_vector
+b lbz_ppc_epilogue
 bl convert
 ldrb w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number
 lsl w2, w2, 2
 str w0, [x20, x2] //"load" byte into rD, lbz::ppc, yes this is STR!
 pc_adjust 0x4
+lbz_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret

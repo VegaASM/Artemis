@@ -356,9 +356,49 @@ ubfx w10, w6, 28, 1 //Get V flag
 pc_adjust 0x4
 ret
 
-//cmpi
+//cmpwi crfD, rA, SIMM
 .globl cmpi_ppc
 cmpi_ppc:
+ldr w2, [x0, crfDoff] //Get crfD number
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, SIMMoff] //get SIMM Value
+ldr w3, [x1, x3] //get rA's value
+cmp w3, w4
+mrs x5, nzcv
+ldr w6, [x1, cr] //grab CR value
+//Extract CR digit based on crfD number
+lsl w7, w2, 2 //mulli the crfD number by 4
+//Do that number minus 28
+sub w7, w7, 28
+neg w7, w7 //Flip it back to positive
+//Now we have ror imm value to rotate the CR by
+ror w6, w6, w7
+//Extract lesat sig digit
+and w8, w6, 0xFFFFFFF0
+//Todo place in NZCV flag bits into w8 (CR digit)!!!!!!!!!!!!!!!!!!!!!
+//...
+//Insert w8 back into w6
+and w6, w6, 0xFFFFFFF0
+orr w6, w6, w8
+//Rotate left back to make CR true again
+sub w7, w7, 32
+neg w7, w7
+ror w3, w6, w7
+//Store CR
+str w3, [x1, cr]
+ret
+/*
+ror 28 = cr0
+ror 24 = cr1
+ror 20 = cr2
+ror 16 = cr3
+ror 12 = cr4
+ror 8 = cr5
+ror 4 = cr6
+ror 0 = cr7
+*/
+
 pc_adjust 0x4
 ret
 
