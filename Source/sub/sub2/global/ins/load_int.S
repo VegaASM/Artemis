@@ -10,11 +10,13 @@ ldr w3, [x0, rAoff] //get rA number
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
-bl verify_ea
-cbnz w0, 0xC
-//NOTE w1 is arg, todo fix this to be w0
-bl dsi_exception_vector
+bl verify_data_ea
+cbz w0, 0x10
+//Call exception address that was returned back
+mov w1, w19
+blr x0
 b lbz_ppc_epilogue
+//EA is good, continue with instruction
 bl convert
 ldrb w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number

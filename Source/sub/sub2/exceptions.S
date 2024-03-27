@@ -86,9 +86,10 @@ ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, hid0]
 tst w1, hid0_emcp
 beq 0xC
-//Do a Checkstop
+//Do a Checkstop, write hacky checkstop flag
 mov w0, -1
-b execute_epilogue /*Hacky return*/
+strb w0, [x27, 0x8]
+ret
 //Copy PC to srr0
 ldr x0, [x27, 0x20] //get reg bank ptr
 ldr w1, [x0, pc]

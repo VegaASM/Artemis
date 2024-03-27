@@ -1,9 +1,8 @@
-
 How to compile Source (Linux)
 
 Step 1. Install PowerPC Linux Compiler & QEMU
 sudo apt-get update
-sudo apt-get install gcc-aarch64-linux-gnu build-essential binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg qemu-user qemu-user-static
+sudo apt-get install gcc-aarch64-linux-gnu build-essential gdb-multiarch binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg qemu-user qemu-user-static
 
 Step 3: Build from Source Code
 cd Source

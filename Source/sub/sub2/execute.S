@@ -1,6 +1,8 @@
 #include "global/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
-#include "exceptions.S" //Must be established before instruction funcs below
-#include "verify_ea.S" //Must be established before any load, store, or paired single file
+#include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_instruction_ea.S
+#include "global/addr_translation_stuff.S" //Must be before both verify's
+#include "verify_instruction_ea.S" //Must be established before any instruction func
+#include "verify_data_ea.S" //Must be established before any load, store, or paired single file
 #include "global/ins/branch.S"
 #include "global/ins/floats.S"
 #include "global/ins/load_float.S"
@@ -369,25 +371,47 @@ ins_sim_EC:
 .align 2
 
 /*x0 = extracted PPC offsets ptr (holds register NUMBERS, not values, and holds IMMS)
-x1 = PPC key/ident*/
+w1 = PPC key/ident*/
 
 .globl execute
 execute:
 /*Prologue*/
-stp fp, lr, [sp, -0x10]!
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
 mov fp, sp
+
+/*backup Args*/
+mov x19, x0
+mov w20, w1
+
+/*Hacky hacky, cba to put mov w0, 0 on a shit ton of instruction funcs for now*/
+/*Preset non-checkstop flag*/
+/*Checkstop within MCE will set this flag to 1*/
+/*use boot.bin space within array table*/
+mov w0, 0
+strb w0, [x27, 0x8]
+
+/*Check if PC (instruction addr) is valid*/
+bl verify_instruction_ea
+cbz w0, get_instruction_func_addr
+
+/*EA was bad, called the return addr that was given back*/
+blr x0
+b 0x1C
 
 /*Take the w1 value and multiply by 8*/
 /*Then add that result to func_table index to get exact function addr to call*/
-lsl w1, w1, 3
+get_instruction_func_addr:
+lsl w20, w20, 3
 adr x2, func_table
-ldr x2, [x2, x1]
+ldr x2, [x2, x20]
 ldr x1, [x27, 0x20] /*Get Reg Bank ptr*/
-blr x2 /*x0 already set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
-mov w0, 0 /*TODO in way future, edit this for within all instructions appropriately*/
+mov x0, x19
+blr x2 /*x0 now set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
+
+/*Grab checkstop flag to return to parent*/
+ldrb w0, [x27, 0x8]
 
 /*Epilogue*/
-.globl execute_epilogue /*HACKY need this for now to do checkstop from MCE if HID0 bit0 is high. Eventually have to write "mov 0" for all other funcs, but maybe its better this way....*/
-execute_epilogue:
-ldp fp, lr, [sp], 0x10
+ldp fp, lr, [sp], 0x20
 ret

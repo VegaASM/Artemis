@@ -489,8 +489,8 @@ ins_mfmsr:
 .asciz "mfmsr r%d" //0x1978
 
 //Not needed for disassembler
-//ins_mfspr:
-//.asciz "mfspr r%d, %d" //0x1998
+ins_mfspr: //TEMP ENABLED TODO!
+.asciz "mfspr r%d, %d" //0x1998
 
 ins_mfsr:
 .asciz "mfsr r%d, %d" //0x19B8
@@ -543,8 +543,8 @@ ins_mtmsr:
 .asciz "mtmsr r%d" //0x1B38
 
 //Not needed for disassembler
-//ins_mtspr:
-//.asciz "mtspr %d, r%d" //0x1B58
+ins_mtspr: //TEMP ENABLED TODO!
+.asciz "mtspr %d, r%d" //0x1B58
 
 ins_mtsr:
 .asciz "mtsr %d, r%d" //0x1B78

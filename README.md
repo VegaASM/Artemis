@@ -14,6 +14,8 @@ After learning ARM64, I wanted to complete a decent size project using the langu
 
 You will need a boot.dol file placed in the Artemis/dol folder. For more info about the DOL format, read this-->> https://wiibrew.org/wiki/DOL
 
+If you instead have a PPC-32 compliant ELF file, you can use an ELF to DOL converter. More info -->> https://www.wiibrew.org/wiki/ELF_to_DOL_Converter
+
 **I have boot.dol ready. How do I run Artemis?**
 
 You need to compile it from Source. View the COMPILING.txt for instructions on how to compile and launch Artemis. After compilation, launch Artemis. Please **NOTE** that this current Repo revision will most likely just Fault (no testing/debug has been performed)! Once Artemis launches, follow the on-screen instructions.
@@ -32,10 +34,10 @@ To eventually be able to accurately simulate every Wii-Broadway register, and in
 
 -----
 
-Version: 0.0-r023
+Version: 0.0-r024
 
 Status: Compiles. Untested. Most likely will just fault.
 
 Artemis can *ONLY* do the following at the moment...
-* Execute a handful of integer & logical instructions
+* Execute a handful of basic instructions
 * Execute in physical memory

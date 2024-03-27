@@ -2367,6 +2367,338 @@ add x1, x1, :lo12: ins_lswx
 mov w27, lswx_ident
 b do_sprintf
 
+lwarxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lwarx
+add x1, x1, :lo12: ins_lwarx
+mov w27, lwarx_ident
+b do_sprintf
+
+lwbrxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lwbrx
+add x1, x1, :lo12: ins_lwbrx
+mov w27, lwbrx_ident
+b do_sprintf
+
+lwzfound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lwz
+add x1, x1, :lo12: ins_lwz
+mov w27, lwz_ident
+b do_sprintf
+
+lwzufound:
+rD w2
+d w3
+rA w4
+adrp x1, ins_lwzu
+add x1, x1, :lo12: ins_lwzu
+mov w27, lwzu_ident
+b do_sprintf
+
+lwzuxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lwzux
+add x1, x1, :lo12: ins_lwzux
+mov w27, lwzux_ident
+b do_sprintf
+
+lwzxfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_lwzx
+add x1, x1, :lo12: ins_lwzx
+mov w27, lwzx_ident
+b do_sprintf
+
+mcrffound:
+crfD w2
+crfS w3
+adrp x1, ins_mcrf
+add x1, x1, :lo12: ins_mcrf
+mov w27, mcrf_ident
+b do_sprintf
+
+mcrxrfound:
+crfD w2
+adrp x1, ins_mcrxr
+add x1, x1, :lo12: ins_mcrxr
+mov w27, mcrxr_ident
+b do_sprintf
+
+mffsfound:
+fD w2
+adrp x1, ins_mffs
+add x1, x1, :lo12: ins_mffs
+mov w27, mffs_ident
+b do_sprintf
+
+mfmsrfound:
+rD w2
+adrp x1, ins_mfmsr
+add x1, x1, :lo12: ins_mfmsr
+mov w27, mfmsr_ident
+b do_sprintf
+
+mfsprfound: /*TODO put in all SPR variations*/
+rD w2
+SPR w3 w18
+adrp x1, ins_mfspr
+add x1, x1, :lo12: ins_mfspr
+mov w27, mfspr_ident
+b do_sprintf
+
+mfsrfound:
+rD w2
+SR w3
+adrp x1, ins_mfsr
+add x1, x1, :lo12: ins_mfsr
+mov w27, mfsr_ident
+b do_sprintf
+
+mfsrinfound:
+rD w2
+rB w3
+adrp x1, ins_mfsrin
+add x1, x1, :lo12: ins_mfsrin
+mov w27, mfsrin_ident
+b do_sprintf
+
+mftbfound:
+rD w2
+TBR w3 w18
+mov w27, mftb_ident
+cmp w3, 269
+beq 0x18
+cmp w3, 268
+bne invalidfound
+adrp x1, ins_mftbl
+add x1, x1, :lo12: ins_mftbl
+b do_sprintf
+adrp x1, ins_mftbu
+add x1, x1, :lo12: ins_mftbu
+b do_sprintf
+
+mtcrffound:
+CRM w2
+rS w3
+mov w27, mtcrf_ident
+cmp w2, 0xFF
+beq 0x10
+adrp x1, ins_mtcrf
+add x1, x1, :lo12: ins_mtcrf
+b do_sprintf
+mov w2, w3
+adrp x1, ins_mtcr
+add x1, x1, :lo12: ins_mtcr
+b do_sprintf
+
+mtfsb0found:
+crbD w2
+adrp x1, ins_mtfsb0
+add x1, x1, :lo12: ins_mtfsb0
+mov w27, mtfsb0_ident
+b do_sprintf
+
+mtfsb1found:
+crbD w2
+adrp x1, ins_mtfsb1
+add x1, x1, :lo12: ins_mtfsb1
+mov w27, mtfsb1_ident
+b do_sprintf
+
+mtfsffound:
+FM w2
+fB w3
+adrp x1, ins_mtfsf
+add x1, x1, :lo12: ins_mtfsf
+mov w27, mtfsf_ident
+b do_sprintf
+
+mtfsfifound:
+crfD w2
+IMM w3
+adrp x1, ins_mtfsfi
+add x1, x1, :lo12: ins_mtfsfi
+mov w27, mtfsfi_ident
+b do_sprintf
+
+mtmsrfound:
+rS w2
+adrp x1, ins_mtmsr
+add x1, x1, :lo12: ins_mtmsr
+mov w27, mtmsr_ident
+b do_sprintf
+
+mtsprfound: /*TODO put in all SPR variations later*/
+SPR w2 w18
+rS w3
+adrp x1, ins_mtspr
+add x1, x1, :lo12: ins_mtspr
+mov w27, mtspr_ident
+b do_sprintf
+
+mtsrfound:
+SR w2
+rS w3
+adrp x1, ins_mtsr
+add x1, x1, :lo12: ins_mtsr
+mov w27, mtsr_ident
+b do_sprintf
+
+mtsrinfound:
+rS w2
+rB w3
+adrp x1, ins_mtsrin
+add x1, x1, :lo12: ins_mtsrin
+mov w27, mtsrin_ident
+b do_sprintf
+
+mulhwfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_mulhw
+add x1, x1, :lo12: ins_mulhw
+mov w27, mulhw_ident
+b do_sprintf
+
+mulhwufound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_mulhwu
+add x1, x1, :lo12: ins_mulhwu
+mov w27, mulhwu_ident
+b do_sprintf
+
+mullifound:
+rD w2
+rA w3
+SIMM w4
+adrp x1, ins_mulli
+add x1, x1, :lo12: ins_mulli
+mov w27, mulli_ident
+b do_sprintf
+
+mullwfound:
+rD w2
+rA w3
+rB w4
+adrp x1, ins_mullw
+add x1, x1, :lo12: ins_mullw
+mov w27, mullw_ident
+b do_sprintf
+
+nandfound:
+rA w2
+rS w3
+rB w4
+adrp x1, ins_nand
+add x1, x1, :lo12: ins_nand
+mov w27, nand_ident
+b do_sprintf
+
+negfound:
+rD w2
+rA w3
+adrp x1, ins_neg
+add x1, x1, :lo12: ins_neg
+mov w27, neg_ident
+b do_sprintf
+
+norfound:
+rA w2
+rS w3
+rB w4
+mov w27, nor_ident
+cmp w3, w4
+bne 0x10
+adrp x1, ins_not
+add x1, x1, :lo12: ins_not
+b do_sprintf
+adrp x1, ins_nor
+add x1, x1, :lo12: ins_nor
+b do_sprintf
+
+orfound:
+rA w2
+rS w3
+rB w4
+mov w27, or_ident
+cmp w3, w4
+bne 0x10
+adrp x1, ins_mr
+add x1, x1, :lo12: ins_mr
+b do_sprintf
+adrp x1, ins_or
+add x1, x1, :lo12: ins_or
+b do_sprintf
+
+orcfound:
+rA w2
+rS w3
+rB w4
+adrp x1, ins_orc
+add x1, x1, :lo12: ins_orc
+mov w27, orc_ident
+b do_sprintf
+
+orifound:
+mov w27, ori_ident
+mov w18, 0x60000000
+cmp w19, w18
+bne 0x10
+adrp x1, ins_nop
+add x1, x1, :lo12: ins_nop
+b do_sprintf
+rA w2
+rS w3
+UIMM w4
+adrp x1, ins_ori
+add x1, x1, :lo12: ins_ori
+b do_sprintf
+
+orisfound:
+rA w2
+rS w3
+UIMM w4
+adrp x1, ins_oris
+add x1, x1, :lo12: ins_oris
+mov w27, oris_ident
+b do_sprintf
+
+psq_lfound:
+fD w2
+ps_SIMM w3
+rA w4
+W_nonx w5
+I_nonx w6
+/*TODO what about rA =/= r0 stuff, is that in up above code or here?*/
+adrp x1, ins_psq_l
+add x1, x1, :lo12: ins_psq_l
+mov w27, psq_l_ident
+b do_sprintf
+
+
+
+invalidfound:
+mov w2, w19
+adrp x1, invalid_instruction
+add x1, x1, :lo12: invalid_instruction
+mov w27, invalid_ident
+b do_sprintf
+
 do_sprintf:
 mov x0, x20
 bl sprintf
