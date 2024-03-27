@@ -35,8 +35,6 @@
 .set hid0_ebd, 0x10000000
 .set hid0_nhr, 0x00010000
 
-
-
 .set allotherexceptions_msr_mask, msr_ile | msr_me | msr_ip //MSR mask for anything BUT machine check. NOTE there's no info on the mask for IABR in the broadway. best to assume its this.
 .set mcheck_msr_mask, msr_ile | msr_ip
 
@@ -81,12 +79,17 @@ ret
 
 .globl machine_check_exception_vector
 machine_check_exception_vector:
-//Check EMCP bit of HID0 (bit0), TODO put in code to check other hID0 relative bits
+//Is ME high on MSR?
 ldr x0, [x27, 0x20] //get reg bank ptr
+ldr w1, [x0, msr]
+tst w1, msr_me
+beq do_checkstop
+//Check EMCP bit of HID0 (bit0), TODO put in code to check other hID0 relative bits
 ldr w1, [x0, hid0]
 tst w1, hid0_emcp
 beq 0xC
 //Do a Checkstop, write hacky checkstop flag
+do_checkstop:
 mov w0, -1
 strb w0, [x27, 0x8]
 ret

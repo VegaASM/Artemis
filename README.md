@@ -22,7 +22,9 @@ You need to compile it from Source. View the COMPILING.txt for instructions on h
 
 **Is there any other notes to be aware of?**
 
-Valid simulated memory addresses are the following ranges
+Currently, Artemis can only execute basic instructions and execute in physical memory.
+
+Valid simulated physical memory addresses are the following ranges
 * 0x00000000 thru 0x017FFFFF
 * 0x10000000 thru 0x13FFFFFF
 
@@ -34,10 +36,6 @@ To eventually be able to accurately simulate every Wii-Broadway register, and in
 
 -----
 
-Version: 0.0-r025
+Version: 0.0-r026
 
 Status: Compiles. Untested. Most likely will just fault.
-
-Artemis can *ONLY* do the following at the moment...
-* Execute a handful of basic instructions
-* Execute in physical memory

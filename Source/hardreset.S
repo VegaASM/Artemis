@@ -117,8 +117,28 @@ str w1, [x0, pc]
 mov w1, 0x80000000
 str w1, [x0, hid4]
 
-/*Invalidate entire Cache*/
-/*bl reset_cache_tables*/ /*Simply rets for now */
+/*Invalidate entire L1 & L2 Cache*/
+/*
+mov w0, Cache_loop_count
+
+movz x1, 0xFFFF, lsl 48
+movk x1, 0xFFFE, lsl 32
+movk x1, 0xFFFF, lsl 16
+movk x1, 0xFFFE
+mvn x2, x1
+
+ldr x3, [x27, 0x48]
+
+cache_reset_loop:
+ldp x4, x5, [x3]
+and x4, x4, x1
+and x5, x5, x1
+orr x4, x5, x2
+orr x5, x5, x2
+stp x3, x4, [x2], 16
+subs w0, w0, 1
+bne cache_reset_loop
+*/
 
 /*End func*/
 ret

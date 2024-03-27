@@ -3,6 +3,7 @@
 #include "sub/submain.S"
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
+#include "sub/cache.S" /*Must be before hardreset.S*/
 #include "hardreset.S"
 #include "insert_bootdol.S"
 
@@ -34,24 +35,32 @@ add x27, sp, 0x10
 .set memtxtrowsize, 0x39
 .set memtxtrows, (mem1bytesize + mem2bytesize) / 16 /*Exclude title row*/
 .set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
-.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize
+.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size
 movz w0, :abs_g1: grand_total_malloc
 movk w0, :abs_g0_nc: grand_total_malloc
 bl malloc
 cbz x0, cant_alloc_mainmemory
 
 /*Store Reg ptr, Mem1 ptr, Mem2 ptr, Artemis.txt, and memory.txt ptr*/
-str x0, [x27, 0x20]
+str x0, [x27, 0x20] /*reg bank ptr*/
 add x1, x0, regbanksize
-str x1, [x27, 0x28]
+str x1, [x27, 0x28] /*mem1 ptr*/
 movz w0, :abs_g1: mem1bytesize
 add x1, x1, x0
-str x1, [x27, 0x30]
+str x1, [x27, 0x30] /*mem2 ptr*/
 movz w0, :abs_g1: mem2bytesize
 add x1, x1, x0
-str x1, [x27, 0x38]
+str x1, [x27, 0x38] /*artemis.txt ptr*/
 add x1, x1, arttxtsize
-str x1, [x27, 0x40]
+str x1, [x27, 0x40] /*memory.txt ptr*/
+movz w0, :abs_g1: memtxtbytesize
+movk w0, :abs_g0_nc: memtxtbytesize
+add x1, x1, x0
+str x1, [x27, 0x48] /*L1 ICache table ptr*/
+add x1, x1, ICache_byte_size
+str x1, [x27, 0x50] /*L1 DCache table ptr*/
+add x1, x1, DCache_byte_size
+str x1, [x27, 0x58] /*L2 Cache table ptr*/
 
 /*SKIPPED FOR NOW...Dump boot.bin contents to memory*/
 /*bl dump_bootbin

@@ -1,3 +1,5 @@
+#include "subfinal/float_legal_check.S"
+
 //Important NOTES
 //lfsX = both ps0 and ps1 get loaded with value
 //lfdX = entire fpr loaded with value
@@ -12,6 +14,15 @@
 //fabs fD, fB
 .globl fabs_ppc
 fabs_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fabs_ppc_epilogue
+mov x0, x19 //TODO fix me
+mov x1, x20
 add x1, x1, fpr0 //set x1 ptr to start at fpr part of reg bank
 ldr w2, [x0, fDoff] //load fD number
 lsl w2, w2, 3
@@ -20,6 +31,9 @@ lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
 //TODO put in code to tell if we do double or single precision..
 pc_adjust 0x4
+fabs_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fabsRC_ppc
@@ -33,6 +47,7 @@ ldr w3, [x1, x2] //Grab fB's value
 //TODO put in code to tell if we do double or single precision..
 //TODO put in code to edit cr1 FP bits
 pc_adjust 0x4
+fabsRC_ppc_epilogue:
 ret
 
 //fadd fD, fA, fB
@@ -50,6 +65,7 @@ ldr d4, [x1, x4] //Grab fB's value
 fadd d3, d3, d4 //fadd::ppc
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+fadd_ppc_epilogue:
 ret
 
 //fadd. fD, fA, fB
@@ -68,6 +84,7 @@ fadd d3, d3, d4 //faddsRC::ppc
 str d3, [x1, x2] //Write fD's value
 //TODO put in code to edit cr1 FP bits
 pc_adjust 0x4
+faddRC_ppc_epilogue:
 ret
 
 //fadds fD, fA, fB
@@ -86,6 +103,7 @@ fadd v3.2s, v3.2s, v4.2s //fadds::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+fadds_ppc_epilogue:
 ret
 
 //fadds. fD, fA, fB
@@ -105,6 +123,7 @@ dup v3.2s, v3.s[1] //ps1 must get output as well
 str d3, [x1, x2] //Write fD's value
 //TODO put in crap for cr1 FP bits
 pc_adjust 0x4
+faddsRC_ppc_epilogue:
 ret
 
 .globl fcmpo_ppc
