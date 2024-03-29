@@ -17,7 +17,7 @@ mainmallocmemEC:
 .globl main
 main:
 /*Prologue*/
-stp fp, lr, [sp, -0x70]! /*Create 0x60 space for Array Table*/
+stp fp, lr, [sp, -0x80]! /*Create 0x70 space for Array Table*/
 mov fp, sp
 
 /*First message*/
@@ -35,7 +35,7 @@ add x27, sp, 0x10
 .set memtxtrowsize, 0x39
 .set memtxtrows, (mem1bytesize + mem2bytesize) / 16 /*Exclude title row*/
 .set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
-.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size
+.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size
 movz w0, :abs_g1: grand_total_malloc
 movk w0, :abs_g0_nc: grand_total_malloc
 bl malloc
@@ -61,6 +61,8 @@ add x1, x1, ICache_byte_size
 str x1, [x27, 0x50] /*L1 DCache table ptr*/
 add x1, x1, DCache_byte_size
 str x1, [x27, 0x58] /*L2 Cache table ptr*/
+add x1, x1, L2Cache_byte_size
+str x1, [x27, 0x60] /*Round Robin addr list ptr*/
 
 /*SKIPPED FOR NOW...Dump boot.bin contents to memory*/
 /*bl dump_bootbin
@@ -106,5 +108,5 @@ bl puts
 /*Epilogue, exit program*/
 epilogue_main:
 mov w0, 0
-ldp fp, lr, [sp], 0x70
+ldp fp, lr, [sp], 0x80
 ret

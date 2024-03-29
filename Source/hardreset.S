@@ -117,27 +117,16 @@ str w1, [x0, pc]
 mov w1, 0x80000000
 str w1, [x0, hid4]
 
-/*Invalidate entire L1 & L2 Cache*/
+/*Reset Cache Addr list*/
 /*
-mov w0, Cache_loop_count
-
-movz x1, 0xFFFF, lsl 48
-movk x1, 0xFFFE, lsl 32
-movk x1, 0xFFFF, lsl 16
-movk x1, 0xFFFE
-mvn x2, x1
-
-ldr x3, [x27, 0x48]
-
-cache_reset_loop:
-ldp x4, x5, [x3]
-and x4, x4, x1
-and x5, x5, x1
-orr x4, x5, x2
-orr x5, x5, x2
-stp x3, x4, [x2], 16
+mov w0, Total_Cache_byte_size / 16
+movz x1, 0x0001, lsl 32
+movk x1, 0x0001
+mov x2, x1
+ldr x3, [x27, 0x60]
+stp x1, x2, [x3], 8
 subs w0, w0, 1
-bne cache_reset_loop
+bne -0x8
 */
 
 /*End func*/
