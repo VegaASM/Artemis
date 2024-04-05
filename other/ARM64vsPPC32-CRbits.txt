@@ -1,0 +1,25 @@
+ARM = PPC = Description
+beq = beq = Z high
+bne = bne = Z low
+bgt = cmp/i+bgt = Z low && N == V
+blt = cmp/i+blt = N =/= V
+bge = N == V
+ble = Z high || N =/=V
+bhs = cmpl/i+bgt = C high
+blo = cmpl/i+blt = C low
+bmi = N high
+bpl = N low
+bvs = bso = V high
+bvc = bns = V low
+bhi = Z low && C high
+bls = Z high || C low
+bcs = C high
+bcc = C low
+bal = b = Bits irrelevant
+
+
+
+
+
+
+

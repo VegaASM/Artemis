@@ -366,7 +366,7 @@ add x2, x20, x2 //Set start rD reg bank ptr for loop
 //do lswi::ppc
 ldrb w1, [x0], 1
 strb w1, [x2], 1 //"load" current byte into current rD, lswi::ppc, yes this is STR!
-subs w21, w21, 1
+subs w3, w3, 1
 bne -0xC
 pc_adjust 0x4
 ldp x19, x20, [sp, 0x10]
@@ -395,7 +395,7 @@ add x2, x20, x2 //Set start rD reg bank ptr for loop
 //do lswx::ppc
 ldrb w1, [x0], 1
 strb w1, [x2], 1 //"load" current byte into current rD, lswx::ppc, yes this is STR!
-subs w21, w21, 1
+subs w3, w3, 1
 bne -0xC
 pc_adjust 0x4
 ldp x19, x20, [sp, 0x10]

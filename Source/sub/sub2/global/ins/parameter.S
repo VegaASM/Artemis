@@ -332,7 +332,7 @@ addzeoRC_ppc:
 pc_adjust 0x4
 ret
 
-//cmp
+//cmpw crfD, rA, rB
 .globl cmp_ppc
 cmp_ppc:
 ldr w2, [x0, rAoff] //Load rA number
@@ -343,74 +343,156 @@ ldr w2, [x1, x2] //Load rA Value
 ldr w3, [x1, x2] //Load rB Value
 ldr w4, [x0, crfDoff] //Load crfD number
 ldr w5, [x1, cr]
-//crap here...
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
+//Now we have ror imm value to rotate the CR by
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
 cmp w2, w3
-mrs x6, nzcv
-ubfx w7, w6, 31, 1 //Get N flag
-ubfx w8, w6, 30, 1 //Get Z flag
-ubfx w9, w6, 29, 1 //Get C flag
-ubfx w10, w6, 28, 1 //Get V flag
-//figure out later...
-
-//TODO finish this!
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 31, 1 //Get N flag
+ubfx w10, w8, 30, 1 //Get Z flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Does N==V? If so, set LT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bfi w5, w12, 3, 1
+//Is Z low && N==V? If so, set GT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bic w12, w12, w10 //and w/ complement, smart!
+bfi w5, w12, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
 ret
 
 //cmpwi crfD, rA, SIMM
 .globl cmpi_ppc
 cmpi_ppc:
-ldr w2, [x0, crfDoff] //Get crfD number
-ldr w3, [x0, rAoff] //get rA number
-lsl w3, w3, 2
-ldr w4, [x0, SIMMoff] //get SIMM Value
-ldr w3, [x1, x3] //get rA's value
-cmp w3, w4
-mrs x5, nzcv
-ldr w6, [x1, cr] //grab CR value
-//Extract CR digit based on crfD number
-lsl w7, w2, 2 //mulli the crfD number by 4
-//Do that number minus 28
-sub w7, w7, 28
-neg w7, w7 //Flip it back to positive
+ldr w2, [x0, rAoff] //Load rA number
+lsl w2, w2, 2
+ldr w3, [x0, SIMMoff] //Load SIMM value
+ldr w2, [x1, x2] //Load rA Value
+ldr w4, [x0, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
 //Now we have ror imm value to rotate the CR by
-ror w6, w6, w7
-//Extract lesat sig digit
-and w8, w6, 0xFFFFFFF0
-//Todo place in NZCV flag bits into w8 (CR digit)!!!!!!!!!!!!!!!!!!!!!
-//...
-//Insert w8 back into w6
-and w6, w6, 0xFFFFFFF0
-orr w6, w6, w8
-//Rotate left back to make CR true again
-sub w7, w7, 32
-neg w7, w7
-ror w3, w6, w7
-//Store CR
-str w3, [x1, cr]
-ret
-/*
-ror 28 = cr0
-ror 24 = cr1
-ror 20 = cr2
-ror 16 = cr3
-ror 12 = cr4
-ror 8 = cr5
-ror 4 = cr6
-ror 0 = cr7
-*/
-
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
+cmp w2, w3
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 31, 1 //Get N flag
+ubfx w10, w8, 30, 1 //Get Z flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Does N==V? If so, set LT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bfi w5, w12, 3, 1
+//Is Z low && N==V? If so, set GT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bic w12, w12, w10 //and w/ complement, smart!
+bfi w5, w12, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
 ret
 
-//cmpl
+//cmplw crfD, rA, rB
 .globl cmpl_ppc
 cmpl_ppc:
+ldr w2, [x0, rAoff] //Load rA number
+lsl w2, w2, 2
+ldr w3, [x0, rBoff] //Load rB number
+lsl w3, w3, 2
+ldr w2, [x1, x2] //Load rA Value
+ldr w3, [x1, x2] //Load rB Value
+ldr w4, [x0, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
+//Now we have ror imm value to rotate the CR by
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
+cmp w2, w3
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 30, 1 //Get Z flag
+ubfx w10, w8, 29, 1 //Get C flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Is C low? If so, set LT, otherwise clear it (flip C bit and set it as LT bit)
+mvn w12, w10 //Flip bit
+bfi w5, w12, 3, 1
+//Set C bit as GT bit
+bfi w5, w10, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
 ret
 
-//cmpli
+//cmplwi crfD, rA, UIMM
 .globl cmpli_ppc
 cmpli_ppc:
+ldr w2, [x0, rAoff] //Load rA number
+lsl w2, w2, 2
+ldr w3, [x0, UIMMoff] //Load UIMM value
+ldr w2, [x1, x2] //Load rA Value
+ldr w4, [x0, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
+//Now we have ror imm value to rotate the CR by
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
+cmp w2, w3
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 30, 1 //Get Z flag
+ubfx w10, w8, 29, 1 //Get C flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Is C low? If so, set LT, otherwise clear it (flip C bit and set it as LT bit)
+mvn w12, w10 //Flip bit
+bfi w5, w12, 3, 1
+//Set C bit as GT bit
+bfi w5, w10, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
 ret
 
