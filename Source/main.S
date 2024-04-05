@@ -4,6 +4,7 @@
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
 #include "sub/cache.S" /*Must be before hardreset.S*/
+#include "insert_bootbin.S"
 #include "hardreset.S"
 #include "insert_bootdol.S"
 
@@ -64,11 +65,11 @@ str x1, [x27, 0x58] /*L2 Cache table ptr*/
 add x1, x1, L2Cache_byte_size
 str x1, [x27, 0x60] /*Round Robin addr list ptr*/
 
-/*SKIPPED FOR NOW...Dump boot.bin contents to memory*/
-/*bl dump_bootbin
-cbnz x0, output_console*/
+/*Get boot.bin contents*/
+bl dump_bootbin
+cbnz x0, output_console
 
-/*Dump boot.dol contents to memory*/
+/*Get boot.dol contents*/
 bl dump_bootdol
 cbnz x0, output_console
 
@@ -83,12 +84,15 @@ stp q0, q1, [x0], 0x20
 subs w2, w2, 0x20
 bne -0x8*/
 
-/*Do a hard reset*/
-bl hardreset /*Does *NOT* return an error, always works*/
-
 /*Attempt to place the boot.dol into simulated mem1*/
 bl insert_bootdol
 cbnz x0, output_console
+
+/*Place boot.bin into simulated reset vector*/
+bl insert_bootbin
+
+/*Do a hard reset*/
+bl hardreset /*Does *NOT* return an error, always works*/
 
 /*Call submain (void)*/
 bl submain

@@ -31,7 +31,7 @@ b 0x8
 mov w18, 4
 
 /*Check all qualified DBats*/
-add x17, x1, dbat0
+add x17, x1, dbat0u
 
 mov w0, w19
 ldr x1, [x17], 8

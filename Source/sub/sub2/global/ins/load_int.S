@@ -318,23 +318,94 @@ ret
 
 .globl lmw_ppc
 lmw_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+ldr w2, [x0, doff] //get SIMM value
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w21, 2
+ldr w3, [x1, x3] //grab rA value
+add w0, w2, w3 //calc EA
+bl convert
+//Set loop counter based on rD's number relative to r31
+ldr w2, [x19, rDoff] //grab rD number
+sub w3, w2, 32
+neg w3, w3
+//Set initial rD reg bank ptr
+lsl w2, w2, 2
+add x2, x20, x2
+//do lmw::ppc
+ldr w1, [x0], 4
+str w1, [x2], 4 //"load" word into current rD, lmw::ppc, yes this is STR!
+subs w3, w3, 1
+bne -0xC
 pc_adjust 0x4
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl lswi_ppc
 lswi_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+ldr w0, [x0, rAoff] //get rA number, save in non-volatile register
+lsl w0, w0, 2
+ldr w0, [x1, x0] //grab rA value
+bl convert
+//Set loop counter based on NB value
+ldr w3, [x19, NBoff] //grab NB value
+//Set initial rD reg bank ptr
+ldr w2, [x19, rDoff] //grab rD number
+lsl w2, w2, 2
+add x2, x20, x2 //Set start rD reg bank ptr for loop
+//do lswi::ppc
+ldrb w1, [x0], 1
+strb w1, [x2], 1 //"load" current byte into current rD, lswi::ppc, yes this is STR!
+subs w21, w21, 1
+bne -0xC
 pc_adjust 0x4
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl lswx_ppc
 lswx_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+ldr w0, [x0, rAoff] //get rA number, save in non-volatile register
+lsl w0, w0, 2
+ldr w0, [x1, x0] //grab rA value
+bl convert
+//Set loop counter based on rB's value
+ldr w3, [x19, rBoff] //grab rB number
+lsl w3, w3, 2
+ldr w3, [x20, x3] //grab rB value
+//Set initial rD reg bank ptr
+ldr w2, [x19, rDoff] //grab rD number
+lsl w2, w2, 2
+add x2, x20, x2 //Set start rD reg bank ptr for loop
+//do lswx::ppc
+ldrb w1, [x0], 1
+strb w1, [x2], 1 //"load" current byte into current rD, lswx::ppc, yes this is STR!
+subs w21, w21, 1
+bne -0xC
 pc_adjust 0x4
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl lwarx_ppc
 lwarx_ppc:
-pc_adjust 0x4
-ret
+//TODO; for now just do standard lwzx
+b lwzx_ppc
 
 .globl lwbrx_ppc
 lwbrx_ppc:

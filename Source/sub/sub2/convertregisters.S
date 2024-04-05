@@ -175,7 +175,7 @@ add x19, x19, x0 /*Move cursor forward*/
 /*sprintf all the IBATs*/
 mov w22, 0 /*Reset %d counter*/
 mov w23, 16
-add x21, x20, ibat0
+add x21, x20, ibat0u
 ibat_sprintf_loop:
 mov x0, x19
 adr x1, IBATs

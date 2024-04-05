@@ -106,11 +106,11 @@ str w2, [x0, iabr]
 /*Set dec, msr, and pc*/
 mov w1, -1
 str w1, [x0, dec]
-mov w1, 0 /*TODO change back to 0x40 once we implement boot.bin fully*/
+mov w1, 0x40 /*ip is only bit high, for no boot.bin, set this to Zero*/
 str w1, [x0, msr]
-mov w1, 0x3400
-/*movz w1, 0xFFF0, lsl 16  TODO implement in future versions
-movk w1, 0x0100*/
+/*mov w1, 0x3400*/ /*for no boot.bin*/
+movz w1, 0xFFF0, lsl 16
+movk w1, 0x0100
 str w1, [x0, pc]
 
 /*HID4 big endian bit 0 (MSB) must always be high, thus it always hard resets as 0x80000000*/
