@@ -16,11 +16,11 @@ You will need a boot.bin file placed in the Artemis/boot folder. Boot.bin contai
 
 By default, the PPC instructions in boot.bin are this...
 
-li r3, 0x3400
-mtsrr0 r3
-li r4, 0x40
-mtsrr1 r4
-rfi
+* li r3, 0x3400
+* mtsrr0 r3
+* li r4, 0x40
+* mtsrr1 r4
+* rfi
 
 After these instructions have executed, the simulated PPC processor will be at 0x3400 with all bits low in the Machine State Register.
 
