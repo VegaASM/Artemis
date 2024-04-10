@@ -1,15 +1,15 @@
 #include "subfinal/float_legal_check.S"
 
 //Important NOTES
-//lfsX = both ps0 and ps1 get loaded with value
-//lfdX = entire fpr loaded with value
-//stfsX = ps0 only gets stored
-//stfdX = entire fpr gets stored
-//math (fadd/s) = ps0's used for input. ps0 and ps1 get output
-//fres = can only be used on single float. ps0 input, ps0 and ps1 get output
-//frsp = can only be used on double float. ps0 gets output, ps1 destination register left undefined
-//fmr = when used on single floats, ps0's is input&output, ps1 of Destination register LEFT UNCHANGED!!!!
-//fabs, fnabs, fneg = when used on single floats, ps0's is input&output, ps1 of Destination register left undefined
+//math HID2 PSE low (i.e. fadds) = entire FPR for input and output
+//math HID2 PSE high (i.e. fadds) = ps0's used for input. ps0 and ps1 get output
+//fres HID2 PSE low = can only be used on single precision floats, entire FPR used
+//fres HID2 PSE high = can only be used on single precision floats. ps0 input, ps0 and ps1 get output
+//frsp HID2 PSE low = can only be used on double floats, entire FPR used
+//frsp = can only be used on double floats. ps0 gets output, ps1 destination register left undefined (junk)
+//fmr HID2 PSE low = entire FPR copied
+//fmr HID2 PSE high = ps0's is input&output, ps1 of Destination register LEFT UNCHANGED!!!!
+//fabs, fnabs, fneg (HID2 PSE doesn't matter) = bit0 of whole FPR is only thing that gets edited
 
 //fabs fD, fB
 .globl fabs_ppc
@@ -26,8 +26,9 @@ ldr w2, [x19, fDoff] //load fD number
 lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
-ldr w3, [x1, x2] //Grab fB's value
-//TODO put in code to tell if we do double or single precision..
+ldr d3, [x1, x3] //Grab fB's value
+fabs d3, d3
+str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
 fabs_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -48,9 +49,10 @@ ldr w2, [x19, fDoff] //load fD number
 lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
-ldr w3, [x1, x2] //Grab fB's value
-//TODO put in code to tell if we do double or single precision..
-//TODO cr1 stuff
+ldr d3, [x1, x3] //Grab fB's value
+fabs d3, d3
+str d3, [x1, x2] //Write new fB
+//TODO cr1 fp bits
 pc_adjust 0x4
 fabsRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -806,22 +808,98 @@ ret
 
 .globl fnabs_ppc
 fnabs_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fnabs_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fabs d3, d3
+fneg d3, d3
+str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
+fnabs_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fnabsRC_ppc
 fnabsRC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fnabsRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fabs d3, d3
+fneg d3, d3
+str d3, [x1, x2] //Write new fB
+//todo cr1 fp bit stuff
 pc_adjust 0x4
+fnabsRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fneg_ppc
 fneg_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fneg_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fneg d3, d3
+str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
+fneg_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fnegRC_ppc
 fnegRC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fnegRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fneg d3, d3
+str d3, [x1, x2] //Write new fB
+//TODO cr1 fp bit stuff
 pc_adjust 0x4
+fnegRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fnmadd_ppc
@@ -1070,44 +1148,213 @@ ret
 
 .globl fres_ppc
 fres_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fres_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+frecpe d3, d3
+str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
+fres_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fresRC_ppc
 fresRC_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fresRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+frecpe d3, d3
+str d3, [x1, x2] //Write new fB
+//TODO cr1 fp stuff
 pc_adjust 0x4
+fresRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl frsp_ppc
 frsp_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, frsp_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fcvt s3, d3 //todo hid2 pse crap
+str s3, [x1, x2] //Write new fB //NOT CORRECT todo
 pc_adjust 0x4
+frsp_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl frspRC_ppc
 frspRC_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, frspRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+fcvt s3, d3 //todo hid2 pse crap
+str s3, [x1, x2] //Write new fB //NOT CORRECT todo
+//todo cr1 fp stuff
 pc_adjust 0x4
+frspRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl frsqrte_ppc
 frsqrte_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, frsqrte_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+frsqrte d3, d3 //NOTE: double-width only! no ps0 only crap
+str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
+frsqrte_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl frsqrteRC_ppc
 frsqrteRC_ppc:
+//todo pse hid2 crap
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, frsqrteRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //load fB number
+lsl w3, w3, 3
+ldr d3, [x1, x3] //Grab fB's value
+frsqrte d3, d3 //NOTE: double-width only! no ps0 only crap
+str d3, [x1, x2] //Write new fB
+//todo cr1 fp stuff
 pc_adjust 0x4
+frsqrteRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fsel_ppc
 fsel_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fsel_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+movi d6, 0
+fcmp d3, d6
+fcsel d7, d4, d5, ge
+str d7, [x1, x2]
 pc_adjust 0x4
+fsel_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl fselRC_ppc
 fselRC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fselRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+movi d6, 0
+fcmp d3, d6
+fcsel d7, d4, d5, ge
+str d7, [x1, x2]
+//todo cr1 fp stuff
 pc_adjust 0x4
+fselRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
-
 
 //fsub fD, fA, fB
 .globl fsub_ppc
@@ -1220,4 +1467,3 @@ fsubsRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
-

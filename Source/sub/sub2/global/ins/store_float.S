@@ -1,4 +1,7 @@
-//Important. On single float stores except stfiwx, ps0 gets stored, NOT ps1
+//TODO add in norms, denorms, nans, conversions etc
+//stfsX HID2 PSE low = entire FPR converted to 32-bit single then stored
+//stfsX HID2 PSE high = ps0 only gets stored
+//stfdX = entire fpr gets stored (64-bit to memory), but on some cases Broadway knows to convert ps0 from 32-bit single to 64-bit double, but how????? theres no way it can tell the precision. Example 0x41008000 is a valid single 32-bit float. And 0x4100800041008000 is a valid  double 64-bit float. But Broadway (on my tests) will convert the ps0 to double before the store. Maybe it's the HID2 PSE bit that determines this (but no mention of it in Broadway manual) will need to test later on real hardware
 //todo verify-ea on all funcs
 //todo since arm64 is LE, do we need to rev/16 all the non-reverse stores?
 
@@ -7,6 +10,8 @@ stfd_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfd_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -20,6 +25,7 @@ lsl w1, w1, 3
 ldr d1, [x19, x1] //grab fS double-value
 str d1, [x0] //store double-float to EA, stfd::ppc
 pc_adjust 0x4
+stfd_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -29,6 +35,8 @@ stfdu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfdu_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -43,6 +51,7 @@ lsl w1, w1, 3
 ldr d1, [x19, x1] //grab fS double-value
 str d1, [x0] //store double-float to EA, stfdu::ppc
 pc_adjust 0x4
+stfdu_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -52,6 +61,8 @@ stfdux_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfdux_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, rAoff] //get rA number
@@ -68,6 +79,7 @@ lsl w1, w1, 3
 ldr d1, [x19, x1] //grab fS double-value
 str d1, [x0] //store double-float to EA, stfdux::ppc
 pc_adjust 0x4
+stfdux_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -77,6 +89,8 @@ stfdx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfdx_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, rAoff] //get rA number
@@ -92,6 +106,7 @@ lsl w1, w1, 3
 ldr d1, [x19, x1] //grab fS double-value
 str d1, [x0] //store double-float to EA, stfdx::ppc
 pc_adjust 0x4
+stfdx_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -101,6 +116,8 @@ stfiwx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfiwx_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, rAoff] //get rA number
@@ -117,6 +134,7 @@ add w1, w1, 4
 ldr s1, [x19, x1] //grab fS ps1***
 str s1, [x0] //store single-float to EA, stfiwx::ppc
 pc_adjust 0x4
+stfiwx_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -126,6 +144,8 @@ stfs_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfs_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -139,6 +159,7 @@ lsl w1, w1, 3
 ldr s1, [x19, x1] //grab fS ps0
 str s1, [x0] //store single-float to EA, stfs::ppc
 pc_adjust 0x4
+stfs_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -148,6 +169,8 @@ stfsu_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfsu_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
@@ -162,6 +185,7 @@ lsl w1, w1, 3
 ldr s1, [x19, x1] //grab fS ps0
 str s1, [x0] //store single-float to EA, stfsu::ppc
 pc_adjust 0x4
+stfsu_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -171,6 +195,8 @@ stfsux_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfsux_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, rAoff] //get rA number
@@ -187,6 +213,7 @@ lsl w1, w1, 3
 ldr s1, [x19, x1] //grab fS ps0
 str s1, [x0] //store single-float to EA, stfsux::ppc
 pc_adjust 0x4
+stfsux_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -196,6 +223,8 @@ stfsx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
+bl float_legal_check
+cbnz w0, stfsx_ppc_epilogue
 mov x19, x0
 mov x20, x1
 ldr w2, [x0, rAoff] //get rA number
@@ -211,6 +240,7 @@ lsl w1, w1, 3
 ldr s1, [x19, x1] //grab fS ps0
 str s1, [x0] //store single-float to EA, stfsx::ppc
 pc_adjust 0x4
+stfsx_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret

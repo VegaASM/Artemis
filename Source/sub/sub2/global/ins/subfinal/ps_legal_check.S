@@ -8,8 +8,15 @@ x1 = reg bank ptr*/
 
 .globl ps_general_legal_check
 ps_general_legal_check:
-/*LE bit enabled in MSR?*/
+/*is FP enabled in MSR?*/
 ldr w2, [x1, msr]
+tst w2, 0x2000
+bne 0x10
+/*Execute FP unavailable*/
+bl fp_exception_vector
+mov w0, -1
+ret
+/*LE bit enabled in MSR?*/
 tbz w2, 1, 0x20
 /*LE is enabled, is HID4 LPE enabled?*/
 ldr w2, [x1, hid4]
@@ -34,8 +41,15 @@ ret
 
 .globl ps_load_store_legal_nonx_check
 ps_load_store_legal_nonx_check:
-/*LE bit enabled in MSR?*/
+/*is FP enabled in MSR?*/
 ldr w2, [x1, msr]
+tst w2, 0x2000
+bne 0x10
+/*Execute FP unavailable*/
+bl fp_exception_vector
+mov w0, -1
+ret
+/*LE bit enabled in MSR?*/
 tbz w2, 1, 0x20
 /*LE is enabled, is HID4 LPE enabled?*/
 ldr w2, [x1, hid4]

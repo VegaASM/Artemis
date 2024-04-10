@@ -9,8 +9,8 @@ float_legal_check:
 ldr w2, [x1, msr]
 tst w2, 0x2000
 bne 0x10
-/*Execute ISI!*/
-bl isi_exception_vector
+/*Execute FP Unavailable*/
+bl fp_exception_vector
 mov w0, -1
 ret
 mov w0, 0

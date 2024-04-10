@@ -38,6 +38,8 @@
 .set allotherexceptions_msr_mask, msr_ile | msr_me | msr_ip //MSR mask for anything BUT machine check. NOTE there's no info on the mask for IABR in the broadway. best to assume its this.
 .set mcheck_msr_mask, msr_ile | msr_ip
 
+//todo fix vectors that use EA to have it recieve EA as w0 arg, not w1, fix all parent funcs...
+
 .globl reset_exception_vector
 reset_exception_vector:
 stp fp, lr, [sp, -0x10]!
