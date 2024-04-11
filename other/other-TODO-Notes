@@ -1,3 +1,8 @@
-fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
+﻿fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
 put in fake values for pvr and chip id SPRs
 make a config file
+NOTE: crF 0 is a COPY of XER [SO]!!
+Dividy by zero sets overflow
+-2^31 / -1 also sets overflow
+0x80000000 / 0xFFFFFFFF = 0x80000000
+0x80000001 / 0xFFFFFFFF = 0x7FFFFFFF

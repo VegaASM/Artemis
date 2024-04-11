@@ -3,7 +3,9 @@
 /*x0 = extracted pcp items ptr, register numbers (NOT values) and IMMs reside here*/
 /*x1 = register bank ppc ptr (register VALUES reside here)*/
 
-//add rD rA rB
+//TODO oe feature isn't done properly on some instructions, Meaning for certain instructions we need to save rD before instruction executes, and compare it to afterwards. Basic cmp and extract V bit of ARM64 flags will work.
+
+//add rD, rA, rB
 .globl add_ppc
 add_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -19,6 +21,7 @@ str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
+//add. rD, rA, rB
 .globl addRC_ppc
 addRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -35,6 +38,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
+//addo rD, rA, rB
 .globl addo_ppc
 addo_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -51,6 +55,7 @@ oe_feature
 pc_adjust 0x4
 ret
 
+//addo. rD, rA, rB
 .globl addoRC_ppc
 addoRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -68,6 +73,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
+//addc rD, rA, rB; & set XER[CA]
 .globl addc_ppc
 addc_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -88,6 +94,7 @@ str w6, [x1, xer] //update ppc xer value
 pc_adjust 0x4
 ret
 
+//addc. rD, rA, rB
 .globl addcRC_ppc
 addcRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -109,6 +116,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
+//addco rD, rA, rB
 .globl addco_ppc
 addco_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -130,6 +138,7 @@ oe_feature
 pc_adjust 0x4
 ret
 
+//addco. rD, rA, rB
 .globl addcoRC_ppc
 addcoRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -165,26 +174,66 @@ ldr w4, [x1, x4] //grab rB's value
 add w3, w3, w4 //adde::ppc
 ldr w5, [x1, xer] //grab ppc xer value
 ubfx w5, w5, 29, 1 //extract xer[ca]
-add w3, w3, w5 //adde::ppc
+add w3, w3, w5 //adde::ppc, rD = rA + rB + XER[CA]
 str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 .globl addeRC_ppc
 addeRC_ppc:
-//TODO figure out how to do adde , addze, addme withusing current CA bit because using an adds instruciton will edit our CA bit!
-//We may be good for adde. addme. and addze. cuz we should be able to do regular add THEN the rc macro
-//But setting SO weill be an issue cuz we need and addS arm64 instruction
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+add w3, w3, w4 //addeRC::ppc
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //addeRC::ppc, rD = rA + rB + XER[CA]; and do cmpwi rD, 0
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl addeo_ppc
 addeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+adds w3, w3, w4 //addeRC::ppc; set V flag for later use of oe_feature macro
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //addeRC::ppc, rD = rA + rB + XER[CA]; and adjust XER SO+OV
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 .globl addeoRC_ppc
 addeoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+adds w3, w3, w4 //addeRC::ppc; set V flag for later use of oe_feature macro
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //addeRC::ppc, rD = rA + rB + XER[CA]; and do cmpwi rD, 0and adjust XER SO+OV
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -236,7 +285,7 @@ lsl w3, w3, 2
 ldr w4, [x0, SIMMoff] //get SIMM
 beq 0x8
 ldr w3, [x1, x3] //grab rA's value
-add w3, w3, w4 //addic::ppc
+add w3, w3, w4 //addicRC::ppc
 str w3, [x1, x2] //write rD
 mrs x5, NZCV //grab ARM64 flags
 ubfx w5, w5, 29, 1 //extract Carry flag
@@ -275,7 +324,7 @@ ldr w3, [x1, x3] //grab rA's value
 ldr w5, [x1, xer] //grab ppc xer value
 ubfx w5, w5, 29, 1 //extract xer[ca]
 add w3, w3, w5 //addme::ppc
-mov w4, -1 //addme::ppc NOTE addme = rA + CA + 0xFFFFFFFF according to BW manual
+mov w4, -1 //addme::ppc NOTE addme = rA + XER[CA] + 0xFFFFFFFF
 add w3, w3, w4 //addme::ppc
 str w3, [x1, x2] //write rD
 pc_adjust 0x4
@@ -284,18 +333,55 @@ ret
 //addme. rD, rA
 .globl addmeRC_ppc
 addmeRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //addmeRC::ppc
+mov w4, -1 //addmeRC::ppc, rD = rA + XER[CA] + 0xFFFFFFFF
+add w3, w3, w4 //addmeRC::ppc
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 //addmeo rD, rA
 .globl addmeo_ppc
 addmeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //addmeo::ppc, set ARM64 V flag for oe_feature macro
+mov w4, -1 //addmeo::ppc, rD = rA + XER[CA] + 0xFFFFFFFF
+add w3, w3, w4 //addmeo::ppc
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 //addmeo. rD, rA
 .globl addmeoRC_ppc
 addmeoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //addmeoRC::ppc, set ARM64 V flag for oe_feature macro
+mov w4, -1 //addmeoRC::ppc, rD = rA + XER[CA] + 0xFFFFFFFF
+add w3, w3, w4 //addmeoRC::ppc
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -309,7 +395,7 @@ lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA's value
 ldr w5, [x1, xer] //grab ppc xer value
 ubfx w5, w5, 29, 1 //extract xer[ca]
-add w3, w3, w5 //addze::ppc
+add w3, w3, w5 //addze::ppc, rD = rA + XER[CA]
 str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
@@ -317,208 +403,48 @@ ret
 //addze. rD, rA
 .globl addzeRC_ppc
 addzeRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //addze::ppc, rD = rA + XER[CA]
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 //addzeo rD, rA
 .globl addzeo_ppc
 addzeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //addze::ppc, rD = rA + XER[CA]; set ARM64 V flag for oe_feature macro
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 //addzeo. rD, rA
 .globl addzeoRC_ppc
 addzeoRC_ppc:
-pc_adjust 0x4
-ret
-
-//cmpw crfD, rA, rB
-.globl cmp_ppc
-cmp_ppc:
-ldr w2, [x0, rAoff] //Load rA number
+ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
-ldr w3, [x0, rBoff] //Load rB number
+ldr w3, [x0, rAoff] //get rA number
 lsl w3, w3, 2
-ldr w2, [x1, x2] //Load rA Value
-ldr w3, [x1, x2] //Load rB Value
-ldr w4, [x0, crfDoff] //Load crfD number
-ldr w5, [x1, cr]
-//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
-lsl w6, w4, 2 //mulli by 4
-sub w6, w6, 28
-neg w7, w6
-//Now we have ror imm value to rotate the CR by
-ror w5, w5, w7
-//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
-//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
-cmp w2, w3
-mrs x8, nzcv
-//Place all flags in their own register
-ubfx w9, w8, 31, 1 //Get N flag
-ubfx w10, w8, 30, 1 //Get Z flag
-ubfx w11, w8, 28, 1 //Get V flag
-//Does N==V? If so, set LT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bfi w5, w12, 3, 1
-//Is Z low && N==V? If so, set GT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bic w12, w12, w10 //and w/ complement, smart!
-bfi w5, w12, 2, 1
-//Set Z bit as EQ bit
-bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
-//New CR has been created, now rotate it back to where it was
-ror w5, w5, w6
-//Write new CR value!
-str w5, [x1, cr]
-pc_adjust 0x4
-ret
-
-//cmpwi crfD, rA, SIMM
-.globl cmpi_ppc
-cmpi_ppc:
-ldr w2, [x0, rAoff] //Load rA number
-lsl w2, w2, 2
-ldr w3, [x0, SIMMoff] //Load SIMM value
-ldr w2, [x1, x2] //Load rA Value
-ldr w4, [x0, crfDoff] //Load crfD number
-ldr w5, [x1, cr]
-//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
-lsl w6, w4, 2 //mulli by 4
-sub w6, w6, 28
-neg w7, w6
-//Now we have ror imm value to rotate the CR by
-ror w5, w5, w7
-//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
-//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
-cmp w2, w3
-mrs x8, nzcv
-//Place all flags in their own register
-ubfx w9, w8, 31, 1 //Get N flag
-ubfx w10, w8, 30, 1 //Get Z flag
-ubfx w11, w8, 28, 1 //Get V flag
-//Does N==V? If so, set LT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bfi w5, w12, 3, 1
-//Is Z low && N==V? If so, set GT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bic w12, w12, w10 //and w/ complement, smart!
-bfi w5, w12, 2, 1
-//Set Z bit as EQ bit
-bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
-//New CR has been created, now rotate it back to where it was
-ror w5, w5, w6
-//Write new CR value!
-str w5, [x1, cr]
-pc_adjust 0x4
-ret
-
-//cmplw crfD, rA, rB
-.globl cmpl_ppc
-cmpl_ppc:
-ldr w2, [x0, rAoff] //Load rA number
-lsl w2, w2, 2
-ldr w3, [x0, rBoff] //Load rB number
-lsl w3, w3, 2
-ldr w2, [x1, x2] //Load rA Value
-ldr w3, [x1, x2] //Load rB Value
-ldr w4, [x0, crfDoff] //Load crfD number
-ldr w5, [x1, cr]
-//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
-lsl w6, w4, 2 //mulli by 4
-sub w6, w6, 28
-neg w7, w6
-//Now we have ror imm value to rotate the CR by
-ror w5, w5, w7
-//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
-//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
-cmp w2, w3
-mrs x8, nzcv
-//Place all flags in their own register
-ubfx w9, w8, 30, 1 //Get Z flag
-ubfx w10, w8, 29, 1 //Get C flag
-ubfx w11, w8, 28, 1 //Get V flag
-//Is C low? If so, set LT, otherwise clear it (flip C bit and set it as LT bit)
-mvn w12, w10 //Flip bit
-bfi w5, w12, 3, 1
-//Set C bit as GT bit
-bfi w5, w10, 2, 1
-//Set Z bit as EQ bit
-bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
-//New CR has been created, now rotate it back to where it was
-ror w5, w5, w6
-//Write new CR value!
-str w5, [x1, cr]
-pc_adjust 0x4
-ret
-
-//cmplwi crfD, rA, UIMM
-.globl cmpli_ppc
-cmpli_ppc:
-ldr w2, [x0, rAoff] //Load rA number
-lsl w2, w2, 2
-ldr w3, [x0, UIMMoff] //Load UIMM value
-ldr w2, [x1, x2] //Load rA Value
-ldr w4, [x0, crfDoff] //Load crfD number
-ldr w5, [x1, cr]
-//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
-lsl w6, w4, 2 //mulli by 4
-sub w6, w6, 28
-neg w7, w6
-//Now we have ror imm value to rotate the CR by
-ror w5, w5, w7
-//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
-//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
-cmp w2, w3
-mrs x8, nzcv
-//Place all flags in their own register
-ubfx w9, w8, 30, 1 //Get Z flag
-ubfx w10, w8, 29, 1 //Get C flag
-ubfx w11, w8, 28, 1 //Get V flag
-//Is C low? If so, set LT, otherwise clear it (flip C bit and set it as LT bit)
-mvn w12, w10 //Flip bit
-bfi w5, w12, 3, 1
-//Set C bit as GT bit
-bfi w5, w10, 2, 1
-//Set Z bit as EQ bit
-bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
-//New CR has been created, now rotate it back to where it was
-ror w5, w5, w6
-//Write new CR value!
-str w5, [x1, cr]
-pc_adjust 0x4
-ret
-
-//cntlzw rA, rS
-.globl cntlzw_ppc
-cntlzw_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-clz w3, w3 //cntlzw::ppc
-str w3, [x1, x2] //write rA
-pc_adjust 0x4
-ret
-
-//cntlzw. rA, rS
-.globl cntlzwRC_ppc
-cntlzwRC_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-clz w3, w3 //cntlzwRC::ppc
-str w3, [x1, x2] //write rA
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //addze::ppc, rD = rA + XER[CA]; set ARM64 V flag for oe_feature macro
+str w3, [x1, x2] //write rD
+oe_feature
 record_feature w3
 pc_adjust 0x4
 ret
@@ -559,12 +485,14 @@ ret
 //divwo
 .globl divwo_ppc
 divwo_ppc:
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
 //divwo.
 .globl divwoRC_ppc
 divwoRC_ppc:
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
@@ -604,66 +532,14 @@ ret
 //divwuo
 .globl divwuo_ppc
 divwuo_ppc:
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
 //divwuo.
 .globl divwuoRC_ppc
 divwuoRC_ppc:
-pc_adjust 0x4
-ret
-
-//extsb
-.globl extsb_ppc
-extsb_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-sxtb w3, w3 //extsb::ppc
-str w3, [x1, x2] //write rA
-pc_adjust 0x4
-ret
-
-//extsb.
-.globl extsbRC_ppc
-extsbRC_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-sxtb w3, w3 //extsbRC::ppc
-str w3, [x1, x2] //write rA
-record_feature w3
-pc_adjust 0x4
-ret
-
-//extsh
-.globl extsh_ppc
-extsh_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-sxth w3, w3 //extsh::ppc
-str w3, [x1, x2] //write rA
-pc_adjust 0x4
-ret
-
-//extsh
-.globl extshRC_ppc
-extshRC_ppc:
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
-ldr w3, [x0, rSoff] //get rS number
-lsl w3, w3, 2
-ldr w3, [x1, x3] //grab rS's value
-sxth w3, w3 //extshRC::ppc
-str w3, [x1, x2] //write rA
-record_feature w3
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
@@ -824,120 +700,400 @@ pc_adjust 0x4
 ret
 
 //nego
-//TODO figure out how to set SO in the nego and nego. instructions
 .globl nego_ppc
 nego_ppc:
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
 //nego.
-//TODO figure out how to set SO in the nego and nego. instructions
 .globl negoRC_ppc
 negoRC_ppc:
+//TODO how do we set the ARM64 V flag in this?
 pc_adjust 0x4
 ret
 
 .globl subf_ppc
 subf_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sub w3, w4, w3 //subf::ppc
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 .globl subfRC_ppc
 subfRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sub w3, w4, w3 //subf::ppc
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfo_ppc
 subfo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sub w3, w4, w3 //subf::ppc
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfoRC_ppc
 subfoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sub w3, w4, w3 //subf::ppc
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfc_ppc
 subfc_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+subs w3, w4, w3 //subfc::ppc
+str w3, [x1, x2] //write rD
+mrs x5, NZCV //grab ARM64 flags
+ubfx w5, w5, 29, 1 //extract Carry flag
+ldr w6, [x1, xer] //grab ppc xer value
+bfi w6, w5, 29, 1 //replace xer's current carry flag
+str w6, [x1, xer] //update ppc xer value
 pc_adjust 0x4
 ret
 
 .globl subfcRC_ppc
 subfcRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+subs w3, w4, w3 //subfc::ppc
+str w3, [x1, x2] //write rD
+mrs x5, NZCV //grab ARM64 flags
+ubfx w5, w5, 29, 1 //extract Carry flag
+ldr w6, [x1, xer] //grab ppc xer value
+bfi w6, w5, 29, 1 //replace xer's current carry flag
+str w6, [x1, xer] //update ppc xer value
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfco_ppc
 subfco_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+subs w3, w4, w3 //subfc::ppc
+str w3, [x1, x2] //write rD
+mrs x5, NZCV //grab ARM64 flags
+ubfx w5, w5, 29, 1 //extract Carry flag
+ldr w6, [x1, xer] //grab ppc xer value
+bfi w6, w5, 29, 1 //replace xer's current carry flag
+str w6, [x1, xer] //update ppc xer value
+oe_feature
 pc_adjust 0x4
 ret
 
 .globl subfcoRC_ppc
 subfcoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+subs w3, w4, w3 //subfc::ppc
+str w3, [x1, x2] //write rD
+mrs x5, NZCV //grab ARM64 flags
+ubfx w5, w5, 29, 1 //extract Carry flag
+ldr w6, [x1, xer] //grab ppc xer value
+bfi w6, w5, 29, 1 //replace xer's current carry flag
+str w6, [x1, xer] //update ppc xer value
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfe_ppc
 subfe_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mvn w3, w3
+add w3, w4, w3 //subfe::ppc
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //subfe::ppc, rD = !rA + rB + XER[CA]
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 .globl subfeRC_ppc
 subfeRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mvn w3, w3
+add w3, w4, w3 //subfe::ppc
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+add w3, w3, w5 //subfe::ppc, rD = !rA + rB + XER[CA]
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfeo_ppc
 subfeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mvn w3, w3
+add w3, w4, w3 //subfe::ppc
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //subfe::ppc, rD = !rA + rB + XER[CA]
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 .globl subfeoRC_ppc
 subfeoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mvn w3, w3
+add w3, w4, w3 //subfe::ppc
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+adds w3, w3, w5 //subfe::ppc, rD = !rA + rB + XER[CA]
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfic_ppc
 subfic_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+cmp w3, 0 //literal 0 rule for rA
+lsl w3, w3, 2
+ldr w4, [x0, SIMMoff] //get SIMM
+beq 0x8
+ldr w3, [x1, x3] //grab rA's value
+sub w3, w4, w3 //subfic::ppc
+str w3, [x1, x2] //write rD
+mrs x5, NZCV //grab ARM64 flags
+ubfx w5, w5, 29, 1 //extract Carry flag
+ldr w6, [x1, xer] //grab ppc xer value
+bfi w6, w5, 29, 1 //replace xer's current carry flag
+str w6, [x1, xer] //update ppc xer value
 pc_adjust 0x4
 ret
 
 .globl subfme_ppc
 subfme_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfme::ppc
+mov w4, 1 //subfme::ppc NOTE addme = !rA + CA - 1 according to BW manual
+sub w3, w3, w4 //subfme::ppc
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 .globl subfmeRC_ppc
 subfmeRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfmeRC::ppc
+mov w4, 1 //subfmeRC::ppc NOTE addme = !rA + CA - 1 according to BW manual
+sub w3, w3, w4 //subfmeRC::ppc
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfmeo_ppc
 subfmeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfmeo::ppc
+mov w4, 1 //subfmeo::ppc NOTE addme = !rA + CA - 1 according to BW manual
+subs w3, w3, w4 //subfmeo::ppc
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 .globl subfmeoRC_ppc
 subfmeoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfmeoRC::ppc
+mov w4, 1 //subfmeoRC::ppc NOTE addme = !rA + CA - 1 according to BW manual
+subs w3, w3, w4 //subfmeoRC::ppc
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfze_ppc
 subfze_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfze::ppc , rD = !(rA) + XER[CA]
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 .globl subfzeRC_ppc
 subfzeRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+add w3, w3, w5 //subfzeRC::ppc , rD = !(rA) + XER[CA]
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
 .globl subfzeo_ppc
 subfzeo_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+adds w3, w3, w5 //subfzeo::ppc , rD = !(rA) + XER[CA]
+str w3, [x1, x2] //write rD
+oe_feature
 pc_adjust 0x4
 ret
 
 .globl subfzeoRC_ppc
 subfzeoRC_ppc:
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w5, [x1, xer] //grab ppc xer value
+ubfx w5, w5, 29, 1 //extract xer[ca]
+mvn w3, w3
+adds w3, w3, w5 //subfzeoRC::ppc , rD = !(rA) + XER[CA]
+str w3, [x1, x2] //write rD
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret

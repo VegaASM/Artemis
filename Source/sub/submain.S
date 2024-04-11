@@ -30,7 +30,7 @@ program_killed:
 successOUTPUT:
 .asciz "Instruction has been simulated/stepped. View/refresh www/artemis.txt & www/memory txt for changes.\n\n"
 welcomeMSG:
-.asciz "Welcome to Artemis!\n\nVersion: 0.0-r033\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
+.asciz "Welcome to Artemis!\n\nVersion: 0.0-r034\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
 fgets_error:
 .asciz "Error! The fgets function failed when retrieving the Console's input.\n\n"
 .align 2

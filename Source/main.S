@@ -3,7 +3,7 @@
 #include "sub/submain.S"
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
-#include "sub/cache.S" /*Must be before hardreset.S*/
+#include "sub/cache_symbols.S" /*Must be before hardreset.S*/
 #include "insert_bootbin.S"
 #include "hardreset.S"
 #include "insert_bootdol.S"

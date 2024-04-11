@@ -6,6 +6,7 @@ str w17, [x18, pc]
 .endm
 
 .macro record_feature wregister //For setting CR cr0's approriate bits from a (.) being used in a PPC instruction
+/*NOTE if instruction requires both oe_feature and record_feature, make sure oe_feature is *FIRST*!, NOT this macro*/
 cmp \wregister, 0
 mrs x18, NZCV //grab ARM64 flags, fyi we don't need C bit
 ldr x17, [x27, 0x20] 
@@ -14,8 +15,8 @@ ldr w16, [x17, cr] //grab ppc CR value
 ubfx w13, w18, 31, 1 //N
 ubfx w14, w18, 30, 1 //Z
 ubfx w15, w18, 28, 1 //V
-//Does N == V, if so set cr0 LT, other clear cr0 LT
-eon w12, w13, w15 //eqv, smart!
+//Does N =/= V, if so set cr0 LT, other clear cr0 LT
+eor w12, w13, w15
 bfi w16, w12, 31, 1
 //Is Z low && N == V? If so set cr0 GT, otherwise clear cr0 GT
 eon w12, w13, w15 //eqv, smart!
@@ -29,7 +30,7 @@ bfi w16, w15, 28, 1
 str w16, [x17, cr]
 .endm
 
-.macro oe_feature //NOTE this assumes the previous adds instruction was executed and NZCV flags are true to that
+.macro oe_feature //NOTE this assumes the previous s-appended ARM64 instruction was executed and NZCV flags are true to that
 //Grab Reg Bank ptr, then grab ppc xer value
 ldr x18, [x27, 0x20]
 ldr w17, [x18, xer]

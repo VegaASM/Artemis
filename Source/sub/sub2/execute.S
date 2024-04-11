@@ -12,8 +12,10 @@
 #include "global/ins/store_int.S"
 #include "global/ins/other.S"
 #include "global/ins/paired_singles.S"
-#include "global/ins/parameter.S"
+#include "global/ins/arithmetic.S"
+#include "global/ins/compare.S"
 #include "global/ins/rotate_shift.S"
+#include "global/ins/cache.S"
 
 func_table:
 .xword add_ppc

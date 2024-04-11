@@ -1,39 +1,4 @@
 
-.globl dcbf_ppc
-dcbf_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbi_ppc
-dcbi_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbst_ppc
-dcbst_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbt_ppc
-dcbt_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbtst_ppc
-dcbtst_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbz_ppc
-dcbz_ppc:
-pc_adjust 0x4
-ret
-
-.globl dcbz_l_ppc
-dcbz_l_ppc:
-pc_adjust 0x4
-ret
-
 .globl eciwx_ppc
 eciwx_ppc:
 pc_adjust 0x4
@@ -49,48 +14,53 @@ eieio_ppc:
 pc_adjust 0x4
 ret
 
-.globl icbi_ppc
-icbi_ppc:
-pc_adjust 0x4
-ret
-
-.globl isync_ppc
-isync_ppc:
-pc_adjust 0x4
-ret
-
 .globl mcrf_ppc
 mcrf_ppc:
 ldr w2, [x0, crfDoff] //grab crfD number
 ldr w3, [x0, crfSoff] //grab crfS number
 ldr w4, [x1, cr] //grab CR register value
 lsl w3, w3, 2 //mulli crfS number by 4
-add w3, w3, 4
-sub w3, w3, 32
-neg w3, w3
-ror w5, w4, w3
+sub w3, w3, 28
+neg w6, w3
+ror w5, w4, w6
 and w5, w5, 0xF
 /**/
 lsl w2, w2, 2
-add w2, w2, 4
-sub w2, w2, 32
+sub w2, w2, 28
 neg w7, w2
 ror w6, w4, w7
-and w6, w6, 0xFFFFFFF0
+and w6, w6, 0xFFFFFFF0 //not using bfc for preference
 /**/
 orr w6, w6, w5
-ror w6, w6, w2 //check me!
+add w2, w2, 32
+ror w6, w6, w2
 str w6, [x1, cr]
 pc_adjust 0x4
 ret
 
+//mcrfs crfD, crfS
 .globl mcrfs_ppc
 mcrfs_ppc:
 pc_adjust 0x4
 ret
 
+//mcrxr crfD
 .globl mcrxr_ppc
 mcrxr_ppc:
+ldr w2, [x0, crfDoff] //get crfD value
+ldr w3, [x1, xer] //get XER value
+ubfx w3, w3, 28, 4 //get XER bits big endian 0 thru 3
+ldr w4, [x1, cr] //get CR
+lsl w2, w2, 2 //mulli crfD by 4
+sub w2, w2, 28 //subtract 28 from result
+neg w3, w2 //neg it to get positive amount to ROR by
+ror w4, w4, w2
+bfi w4, w3, 0, 4 //Insert XER bits
+add w2, w2, 32 //get new amount to ROR back to
+ror w4, w4, 2
+bfc w3, 28, 4 //clear XER big endian bits 0 thru 3
+str w3, [x1, xer] //write new XER value
+str w4, [x1, cr] //write new CR value
 pc_adjust 0x4
 ret
 
@@ -557,21 +527,59 @@ ret
 
 .globl mtfsb0_ppc
 mtfsb0_ppc:
+ldr w2, [x0, crbDoff] //load crbD value
+ldr w3, [x1, fpscr] //get fpscr value
+sub w2, w2, 31
+neg w4, w2
+ror w3, w3, w4
+bfc w3, 0, 1
+add w2, w2, 32
+ror w3, w3, 2
+str w3, [x1, fpscr]
 pc_adjust 0x4
 ret
 
 .globl mtfsb0RC_ppc
 mtfsb0RC_ppc:
+ldr w2, [x0, crbDoff] //load crbD value
+ldr w3, [x1, fpscr] //get fpscr value
+sub w2, w2, 31
+neg w4, w2
+ror w3, w3, w4
+bfc w3, 0, 1
+add w2, w2, 32
+ror w3, w3, 2
+str w3, [x1, fpscr]
 pc_adjust 0x4
+//todo cr1 fp bits
 ret
 
 .globl mtfsb1_ppc
 mtfsb1_ppc:
+ldr w2, [x0, crbDoff] //load crbD value
+ldr w3, [x1, fpscr] //get fpscr value
+sub w2, w2, 31
+neg w4, w2
+ror w3, w3, w4
+orr w3, w3, 1
+add w2, w2, 32
+ror w3, w3, 2
+str w3, [x1, fpscr]
 pc_adjust 0x4
 ret
 
 .globl mtfsb1RC_ppc
 mtfsb1RC_ppc:
+ldr w2, [x0, crbDoff] //load crbD value
+ldr w3, [x1, fpscr] //get fpscr value
+sub w2, w2, 31
+neg w4, w2
+ror w3, w3, w4
+orr w3, w3, 1
+add w2, w2, 32
+ror w3, w3, 2
+str w3, [x1, fpscr]
+//todo cr1 fp bits
 pc_adjust 0x4
 ret
 
@@ -1016,12 +1024,84 @@ ret
 
 .globl tw_ppc
 tw_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rBoff] //get rB number
+lsl w3, w3, 2
+ldr w2, [x1, x2] //get rA value
+ldr w3, [x1, x3] //get rB value
+ldr w4, [x0, TOoff] //get TO Value
+cmp w2, w3 //set flags
+mrs x2, nzcv //get flags
+ubfx w5, w2, 31, 1 //N
+ubfx w6, w2, 30, 1 //Z
+ubfx w7, w2, 29, 1 //C
+ubfx w8, w2, 28, 1 //V
+//Make LT flag from ARM64 flags, and place it in big endian bit 27 of dedicated scrap register
+eor w9, w5, w8
+lsl w9, w9, 4
+//Make GT flag from ARM64 flags, and place it in big endian bit 28 of dedicated scrap register
+eon w10, w5, w8 //eqv
+bic w10, w10, w6 //and w/ complement
+bfi w9, w0, 3, 1
+//Make EQ flag from ARM64 flags, and place it in big endian bit 29 of dedicated scrap register
+bfi w9, w6, 2, 1
+//Make Unsigned LT flag from ARM64 flags, and place in big endian bit 30 of dedicated scrap register
+mvn w10, w7
+bfi w9, w0, 1, 1
+//Make Unsigned GT flag from ARM64 flags, and place in big endian bit 31 of dedicated scrap register
+bfi w9, w7, 0, 1
+//scrap register will be used to do Logical AND with TO field
+//if *ANY* bit remains high after ANDing, then Trap!
+tst w9, w4
+beq 0x8
+bl program_exception_vector
 pc_adjust 0x4
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl twi_ppc
 twi_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rBoff] //get SIMM
+ldr w2, [x1, x2] //get rA value
+ldr w4, [x0, TOoff] //get TO Value
+cmp w2, w3 //set flags
+mrs x2, nzcv //get flags
+ubfx w5, w2, 31, 1 //N
+ubfx w6, w2, 30, 1 //Z
+ubfx w7, w2, 29, 1 //C
+ubfx w8, w2, 28, 1 //V
+//Make LT flag from ARM64 flags, and place it in big endian bit 27 of dedicated scrap register
+eor w9, w5, w8
+lsl w9, w9, 4
+//Make GT flag from ARM64 flags, and place it in big endian bit 28 of dedicated scrap register
+eon w10, w5, w8 //eqv
+bic w10, w10, w6 //and w/ complement
+bfi w9, w0, 3, 1
+//Make EQ flag from ARM64 flags, and place it in big endian bit 29 of dedicated scrap register
+bfi w9, w6, 2, 1
+//Make Unsigned LT flag from ARM64 flags, and place in big endian bit 30 of dedicated scrap register
+mvn w10, w7
+bfi w9, w0, 1, 1
+//Make Unsigned GT flag from ARM64 flags, and place in big endian bit 31 of dedicated scrap register
+bfi w9, w7, 0, 1
+//scrap register will be used to do Logical AND with TO field
+//if *ANY* bit remains high after ANDing, then Trap!
+tst w9, w4
+beq 0x8
+bl program_exception_vector
 pc_adjust 0x4
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl invalid_ppc

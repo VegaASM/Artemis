@@ -1,3 +1,6 @@
+/*x0 = extracted pcp items ptr, register numbers (NOT values) and IMMs reside here*/
+/*x1 = register bank ppc ptr (register VALUES reside here)*/
+
 //and rA, rS, rB
 .globl and_ppc
 and_ppc:
@@ -90,6 +93,33 @@ ldr w4, [x0, UIMMoff] //get UIMM
 ldr w3, [x1, x3] //grab rS's value
 lsl w4, w4, 16 //andisRC::ppc
 and w3, w3, w4 //andisRC::ppc
+str w3, [x1, x2] //write rA
+record_feature w3
+pc_adjust 0x4
+ret
+
+//cntlzw rA, rS
+.globl cntlzw_ppc
+cntlzw_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+clz w3, w3 //cntlzw::ppc
+str w3, [x1, x2] //write rA
+pc_adjust 0x4
+ret
+
+//cntlzw. rA, rS
+.globl cntlzwRC_ppc
+cntlzwRC_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+clz w3, w3 //cntlzwRC::ppc
 str w3, [x1, x2] //write rA
 record_feature w3
 pc_adjust 0x4
@@ -353,7 +383,7 @@ str w5, [x1, cr]
 pc_adjust 0x4
 ret
 
-//eqv/xnor
+//eqv/xnor rA, rS, rB
 .globl eqv_ppc
 eqv_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -369,7 +399,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//eqv./xnor.
+//eqv./xnor. rA, rS, rB
 .globl eqvRC_ppc
 eqvRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -386,7 +416,61 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//nand
+//extsb rA, rS
+.globl extsb_ppc
+extsb_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+sxtb w3, w3 //extsb::ppc
+str w3, [x1, x2] //write rA
+pc_adjust 0x4
+ret
+
+//extsb. rA, rS
+.globl extsbRC_ppc
+extsbRC_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+sxtb w3, w3 //extsbRC::ppc
+str w3, [x1, x2] //write rA
+record_feature w3
+pc_adjust 0x4
+ret
+
+//extsh rA, rS
+.globl extsh_ppc
+extsh_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+sxth w3, w3 //extsh::ppc
+str w3, [x1, x2] //write rA
+pc_adjust 0x4
+ret
+
+//extsh. rA, rS
+.globl extshRC_ppc
+extshRC_ppc:
+ldr w2, [x0, rAoff] //get rA number
+lsl w2, w2, 2
+ldr w3, [x0, rSoff] //get rS number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rS's value
+sxth w3, w3 //extshRC::ppc
+str w3, [x1, x2] //write rA
+record_feature w3
+pc_adjust 0x4
+ret
+
+//nand rA, rS, rB
 .globl nand_ppc
 nand_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -403,7 +487,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//nand.
+//nand. rA, rS, rB
 .globl nandRC_ppc
 nandRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -421,7 +505,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//nor
+//nor rA, rS, rB
 .globl nor_ppc
 nor_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -438,7 +522,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//nor.
+//nor. rA, rS, rB
 .globl norRC_ppc
 norRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -456,7 +540,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//or
+//or rA, rS, rB
 .globl or_ppc
 or_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -472,7 +556,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//or.
+//or. rA, rS, rB
 .globl orRC_ppc
 orRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -489,7 +573,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//orc
+//orc rA, rS, rB
 .globl orc_ppc
 orc_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -505,7 +589,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//orc.
+//orc. rA, rS, rB
 .globl orcRC_ppc
 orcRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -522,7 +606,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//ori
+//ori rA, rS, UIMM
 .globl ori_ppc
 ori_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -536,7 +620,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//oris
+//oris rA, rS, UIMM
 .globl oris_ppc
 oris_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -551,7 +635,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//xor
+//xor rA, rS, rB
 .globl xor_ppc
 xor_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -568,7 +652,7 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//xor.
+//xor. rA, rS, rB
 .globl xorRC_ppc
 xorRC_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -584,7 +668,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//xori
+//xori rA, rS, UIMM
 .globl xori_ppc
 xori_ppc:
 ldr w2, [x0, rAoff] //get rA number
@@ -598,7 +682,7 @@ str w3, [x1, x2] //write rA
 pc_adjust 0x4
 ret
 
-//xoris
+//xoris rA, rS, UIMM
 .globl xoris_ppc
 xoris_ppc:
 ldr w2, [x0, rAoff] //get rA number
