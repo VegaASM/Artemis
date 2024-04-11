@@ -1,0 +1,13 @@
+#This is the configuration file for Artemis
+#Only Hashed Tagged style comments are allowed
+#Spacing & Tabbing is permitted
+
+#This file only contains one setting. A numerical value that determines which option to use
+#See notes.txt for more details
+#0 = Broadway Boot
+#1 = Custom Boot
+#2 = Boot.bin only
+#3 = Boot.dol only
+#4 = ppc.elf only
+
+0

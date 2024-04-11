@@ -1,4 +1,5 @@
-﻿fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
+﻿finish rest of HID2 PSE add-ons for float_int.S
+fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
 put in fake values for pvr and chip id SPRs
 make a config file
 NOTE: crF 0 is a COPY of XER [SO]!!

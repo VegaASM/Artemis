@@ -1,6 +1,6 @@
 #include "subfinal/float_legal_check.S"
 
-//Important NOTES
+//Single Precision Important NOTES
 //math HID2 PSE low (i.e. fadds) = entire FPR for input and output
 //math HID2 PSE high (i.e. fadds) = ps0's used for input. ps0 and ps1 get output
 //fres HID2 PSE low = can only be used on single precision floats, entire FPR used
@@ -133,8 +133,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fadd v3.2s, v3.2s, v4.2s //fadds::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fadd d3, d3, d4
+fcvt s0, d0
+fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fadds_ppc_epilogue:
@@ -161,8 +168,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fadd v3.2s, v3.2s, v4.2s //faddsRC::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fadd d3, d3, d4
+fcvt s0, d0
+fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -197,7 +211,6 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-//TODO put in code to tell single vs double float
 fcvtas w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 pc_adjust 0x4
@@ -222,7 +235,6 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-//TODO put in code to tell single vs double float
 fcvtas w3, d3 //or would it be fcvtn? check me in future
 str w3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
@@ -248,7 +260,6 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-//TODO put in code to tell single vs double float
 fcvtzs w3, d3
 str w3, [x1, x2] //Write fD's value
 pc_adjust 0x4
@@ -273,7 +284,6 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-//TODO put in code to tell single vs double float
 fcvtzs w3, d3
 str w3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
@@ -357,8 +367,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fdiv v3.2s, v3.2s, v4.2s //fdivs::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fdiv d3, d3, d4
+fcvt s0, d0
+fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fdivs_ppc_epilogue:
@@ -385,8 +402,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fdiv v3.2s, v3.2s, v4.2s //fdivsRC::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fdiv d3, d3, d4
+fcvt s0, d0
+fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -561,7 +585,7 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
-//TODO put in code to tell if we do double or single precision..
+//TODO put in code to read HID2 PSE to determine what do exactly do..
 //Leave ps1 of dest reg unchanged
 pc_adjust 0x4
 fmrRC_ppc_epilogue:

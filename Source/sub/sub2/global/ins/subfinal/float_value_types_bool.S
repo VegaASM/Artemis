@@ -8,11 +8,10 @@
 .set double_fraction_mask, 0x000FFFFFFFFFFFFF
 /*.set hid2_pse, 0x20000000 TODO put all HID stuff in own file*/
 
-.globl is_hid2_pse_high /*NOTE maybe not have it in own func */
-is_hid2_pse_high:
-ldr w0, [x27, 0x20] /*reg bank ptr*/
-ubfx w0, w0, 29, 1
-ret
+.macro Get_hid2_pse wregister
+ldr \wregister, [x27, 0x20] /*reg bank ptr*/
+ubfx \wregister, \wregister, 29, 1
+.endm
 
 .globl is_normalized_single
 is_normalized_single:

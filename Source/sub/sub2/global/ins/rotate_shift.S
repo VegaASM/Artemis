@@ -4,7 +4,7 @@ rlwimi_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x0, SHoff] //load SH value
 ldr w5, [x0, MBoff] //load MB value
@@ -12,7 +12,38 @@ ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
 ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwimi
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwimi
+ME_higherthan_MBrlwimi:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwimi:
+and w7, w7, w8
+//w7 has Mask, now temporarily ANd it with what's in rS
+and w9, w3, w7
+//Now logically flip this temp value
+mvn w9, w9
+//Now take this flipped value, and AND it with what's in rS to clear its clear qualified bits determined by the Mask
+and w9, w3, w9
+//All we got to do now is OR the Mask into rS to get rA result and we're done
+orr w3, w3, w9
+str w3, [x1, x2] //rlwimi::ppc
 pc_adjust 0x4
 ret
 
@@ -22,7 +53,7 @@ rlwimiRC_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x0, SHoff] //load SH value
 ldr w5, [x0, MBoff] //load MB value
@@ -30,7 +61,39 @@ ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
 ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwimiRC
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwimiRC
+ME_higherthan_MBrlwimiRC:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwimiRC:
+and w7, w7, w8
+//w7 has Mask, now temporarily ANd it with what's in rS
+and w9, w3, w7
+//Now logically flip this temp value
+mvn w9, w9
+//Now take this flipped value, and AND it with what's in rS to clear its clear qualified bits determined by the Mask
+and w9, w3, w9
+//All we got to do now is OR the Mask into rS to get rA result and we're done
+orr w3, w3, w9
+str w3, [x1, x2] //rlwimiRC::ppc
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -40,7 +103,7 @@ rlwinm_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x0, SHoff] //load SH value
 ldr w5, [x0, MBoff] //load MB value
@@ -48,7 +111,32 @@ ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
 ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwinm
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwinm
+ME_higherthan_MBrlwinm:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwinm:
+and w7, w7, w8
+//Now apply the mask and we're done
+and w3, w3, w7
+str w3, [x1, x2] //rlwinm::ppc
 pc_adjust 0x4
 ret
 
@@ -58,7 +146,7 @@ rlwinmRC_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x0, SHoff] //load SH value
 ldr w5, [x0, MBoff] //load MB value
@@ -66,45 +154,123 @@ ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
 ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwinmRC
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwinmRC
+ME_higherthan_MBrlwinmRC:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwinmRC:
+and w7, w7, w8
+//Now apply the mask and we're done
+and w3, w3, w7
+str w3, [x1, x2] //rlwinmRC::ppc
 pc_adjust 0x4
+record_feature w3
 ret
 
-//rlwnm rA, rS, SH, MB, ME
+//rlwnm rA, rS, rB, MB, ME
 .globl rlwnm_ppc
 rlwnm_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w4, [x0, rBoff] //load rB number
+lsl w4, w4, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x1, x4] //load rB value
 ldr w5, [x0, MBoff] //load MB value
 ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
-ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+ror w3, w3, w4 //rotate left via rB
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwnm
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwnm
+ME_higherthan_MBrlwnm:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwnm:
+and w7, w7, w8
+//Now apply the mask and we're done
+and w3, w3, w7
+str w3, [x1, x2] //rlwnm::ppc
 pc_adjust 0x4
 ret
 
-//rlwnm. rA, rS, SH, MB, ME
+//rlwnm. rA, rS, rB, MB, ME
 .globl rlwnmRC_ppc
 rlwnmRC_ppc:
 ldr w2, [x0, rAoff] //load rA number
 lsl w2, w2, 2
 ldr w3, [x0, rSoff] //load rS number
-lsl w3, w3, w2
+lsl w3, w3, 2
 ldr w4, [x0, rBoff] //load rB number
+lsl w4, w4, 2
 ldr w3, [x1, x3] //load rS value
 ldr w4, [x1, x4] //load rB value
 ldr w5, [x0, MBoff] //load MB value
 ldr w6, [x0, MEoff] //load ME value
 sub w4, w4, 32
 neg w4, w4
-ror w3, w3, w4 //rotate left via SH
-//TODO calc how to do mask start and end..
+ror w3, w3, w4 //rotate left via rB
+//Is ME > MB
+//If so we gotta make sure chain of bits "wraps" around when going from big endian bit 31 back over to bit 0
+cmp w5, w6
+bhi ME_higherthan_MBrlwnmRC
+//First, set a signed mask using ME's value
+mov w7, 0x80000000
+asr w7, w7, w6
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on MB's real value
+lsr w8, w8, w5
+b and_temp_masksrlwnmRC
+ME_higherthan_MBrlwnmRC:
+//First, set signed mask using MB's value
+mov w7, 0x80000000
+asr w7, w7, w5
+//Next, set a all bits high mask
+mov w8, 0xFFFFFFFF
+//Now, shift this mask to the right depending on ME's real value
+lsr w8, w8, w6
+//And both masks together to get instruction's actual mask
+and_temp_masksrlwnmRC:
+and w7, w7, w8
+//Now apply the mask and we're done
+and w3, w3, w7
+str w3, [x1, x2] //rlwnmRC::ppc
 pc_adjust 0x4
 ret
 
