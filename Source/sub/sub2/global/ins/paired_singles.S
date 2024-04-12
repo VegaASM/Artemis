@@ -381,7 +381,7 @@ mov fp, sp
 mov x19, x0
 mov x20, x1
 bl ps_general_legal_check
-cbnz w0, ps_merge10_ppc_epilogue
+cbnz w0, ps_merge11_ppc_epilogue
 add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
 ldr w2, [x19, fDoff] //load fD number
 lsl w2, w2, 3
@@ -394,7 +394,7 @@ ldr d4, [x1, x4] //Grab fB's value
 ins v4.s[0], v3.s[1] //place fA ps1 into fD ps0, by code design fB ps1 is "already in" fD ps1
 str d4, [x1, x2] //Write fD's value; NOTE d4 is stored, not d4
 pc_adjust 0x4
-ps_merge10_ppc_epilogue:
+ps_merge11_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
@@ -414,7 +414,7 @@ mov fp, sp
 mov x19, x0
 mov x20, x1
 bl ps_general_legal_check
-cbnz w0, ps_merge10_ppc_epilogue
+cbnz w0, ps_mr_ppc_epilogue
 add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
 ldr w2, [x19, fDoff] //load fD number
 lsl w2, w2, 3
@@ -422,7 +422,7 @@ ldr w3, [x19, fAoff] //load fA number
 ldr d3, [x1, x3] //Grab fA's value
 str d3, [x1, x2] //All we need to do is just Write fD's value. ARM64 does zero conversion, yay
 pc_adjust 0x4
-ps_merge10_ppc_epilogue:
+ps_mr_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret

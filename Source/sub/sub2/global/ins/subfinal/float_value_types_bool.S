@@ -29,8 +29,8 @@ ret
 
 .globl is_normalized_double
 is_normalized_double:
-fmov w0, s0
-ubfx w0, w0, double_exp_lsb, double_exp_size
+fmov x0, d0
+ubfx x0, x0, double_exp_lsb, double_exp_size
 cmp w0, 0x7FF
 beq 0x14
 cmp w0, 0
@@ -42,7 +42,7 @@ mov w0, 0
 ret
 
 is_positive_zero_single:
-movi s1, 0
+movi d1, 0
 fcmp s0, s1
 bne 0xC
 mov w0, 1
@@ -60,7 +60,7 @@ mov w0, 0
 ret
 
 is_negative_zero_single:
-movi s1, 0
+movi d1, 0
 fneg s1, s1 //flip the sign bit
 fcmp s0, s1
 bne 0xC
@@ -71,7 +71,7 @@ ret
 
 is_negative_zero_double:
 movi d1, 0
-fneg d1, d1, //flip the sign bit
+fneg d1, d1 //flip the sign bit
 fcmp d0, d1
 bne 0xC
 mov w0, 1
@@ -183,7 +183,7 @@ and w0, w2, w3 //If exp = max && fraction != 0, then return true
 ret
 
 is_NaN_double:
-fmov x1, s0
+fmov x1, d0
 ubfx x0, x1, double_exp_lsb, double_exp_size
 cmp w0, 0xFF
 mrs x2, nzcv
@@ -203,7 +203,7 @@ clz w2, w0
 add w1, w1, w2
 lsl w0, w0, w2
 eor w0, w0, 0x80000000
-bfi w0, w1, xx, xx
+//TODO bfi w0, w1, xx, xx
 fmov s0, w0
 ret
 
@@ -213,10 +213,10 @@ fmov x0, d0
 ubfx x1, x0, double_exp_lsb, double_exp_size
 clz x2, x0
 add x1, x1, x2
-lsl x0, x0, w2
+lsl x0, x0, x2
 eor x0, x0, 0x8000000000000000
-bfi x0, x1, xx, xx
-fmov x0, x0
+//TODO bfi x0, x1, xx, xx
+fmov d0, x0
 ret
 
 /*how to normalize a denormed number

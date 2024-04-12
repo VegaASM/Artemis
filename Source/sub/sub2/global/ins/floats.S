@@ -1,4 +1,5 @@
 #include "subfinal/float_legal_check.S"
+#include "subfinal/float_value_types_bool.S" //TODO this should be somewhere not here, cuz we may get assembler kickout if for w/e reason in execute.S the float.S gets established After paired_singles.S
 
 //Single Precision Important NOTES
 //math HID2 PSE low (i.e. fadds) = entire FPR for input and output
@@ -140,8 +141,8 @@ fadd v3.2s, v3.2s, v4.2s //fadds::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
 b 0x10
 fadd d3, d3, d4
-fcvt s0, d0
-fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fadds_ppc_epilogue:
@@ -175,8 +176,8 @@ fadd v3.2s, v3.2s, v4.2s //faddsRC::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
 b 0x10
 fadd d3, d3, d4
-fcvt s0, d0
-fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -374,8 +375,8 @@ fdiv v3.2s, v3.2s, v4.2s //fdivs::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
 b 0x10
 fdiv d3, d3, d4
-fcvt s0, d0
-fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fdivs_ppc_epilogue:
@@ -409,8 +410,8 @@ fdiv v3.2s, v3.2s, v4.2s //fdivsRC::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
 b 0x10
 fdiv d3, d3, d4
-fcvt s0, d0
-fcvt d0, s0 //Result needs to be single precision but using 64-bits in width
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -502,9 +503,17 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x14
 fmul v3.2s, v3.2s, v4.2s
 fadd v3.2s, v3.2s, v5.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x14
+fmul d3, d3, d4
+fadd d3, d3, d5
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fmadds_ppc_epilogue:
@@ -534,9 +543,17 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x14
 fmul v3.2s, v3.2s, v4.2s
 fadd v3.2s, v3.2s, v5.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x14
+fmul d3, d3, d4
+fadd d3, d3, d5
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -561,8 +578,12 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
-//TODO put in code to tell if we do double or single precision..
-//Leave ps1 of dest reg unchanged
+Get_hid2_pse w18
+cmp w18, 0
+beq 0xC //for fmr with PSE low, we can simply just write to fD in reg bank
+ldr x5, [x1, x2] //need current fD value
+ins v3.s[0], v5.s[0] //fmr does ps0 fB into fD with fD's ps1 unchanged. But I don't want the ARM64 dest register to be v5. So what we can do is just insert fD's ps1 into fB, and store the "fB" value as the new fD
+str x3, [x1, x2] //write new fD value
 pc_adjust 0x4
 fmr_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -585,8 +606,13 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
-//TODO put in code to read HID2 PSE to determine what do exactly do..
-//Leave ps1 of dest reg unchanged
+Get_hid2_pse w18
+cmp w18, 0
+beq 0xC //for fmr with PSE low, we can simply just write to fD in reg bank
+ldr x5, [x1, x2] //need current fD value
+ins v3.s[0], v5.s[0] //fmr does ps0 fB into fD with fD's ps1 unchanged. But I don't want the ARM64 dest register to be v5. So what we can do is just insert fD's ps1 into fB, and store the "fB" value as the new fD
+str x3, [x1, x2] //write new fD value
+//TODO cr1 stuff
 pc_adjust 0x4
 fmrRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -676,9 +702,17 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x14
 fmul v3.2s, v3.2s, v4.2s
 fsub v3.2s, v3.2s, v5.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x14
+fmul d3, d3, d4
+fsub d3, d3, d5
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fmsubs_ppc_epilogue:
@@ -708,9 +742,17 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x14
 fmul v3.2s, v3.2s, v4.2s
 fsub v3.2s, v3.2s, v5.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x14
+fmul d3, d3, d4
+fsub d3, d3, d5
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -793,8 +835,15 @@ ldr w4, [x19, fCoff] //load fC number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fmul v3.2s, v3.2s, v4.2s //fmuls::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fmul d3, d3, d4
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fmuls_ppc_epilogue:
@@ -820,8 +869,16 @@ ldr w4, [x19, fCoff] //load fC number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
-fmul v3.2s, v3.2s, v4.2s //fmulsRC::ppc
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+fmul v3.2s, v3.2s, v4.2s //fmuls::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+str d3, [x1, x2] //Write fD's value
+b 0x10
+fmul d3, d3, d4
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -1004,10 +1061,19 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x18
 fmul v3.2s, v3.2s, v4.2s
 fadd v3.2s, v3.2s, v5.2s
 fneg v3.2s, v3.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x18
+fmul d3, d3, d4
+fadd d3, d3, d5
+fneg d3, d3
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fnmadds_ppc_epilogue:
@@ -1036,12 +1102,20 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x18
 fmul v3.2s, v3.2s, v4.2s
 fadd v3.2s, v3.2s, v5.2s
 fneg v3.2s, v3.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x18
+fmul d3, d3, d4
+fadd d3, d3, d5
+fneg d3, d3
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
-//TODO cr1 stuff
 pc_adjust 0x4
 fnmaddsRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1126,10 +1200,19 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x18
 fmul v3.2s, v3.2s, v4.2s
 fsub v3.2s, v3.2s, v5.2s
 fneg v3.2s, v3.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x18
+fmul d3, d3, d4
+fsub d3, d3, d5
+fneg d3, d3
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fnmsubs_ppc_epilogue:
@@ -1158,10 +1241,19 @@ lsl w5, w5, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fC's value
 ldr d5, [x1, x5] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x18
 fmul v3.2s, v3.2s, v4.2s
 fsub v3.2s, v3.2s, v5.2s
 fneg v3.2s, v3.2s
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x18
+fmul d3, d3, d4
+fsub d3, d3, d5
+fneg d3, d3
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
@@ -1172,7 +1264,6 @@ ret
 
 .globl fres_ppc
 fres_ppc:
-//todo pse hid2 crap
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1186,8 +1277,16 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+frecpe v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
 frecpe d3, d3
-str d3, [x1, x2] //Write new fB
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
+str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fres_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1196,7 +1295,6 @@ ret
 
 .globl fresRC_ppc
 fresRC_ppc:
-//todo pse hid2 crap
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1210,9 +1308,17 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+frecpe v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
 frecpe d3, d3
-str d3, [x1, x2] //Write new fB
-//TODO cr1 fp stuff
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
+str d3, [x1, x2] //Write fD's value
+//TODO cr1 stuff
 pc_adjust 0x4
 fresRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1221,7 +1327,6 @@ ret
 
 .globl frsp_ppc
 frsp_ppc:
-//todo pse hid2 crap
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1235,8 +1340,15 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-fcvt s3, d3 //todo hid2 pse crap
-str s3, [x1, x2] //Write new fB //NOT CORRECT todo
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+fcvt s3, d3
+dup v3.2s, v3.s[1] //ps0 needs to have result. ps1 is suppose to be undefined. We could put some "junk" random value for ps1 now..., but I'll let it be (TODO)
+b 0xC
+fcvt s3, d3 //do the frsp conversion
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
+str s3, [x1, x2]
 pc_adjust 0x4
 frsp_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1245,7 +1357,6 @@ ret
 
 .globl frspRC_ppc
 frspRC_ppc:
-//todo pse hid2 crap
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1259,9 +1370,16 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-fcvt s3, d3 //todo hid2 pse crap
-str s3, [x1, x2] //Write new fB //NOT CORRECT todo
-//todo cr1 fp stuff
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+fcvt s3, d3
+dup v3.2s, v3.s[1] //ps0 needs to have result. ps1 is suppose to be undefined. We could put some "junk" random value for ps1 now..., but I'll let it be (TODO)
+b 0xC
+fcvt s3, d3 //do the frsp conversion
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
+str s3, [x1, x2]
+//TODO cr1 stuff
 pc_adjust 0x4
 frspRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1270,7 +1388,9 @@ ret
 
 .globl frsqrte_ppc
 frsqrte_ppc:
-//todo pse hid2 crap
+//According to Broadway Manual HID2 PSE doesn't effect instruction but that has to be wrong or else my DBZ and MKWii speedometer codes would produce wild (undefined) results.
+//Broadway manual says whole FPR input and whole FPR is output
+//Has to be this.. when HID2 PSE low, that is the case but when HID2 PSE high, ps0 is input and result is written to ps0 and ps1
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1284,7 +1404,13 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-frsqrte d3, d3 //NOTE: double-width only! no ps0 only crap
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+frsqrte v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x8
+frsqrte d3, d3 //NOTE do NOT do fcvt twice to make a 64-bit width single precision result. This instruction is meant to output double-precision result (when HID2 PSE is low)
 str d3, [x1, x2] //Write new fB
 pc_adjust 0x4
 frsqrte_ppc_epilogue:
@@ -1294,7 +1420,9 @@ ret
 
 .globl frsqrteRC_ppc
 frsqrteRC_ppc:
-//todo pse hid2 crap
+//According to Broadway Manual HID2 PSE doesn't effect instruction but that has to be wrong or else my DBZ and MKWii speedometer codes would produce wild (undefined) results.
+//Broadway manual says whole FPR input and whole FPR is output
+//Has to be this.. when HID2 PSE low, that is the case but when HID2 PSE high, ps0 is input and result is written to ps0 and ps1
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1308,9 +1436,15 @@ lsl w2, w2, 3
 ldr w3, [x19, fBoff] //load fB number
 lsl w3, w3, 3
 ldr d3, [x1, x3] //Grab fB's value
-frsqrte d3, d3 //NOTE: double-width only! no ps0 only crap
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+frsqrte v3.2s, v3.2s
+dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x8
+frsqrte d3, d3 //NOTE do NOT do fcvt twice to make a 64-bit width single precision result. This instruction is meant to output double-precision result (when HID2 PSE is low)
 str d3, [x1, x2] //Write new fB
-//todo cr1 fp stuff
+//TODO cr1 stuff
 pc_adjust 0x4
 frsqrteRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1454,8 +1588,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
 fsub v3.2s, v3.2s, v4.2s //fsubs::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fsub d3, d3, d4
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
 fsubs_ppc_epilogue:
@@ -1482,8 +1623,15 @@ ldr w4, [x19, fBoff] //load fB number
 lsl w4, w4, 3
 ldr d3, [x1, x3] //Grab fA's value
 ldr d4, [x1, x4] //Grab fB's value
-fsub v3.2s, v3.2s, v4.2s //fsubsRC::ppc
+Get_hid2_pse w18
+cmp w18, 0
+beq 0x10
+fsub v3.2s, v3.2s, v4.2s //fsubs::ppc
 dup v3.2s, v3.s[1] //ps1 must get output as well
+b 0x10
+fsub d3, d3, d4
+fcvt s3, d3
+fcvt d3, s3 //Result needs to be single precision but using 64-bits in width
 str d3, [x1, x2] //Write fD's value
 //TODO cr1 stuff
 pc_adjust 0x4
