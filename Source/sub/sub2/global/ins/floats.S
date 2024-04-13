@@ -186,14 +186,116 @@ ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
 
+//fcmpo crfD, fA, fB
 .globl fcmpo_ppc
 fcmpo_ppc:
+//Hmm nothing in Broadway manual about HID2 PSE effect instruction?
+//TODO fpscr and ordered/unordered stuff
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fcmpo_ppc_epilogue
+ldr w2, [x19, fAoff] //Load fA number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //Load fB number
+lsl w3, w3, 3
+ldr d2, [x1, x2] //Load fA Value
+ldr d3, [x1, x2] //Load fB Value
+ldr w4, [x19, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
+//Now we have ror imm value to rotate the CR by
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
+fcmp d2, d3
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 31, 1 //Get N flag
+ubfx w10, w8, 30, 1 //Get Z flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Does N=/=V? If so, set LT, otherwise clear it
+eor w12, w9, w11
+bfi w5, w12, 3, 1
+//Is Z low && N==V? If so, set GT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bic w12, w12, w10 //and w/ complement, smart!
+bfi w5, w12, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+add w6, w6, 32
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
+fcmpo_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
+//fcmpu crfD, fA, fB
 .globl fcmpu_ppc
 fcmpu_ppc:
+//Hmm nothing in Broadway manual about HID2 PSE effect instruction?
+//TODO fpscr and ordered/unordered stuff
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
+bl float_legal_check
+cbnz w0, fcmpu_ppc_epilogue
+ldr w2, [x19, fAoff] //Load fA number
+lsl w2, w2, 3
+ldr w3, [x19, fBoff] //Load fB number
+lsl w3, w3, 3
+ldr d2, [x1, x2] //Load fA Value
+ldr d3, [x1, x2] //Load fB Value
+ldr w4, [x19, crfDoff] //Load crfD number
+ldr w5, [x1, cr]
+//Based on crfD number, we must do an equation to get the ror imm value to place crfD digit at right side
+lsl w6, w4, 2 //mulli by 4
+sub w6, w6, 28
+neg w7, w6
+//Now we have ror imm value to rotate the CR by
+ror w5, w5, w7
+//NOTE we don't need to clear last digit cuz every bit in digit will be mask inserted
+//crfD is now clear, Do the ARM64 comparison and grab ARM64 flags
+fcmp d2, d3
+mrs x8, nzcv
+//Place all flags in their own register
+ubfx w9, w8, 31, 1 //Get N flag
+ubfx w10, w8, 30, 1 //Get Z flag
+ubfx w11, w8, 28, 1 //Get V flag
+//Does N=/=V? If so, set LT, otherwise clear it
+eor w12, w9, w11
+bfi w5, w12, 3, 1
+//Is Z low && N==V? If so, set GT, otherwise clear it
+eon w12, w9, w11 //eqv aka xnor, smart!
+bic w12, w12, w10 //and w/ complement, smart!
+bfi w5, w12, 2, 1
+//Set Z bit as EQ bit
+bfi w5, w9, 1, 1
+//Set V bit as SO bit
+bfi w5, w11, 0, 1
+//New CR has been created, now rotate it back to where it was
+add w6, w6, 32
+ror w5, w5, w6
+//Write new CR value!
+str w5, [x1, cr]
 pc_adjust 0x4
+fcmpu_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 //fctiw fD, fB

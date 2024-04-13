@@ -3,8 +3,6 @@
 /*x0 = extracted pcp items ptr, register numbers (NOT values) and IMMs reside here*/
 /*x1 = register bank ppc ptr (register VALUES reside here)*/
 
-//TODO oe feature isn't done properly on some instructions, Meaning for certain instructions we need to save rD before instruction executes, and compare it to afterwards. Basic cmp and extract V bit of ARM64 flags will work.
-
 //add rD, rA, rB
 .globl add_ppc
 add_ppc:
@@ -496,7 +494,7 @@ divwoRC_ppc:
 pc_adjust 0x4
 ret
 
-//divwu
+//divwu rD, rA, rB
 .globl divwu_ppc
 divwu_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -512,7 +510,7 @@ str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
-//divwu.
+//divwu. rD, rA, rB
 .globl divwuRC_ppc
 divwuRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
@@ -529,17 +527,44 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//divwuo
+//divwuo rD, rA, rB
 .globl divwuo_ppc
 divwuo_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+ldr w5, [x1, x2] //grab current rD value
+udiv w3, w3, w4 //divwuo::ppc
+cmp w3, w5
+str w3, [x1, x2] //write rD
+bvc 0x8
+oe_feature
 pc_adjust 0x4
 ret
 
-//divwuo.
+//divwuo. rD, rA, rB
 .globl divwuoRC_ppc
 divwuoRC_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+ldr w5, [x1, x2] //grab current rD value
+udiv w3, w3, w4 //divwuoRC::ppc
+cmp w3, w5
+str w3, [x1, x2] //write rD
+bvc 0x8
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -699,17 +724,38 @@ record_feature w3
 pc_adjust 0x4
 ret
 
-//nego
+//nego rD, rA
 .globl nego_ppc
 nego_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x2] //grab current rD value
+neg w3, w3 //neg::ppc
+cmp w3, w4
+str w3, [x1, x2] //write rD
+bvc 0x8
+oe_feature
 pc_adjust 0x4
 ret
 
-//nego.
+//nego. rD, rA
 .globl negoRC_ppc
 negoRC_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x2] //grab current rD value
+neg w3, w3 //neg::ppc
+cmp w3, w4
+str w3, [x1, x2] //write rD
+bvc 0x8
+oe_feature
+record_feature w3
 pc_adjust 0x4
 ret
 

@@ -1,5 +1,4 @@
-//todo verify-ea on all ins funcs
-//todo since arm64 is le, we may need to rev all non-rev loads
+//todo verify-ea on all ins funcs, but we need to rewrite and write a bunch of funcs like is_dis_met? and is_isi_met, isi_mce_met? etc etc
 
 .globl lbz_ppc
 lbz_ppc:
@@ -116,7 +115,10 @@ lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
 bl convert
-ldrsh w0, [x0]
+ldrh w0, [x0]
+rev16 w0, w0
+sxth w0, w0
+rev16 w0, w0
 ldr w2, [x19, rDoff] //grab rD number
 lsl w2, w2, 2
 str w0, [x20, x2] //"load" signed halfword into rD, lha::ppc, yes this is STR!
@@ -139,7 +141,10 @@ ldr w4, [x1, x3] //grab rA value
 add w0, w2, w4 //calc EA
 str w0, [x1, x3] //write new rA value
 bl convert
-ldrsh w0, [x0]
+ldrh w0, [x0]
+rev16 w0, w0
+sxth w0, w0
+rev16 w0, w0
 ldr w2, [x19, rDoff] //grab rD number
 lsl w2, w2, 2
 str w0, [x20, x2] //"load" signed halfword into rD, lhau::ppc, yes this is STR!
@@ -164,7 +169,10 @@ ldr w5, [x1, x3] //grab rB value
 add w0, w4, w5 //calc EA
 str w0, [x1, x3] //write new rA value
 bl convert
-ldrsh w0, [x0]
+ldrh w0, [x0]
+rev16 w0, w0
+sxth w0, w0
+rev16 w0, w0
 ldr w2, [x19, rDoff] //grab rD number
 lsl w2, w2, 2
 str w0, [x20, x2] //"load" signed halfword into rD, lhaux::ppc, yes this is STR!
@@ -188,7 +196,10 @@ ldr w4, [x1, x2] //grab rA value
 ldr w5, [x1, x3] //grab rB value
 add w0, w4, w5 //calc EA
 bl convert
-ldrsh w0, [x0]
+ldrh w0, [x0]
+rev16 w0, w0
+sxth w0, w0
+rev16 w0, w0
 ldr w2, [x19, rDoff] //grab rD number
 lsl w2, w2, 2
 str w0, [x20, x2] //"load" signed halfword into rD, lhax::ppc, yes this is STR!

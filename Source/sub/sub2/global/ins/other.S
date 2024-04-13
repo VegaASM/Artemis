@@ -1,16 +1,49 @@
 
 .globl eciwx_ppc
 eciwx_ppc:
+//If EAR[E] = 0, then DSI (todo)
+//If EA not div'd by 4, then Alignment
+//What about priority for "normal" DSI?? Hmmm
+//Otherwise nop since Artemis does not simulate
+stp fp, lr, [sp, -0x20]!
+str x19, [sp, 0x10]
+mov fp, sp
+ldr w2, [x0, rBoff] //get rA number
+ldr w3, [x0, rAoff] //get rB number
+lsl w2, w2, 2
+lsl w3, w3, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc & save EA
+mov w19, w0
+bl verify_data_ea
+cbz w0, 0x14
+//Call exception address that was returned back
+mov x1, x0
+mov w0, w19
+blr x1
+b 0x8
+//Is EA 4-byte aligned?
+tbz w19, 3, 0x10
+mov w0, w19
+bl alignment_exception_vector
+b 0x8
 pc_adjust 0x4
+ldr x19, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ecowx_ppc
 ecowx_ppc:
+//If EAR[E] = 0, then DSI
+//If EA not div'd by 4, then Alignment
+//Otherwise nop since Artemis does not simulate
 pc_adjust 0x4
 ret
 
 .globl eieio_ppc
 eieio_ppc:
+//Just nop since Artemis does not simulate store gathering
 pc_adjust 0x4
 ret
 
