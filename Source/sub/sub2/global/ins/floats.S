@@ -7,9 +7,11 @@
 //fres HID2 PSE low = can only be used on single precision floats, entire FPR used
 //fres HID2 PSE high = can only be used on single precision floats. ps0 input, ps0 and ps1 get output
 //frsp HID2 PSE low = can only be used on double floats, entire FPR used
-//frsp = can only be used on double floats. ps0 gets output, ps1 destination register left undefined (junk)
+//frsp HID2 PSE high= can only be used on double floats. ps0 gets output, ps1 destination register left undefined (junk)
+//frsqrte HID2 PSE low = entire FPR for input and output
+//frsqrte HID2 PSE high = ps0 for input & output. ps1 left UNCHANGED! (left out of Broadway Manual)
 //fmr HID2 PSE low = entire FPR copied
-//fmr HID2 PSE high = ps0's is input&output, ps1 of Destination register LEFT UNCHANGED!!!!
+//fmr HID2 PSE high = ps0 and ps1 get output (Broadway manual is WRONG!!!!!!!)
 //fabs, fnabs, fneg (HID2 PSE doesn't matter) = bit0 of whole FPR is only thing that gets edited
 
 //fabs fD, fB
@@ -682,9 +684,8 @@ lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
-beq 0xC //for fmr with PSE low, we can simply just write to fD in reg bank
-ldr x5, [x1, x2] //need current fD value
-ins v3.s[0], v5.s[0] //fmr does ps0 fB into fD with fD's ps1 unchanged. But I don't want the ARM64 dest register to be v5. So what we can do is just insert fD's ps1 into fB, and store the "fB" value as the new fD
+beq 0x8 //for fmr with PSE low, we can simply just write to fD in reg bank
+dup v3.2s, v3.s[1] //ps1 gets output as well
 str x3, [x1, x2] //write new fD value
 pc_adjust 0x4
 fmr_ppc_epilogue:
@@ -710,11 +711,9 @@ lsl w3, w3, 3
 ldr w3, [x1, x2] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
-beq 0xC //for fmr with PSE low, we can simply just write to fD in reg bank
-ldr x5, [x1, x2] //need current fD value
-ins v3.s[0], v5.s[0] //fmr does ps0 fB into fD with fD's ps1 unchanged. But I don't want the ARM64 dest register to be v5. So what we can do is just insert fD's ps1 into fB, and store the "fB" value as the new fD
+beq 0x8 //for fmr with PSE low, we can simply just write to fD in reg bank
+dup v3.2s, v3.s[1] //ps1 gets output as well
 str x3, [x1, x2] //write new fD value
-//TODO cr1 stuff
 pc_adjust 0x4
 fmrRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1490,9 +1489,6 @@ ret
 
 .globl frsqrte_ppc
 frsqrte_ppc:
-//According to Broadway Manual HID2 PSE doesn't effect instruction but that has to be wrong or else my DBZ and MKWii speedometer codes would produce wild (undefined) results.
-//Broadway manual says whole FPR input and whole FPR is output
-//Has to be this.. when HID2 PSE low, that is the case but when HID2 PSE high, ps0 is input and result is written to ps0 and ps1
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1509,11 +1505,12 @@ ldr d3, [x1, x3] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
 beq 0x10
+ldr d4, [x1, x2] //get current fD value
 frsqrte v3.2s, v3.2s
-dup v3.2s, v3.s[1] //ps1 must get output as well
+ins v3.s[0], v4.s[0] //ps0 is output with keeping original fD ps1 intact
 b 0x8
 frsqrte d3, d3 //NOTE do NOT do fcvt twice to make a 64-bit width single precision result. This instruction is meant to output double-precision result (when HID2 PSE is low)
-str d3, [x1, x2] //Write new fB
+str d3, [x1, x2] //Write new fD
 pc_adjust 0x4
 frsqrte_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -1522,9 +1519,6 @@ ret
 
 .globl frsqrteRC_ppc
 frsqrteRC_ppc:
-//According to Broadway Manual HID2 PSE doesn't effect instruction but that has to be wrong or else my DBZ and MKWii speedometer codes would produce wild (undefined) results.
-//Broadway manual says whole FPR input and whole FPR is output
-//Has to be this.. when HID2 PSE low, that is the case but when HID2 PSE high, ps0 is input and result is written to ps0 and ps1
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -1541,12 +1535,12 @@ ldr d3, [x1, x3] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
 beq 0x10
+ldr d4, [x1, x2] //get current fD value
 frsqrte v3.2s, v3.2s
-dup v3.2s, v3.s[1] //ps1 must get output as well
+ins v3.s[0], v4.s[0] //ps0 is output with keeping original fD ps1 intact
 b 0x8
 frsqrte d3, d3 //NOTE do NOT do fcvt twice to make a 64-bit width single precision result. This instruction is meant to output double-precision result (when HID2 PSE is low)
-str d3, [x1, x2] //Write new fB
-//TODO cr1 stuff
+str d3, [x1, x2] //Write new fD
 pc_adjust 0x4
 frsqrteRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]

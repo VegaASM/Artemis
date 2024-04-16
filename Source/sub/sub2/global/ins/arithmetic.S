@@ -483,14 +483,37 @@ ret
 //divwo
 .globl divwo_ppc
 divwo_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sdiv w3, w3, w4 //divwRC::ppc
+ldr w5, [x1, x2] //grab current rD value
+oe_feature_dmn w3 w5
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 //divwo.
 .globl divwoRC_ppc
 divwoRC_ppc:
-//TODO how do we set the ARM64 V flag in this?
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+sdiv w3, w3, w4 //divwRC::ppc
+ldr w5, [x1, x2] //grab current rD value
+oe_feature_dmn w3 w5
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -538,12 +561,10 @@ ldr w4, [x0, rBoff] //get rB number
 lsl w4, w4, 2
 ldr w3, [x1, x3] //grab rA's value
 ldr w4, [x1, x4] //grab rB's value
+udiv w3, w3, w4 //divwu::ppc
 ldr w5, [x1, x2] //grab current rD value
-udiv w3, w3, w4 //divwuo::ppc
-cmp w3, w5
+oe_feature_dmn w3 w5
 str w3, [x1, x2] //write rD
-bvc 0x8
-oe_feature
 pc_adjust 0x4
 ret
 
@@ -558,12 +579,10 @@ ldr w4, [x0, rBoff] //get rB number
 lsl w4, w4, 2
 ldr w3, [x1, x3] //grab rA's value
 ldr w4, [x1, x4] //grab rB's value
+udiv w3, w3, w4 //divwu::ppc
 ldr w5, [x1, x2] //grab current rD value
-udiv w3, w3, w4 //divwuoRC::ppc
-cmp w3, w5
+oe_feature_dmn w3 w5
 str w3, [x1, x2] //write rD
-bvc 0x8
-oe_feature
 record_feature w3
 pc_adjust 0x4
 ret
@@ -688,12 +707,39 @@ ret
 //mullwo rD, rA, rB
 .globl mullwo_ppc
 mullwo_ppc:
+//TODO stuff most likely wrong cuz it overflow looks at 64-bit, not 32-bit
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mul w3, w3, w4 //mullwRC::ppc
+ldr w5, [x1, x2] //grab current rD value
+oe_feature_dmn w3 w5
+str w3, [x1, x2] //write rD
 pc_adjust 0x4
 ret
 
 //mullwo. rD, rA, rB
 .globl mullwoRC_ppc
 mullwoRC_ppc:
+//TODO stuff most likely wrong cuz it overflow looks at 64-bit, not 32-bit
+ldr w2, [x0, rDoff] //get rD number
+lsl w2, w2, 2
+ldr w3, [x0, rAoff] //get rA number
+lsl w3, w3, 2
+ldr w4, [x0, rBoff] //get rB number
+lsl w4, w4, 2
+ldr w3, [x1, x3] //grab rA's value
+ldr w4, [x1, x4] //grab rB's value
+mul w3, w3, w4 //mullwRC::ppc
+ldr w5, [x1, x2] //grab current rD value
+oe_feature_dmn w3 w5
+str w3, [x1, x2] //write rD
+record_feature w3
 pc_adjust 0x4
 ret
 
@@ -732,12 +778,10 @@ lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA's value
+neg w3, w3 //negRC::ppc
 ldr w4, [x1, x2] //grab current rD value
-neg w3, w3 //neg::ppc
-cmp w3, w4
+oe_feature_dmn w3 w4
 str w3, [x1, x2] //write rD
-bvc 0x8
-oe_feature
 pc_adjust 0x4
 ret
 
@@ -749,12 +793,10 @@ lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA's value
+neg w3, w3 //negRC::ppc
 ldr w4, [x1, x2] //grab current rD value
-neg w3, w3 //neg::ppc
-cmp w3, w4
+oe_feature_dmn w3 w4
 str w3, [x1, x2] //write rD
-bvc 0x8
-oe_feature
 record_feature w3
 pc_adjust 0x4
 ret
