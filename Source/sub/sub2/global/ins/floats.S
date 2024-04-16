@@ -11,7 +11,7 @@
 //frsqrte HID2 PSE low = entire FPR for input and output
 //frsqrte HID2 PSE high = ps0 for input & output. ps1 left UNCHANGED! (left out of Broadway Manual)
 //fmr HID2 PSE low = entire FPR copied
-//fmr HID2 PSE high = ps0 and ps1 get output (Broadway manual is WRONG!!!!!!!)
+//fmr HID2 PSE high = ps0 for input & output. ps1 left UNCHANGED
 //fabs, fnabs, fneg (HID2 PSE doesn't matter) = bit0 of whole FPR is only thing that gets edited
 
 //fabs fD, fB
@@ -685,8 +685,9 @@ ldr w3, [x1, x2] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
 beq 0x8 //for fmr with PSE low, we can simply just write to fD in reg bank
-dup v3.2s, v3.s[1] //ps1 gets output as well
-str x3, [x1, x2] //write new fD value
+ldr d4, [x1, x2] //get current fD value
+ins v3.s[0], v4.s[0] //ps0 is output with keeping original fD ps1 intact
+str d3, [x1, x2] //write new fD value
 pc_adjust 0x4
 fmr_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
@@ -712,8 +713,9 @@ ldr w3, [x1, x2] //Grab fB's value
 Get_hid2_pse w18
 cmp w18, 0
 beq 0x8 //for fmr with PSE low, we can simply just write to fD in reg bank
-dup v3.2s, v3.s[1] //ps1 gets output as well
-str x3, [x1, x2] //write new fD value
+ldr d4, [x1, x2] //get current fD value
+ins v3.s[0], v4.s[0] //ps0 is output with keeping original fD ps1 intact
+str d3, [x1, x2] //write new fD value
 pc_adjust 0x4
 fmrRC_ppc_epilogue:
 ldp x19, x20, [sp, 0x10]
