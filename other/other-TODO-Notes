@@ -1,4 +1,5 @@
-﻿oe_feature on div, neg, and mullw cannot use oe_feature, fix this
+﻿do we need to fix revs on int stores? we need them as Big Endian when residing in mem.txt, or does mem.txt do it for us. check l8r
+fix conversions on ps loads and stores, what about max's being exceeded???
 fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
 put in fake values for pvr and chip id SPRs
 make a config file

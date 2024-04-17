@@ -11,7 +11,9 @@
 #include "global/ins/store_float.S"
 #include "global/ins/store_int.S"
 #include "global/ins/other.S"
-#include "global/ins/paired_singles.S"
+#include "global/ins/paired_singles.S" //Must be established before ps_load.S and ps_store.S
+#include "global/ins/ps_load.S"
+#include "global/ins/ps_store.S"
 #include "global/ins/arithmetic.S"
 #include "global/ins/compare.S"
 #include "global/ins/rotate_shift.S"
