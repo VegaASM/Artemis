@@ -84,8 +84,8 @@ adr x0, fclosebootbinEC
 cbnz w1, dumpbootbin_epilogue
 
 /*Store boot.bin ptr and size to array*/
-str x21, [x27]
-str w20, [x27, 0x8]
+str x21, [x27, bootbin_ptr]
+str w20, [x27, bootbin_size]
 
 /*Return back zero (success)*/
 mov w0, 0

@@ -1,4 +1,4 @@
-#include "sub/sub2/global/registerbankmap.S"
+#include "sub/sub2/sub3/symbols_macros/registerbankmap.S"
 
 /*This func will set all registers to their hard reset values*/
 
@@ -6,7 +6,7 @@
 hardreset:
 
 /*Get pointer to register bank*/
-ldr x0, [x27, 0x20]
+ldr x0, [x27, regbank_ptr]
 
 /*We need to null out the following
 LR

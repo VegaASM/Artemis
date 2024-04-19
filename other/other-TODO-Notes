@@ -2,6 +2,7 @@
 fix conversions on ps loads and stores, what about max's being exceeded???
 fix 0xFFFn_nnnn limitations in regards to high memory such as 0x017FFFFF
 put in fake values for pvr and chip id SPRs
+put in fake HID1 values
 make a config file
 on cmp instructions with RC bit (illegal ofc) is the program exp called or do undefined results occur?
 NOTE: crF 0 is a COPY of XER [SO]!!

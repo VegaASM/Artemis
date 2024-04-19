@@ -1,19 +1,8 @@
-/*#include "sub2/global/convert.S"*/ /*Already established in insert_boot.dol.S*/
 #include "sub2/write_memory_txt.S"
-#include "console_input.S"
 #include "sub2/instruction_simulate_main.S"
+#include "console_input.S"
 
 /*This func is basically a root func that will do all the simulation, console i/o's, and file i/o's. This func should never end whenever the emulation is running proper*/
-
-/*
-Array (x27) contents
-...
-0x20 = Register Table ptr
-0x28 = Mem1 ptr
-0x30 = Mem2 ptr
-0x38 = artemis.txt contents ptr
-0x40 = memory.txt contents ptr
-*/
 
 txtartname:
 .asciz "www/artemis.txt"
@@ -30,7 +19,7 @@ program_killed:
 successOUTPUT:
 .asciz "Instruction has been simulated/stepped. View/refresh www/artemis.txt & www/memory txt for changes.\n\n"
 welcomeMSG:
-.asciz "Welcome to Artemis!\n\nVersion: 0.0-r041\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
+.asciz "Welcome to Artemis!\n\nVersion: 0.0-r042\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
 fgets_error:
 .asciz "Error! The fgets function failed when retrieving the Console's input.\n\n"
 .align 2

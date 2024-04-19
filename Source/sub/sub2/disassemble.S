@@ -1,6 +1,6 @@
-#include "global/ins/extractedPPCstuffOffsets.S"
-#include "global/ins/instruction_strings.S"
-#include "global/ppc_idents.S"
+#include "sub3/symbols_macros/extractedPPCstuffOffsets.S"
+#include "sub3/symbols_macros/instruction_strings.S"
+#include "sub3/symbols_macros/ppc_idents.S"
 
 /*TODO put in branch, spr, condi-trap, and rotation mnemonicsc*/
 

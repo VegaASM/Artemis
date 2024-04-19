@@ -9,7 +9,7 @@ mov fp, sp
 
 /*The disassembler engine will have null byte enders for any string it produces, fyi*/
 /*Place 1st string at very start of artemis.txt*/
-ldr x2, [x27, 0x38]
+ldr x2, [x27, artemistxt_ptr]
 first_string_transfer:
 ldrb w3, [x0], 1
 strb w3, [x2], 1

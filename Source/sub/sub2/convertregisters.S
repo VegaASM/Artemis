@@ -1,4 +1,3 @@
-/*#include "global/registerbankmap.S"*/ /*Already established in hardreset.S*/
 
 GPRs:
 .asciz "r%d: 0x%08X r%d: 0x%08X\n"
@@ -44,8 +43,7 @@ convertRegEC:
 .asciz "Error! A sprintf error occurred when converting Register Integer Data to ASCII."
 .align 2
 
-/*x0 arg = ptr to artemis.html*/
-
+/*x0 arg = ptr to artemis.txt*/
 .globl convertregisters
 convertregisters:
 stp fp, lr, [sp, -0x40]!

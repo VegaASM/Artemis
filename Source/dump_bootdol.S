@@ -83,8 +83,8 @@ adr x0, fclosebootdolEC
 cbnz w1, dumpbootdol_epilogue
 
 /*Store boot.dol ptr and size to array*/
-str x21, [x27, 0x10]
-str w20, [x27, 0x18]
+str x21, [x27, bootdol_ptr]
+str w20, [x27, bootdol_size]
 
 /*Return back zero (success)*/
 mov w0, 0

@@ -1,23 +1,24 @@
-#include "global/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
+#include "sub3/symbols_macros/spr_symbols.S"
+#include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
 #include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_instruction_ea.S
-#include "global/addr_translation_stuff.S" //Must be before both verify's
+#include "sub3/sub4/check_bats.S" //Must be before both verify's
 #include "verify_instruction_ea.S" //Must be established before any instruction func
 #include "verify_data_ea.S" //Must be established before any load, store, or paired single file
-#include "global/ins/branch.S"
-#include "global/ins/floats.S"
-#include "global/ins/load_float.S"
-#include "global/ins/load_int.S"
-#include "global/ins/logical.S"
-#include "global/ins/store_float.S"
-#include "global/ins/store_int.S"
-#include "global/ins/other.S"
-#include "global/ins/paired_singles.S" //Must be established before ps_load.S and ps_store.S
-#include "global/ins/ps_load.S"
-#include "global/ins/ps_store.S"
-#include "global/ins/arithmetic.S"
-#include "global/ins/compare.S"
-#include "global/ins/rotate_shift.S"
-#include "global/ins/cache.S"
+#include "sub3/ins/branch.S"
+#include "sub3/ins/floats.S"
+#include "sub3/ins/load_float.S"
+#include "sub3/ins/load_int.S"
+#include "sub3/ins/logical.S"
+#include "sub3/ins/store_float.S"
+#include "sub3/ins/store_int.S"
+#include "sub3/ins/other.S"
+#include "sub3/ins/paired_singles.S" //Must be established before ps_load.S and ps_store.S
+#include "sub3/ins/ps_load.S"
+#include "sub3/ins/ps_store.S"
+#include "sub3/ins/arithmetic.S"
+#include "sub3/ins/compare.S"
+#include "sub3/ins/rotate_shift.S"
+#include "sub3/ins/cache.S"
 
 func_table:
 .xword add_ppc

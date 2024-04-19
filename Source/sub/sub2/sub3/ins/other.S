@@ -35,10 +35,36 @@ ret
 
 .globl ecowx_ppc
 ecowx_ppc:
-//If EAR[E] = 0, then DSI
+//If EAR[E] = 0, then DSI (todo)
 //If EA not div'd by 4, then Alignment
+//What about priority for "normal" DSI?? Hmmm
 //Otherwise nop since Artemis does not simulate
+stp fp, lr, [sp, -0x20]!
+str x19, [sp, 0x10]
+mov fp, sp
+ldr w2, [x0, rBoff] //get rA number
+ldr w3, [x0, rAoff] //get rB number
+lsl w2, w2, 2
+lsl w3, w3, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc & save EA
+mov w19, w0
+bl verify_data_ea
+cbz w0, 0x14
+//Call exception address that was returned back
+mov x1, x0
+mov w0, w19
+blr x1
+b 0x8
+//Is EA 4-byte aligned?
+tbz w19, 3, 0x10
+mov w0, w19
+bl alignment_exception_vector
+b 0x8
 pc_adjust 0x4
+ldr x19, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl eieio_ppc
@@ -100,11 +126,11 @@ ret
 //mfcr rD
 .globl mfcr_ppc
 mfcr_ppc:
-pc_adjust 0x4
 ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
 ldr w3, [x1, cr] //get CR value
 str w3, [x1, x2] //mfcr::ppc
+pc_adjust 0x4
 ret
 
 .globl mffs_ppc
@@ -555,6 +581,39 @@ ret
 
 .globl mtcrf_ppc
 mtcrf_ppc:
+ldr w2, [x0, rSoff] //get rS number
+ldr w3, [x0, CRMoff] //get CRM Value
+lsl w2, w2, 2
+ldr w2, [x1, x2] //get rS Value
+//create CRM mask (w8)
+//Set w3 to get ror'd by 1 everytime per loop to get bit of CRM
+ror w4, w3, 31
+//Prep a lsl shiftor amount for the loop
+mov w5, 0
+mov w6, 0
+//Set loop amount
+mov w7, 32
+//Loop
+crm_mask_loop:
+ror w4, w4, 1 //Place current working bit into bit 0 slot
+ubfx w8, w4, 0, 1 //Grab Bit
+bfi w8, w8, 3, 1 //Copy bit 0 to bits 1 thru 3
+bfi w8, w8, 2, 1
+bfi w8, w8, 1, 1
+lsl w8, w8, w5 //Do the shiftor
+orr w6, w6, w8 //Update CRM mask
+subs w7, w7, 1
+add w5, w5, 4 //Update shiftor
+bne crm_mask_loop
+//And rS with mask
+and w2, w2, w5
+//And CR with !mask
+mvn w5, w5
+and w3, w3, w5
+//OR both results to get new CR
+orr w2, w2, w3
+//Write new CR
+str w2, [x1, cr]
 pc_adjust 0x4
 ret
 
@@ -618,22 +677,132 @@ ret
 
 .globl mtfsf_ppc
 mtfsf_ppc:
+ldr w2, [x0, FMoff] //get FM value
+add x3, x1, fpr0 //adjust regbank ptr
+ldr w4, [x0, fBoff] //get fB number
+lsl w4, w4, 8
+ldr x4, [x1, x3] //get fB Value as double-int
+ldr w5, [x1, fpscr] //get FPRSCR value
+//create FM mask (w8)
+//Set w2 to get ror'd by 1 everytime per loop to get bit of FM
+ror w6, w2, 31
+//Prep a lsl shiftor amount for the loop
+mov w7, 0
+mov w8, 0
+//Set loop amount
+mov w9, 32
+//Loop
+fm_mask_loop:
+ror w6, w6, 1 //Place current working bit into bit 0 slot
+ubfx w10, w6, 0, 1 //Grab Bit
+bfi w10, w10, 3, 1 //Copy bit 0 to bits 1 thru 3
+bfi w10, w10, 2, 1
+bfi w10, w10, 1, 1
+lsl w10, w10, w5 //Do the shiftor
+orr w8, w8, w10 //Update FM mask
+subs w9, w9, 1
+add w7, w7, 4 //Update shiftor
+bne fm_mask_loop
+//And lower 32-bits of fB with mask
+and w4, w4, w8
+//And FPSCR with !mask
+mvn w8, w8
+and w5, w5, w8
+//OR both results to get new FPSCR
+orr w2, w4, w10
+//Write new CR
+str w2, [x1, fpscr]
 pc_adjust 0x4
 ret
 
 .globl mtfsfRC_ppc
 mtfsfRC_ppc:
+ldr w2, [x0, FMoff] //get FM value
+add x3, x1, fpr0 //adjust regbank ptr
+ldr w4, [x0, fBoff] //get fB number
+lsl w4, w4, 8
+ldr x4, [x1, x3] //get fB Value as double-int
+ldr w5, [x1, fpscr] //get FPRSCR value
+//create FM mask (w8)
+//Set w2 to get ror'd by 1 everytime per loop to get bit of FM
+ror w6, w2, 31
+//Prep a lsl shiftor amount for the loop
+mov w7, 0
+mov w8, 0
+//Set loop amount
+mov w9, 32
+//Loop
+fmRC_mask_loop:
+ror w6, w6, 1 //Place current working bit into bit 0 slot
+ubfx w10, w6, 0, 1 //Grab Bit
+bfi w10, w10, 3, 1 //Copy bit 0 to bits 1 thru 3
+bfi w10, w10, 2, 1
+bfi w10, w10, 1, 1
+lsl w10, w10, w5 //Do the shiftor
+orr w8, w8, w10 //Update FM mask
+subs w9, w9, 1
+add w7, w7, 4 //Update shiftor
+bne fmRC_mask_loop
+//And lower 32-bits of fB with mask
+and w4, w4, w8
+//And FPSCR with !mask
+mvn w8, w8
+and w5, w5, w8
+//OR both results to get new FPSCR
+orr w2, w4, w10
+//Write new CR
+str w2, [x1, fpscr]
+//todo cr1 fp stuff
 pc_adjust 0x4
 ret
 
 .globl mtfsfi_ppc
 mtfsfi_ppc:
-pc_adjust 0x4
+ldr w2, [x0, crfDoff] //get crfD value
+ldr w3, [x0, IMMoff] //get IMM value
+ldr w4, [x1, fpscr] //get FPSCR value
+//Set IMM as if it was replacing cr0
+lsl w3, w3, 28
+//Set Start Mask for crF field
+mov w5, 0xF0000000
+//Multiply crfD by 4
+lsl w2, w2, 2
+//Shift right Start mask with Multiplied amount
+lsr w5, w5, w2
+//Shift right IMM by Multiplied amount
+lsr w3, w3, w2
+//And FPSCR with !mask
+mvn w6, w5
+and w4, w4, w6
+//Orr in IMM
+orr w4, w4, w3
+//Write new FPSCR
+str w4, [x1, fpscr]
 ret
 
 .globl mtfsfiRC_ppc
 mtfsfiRC_ppc:
-pc_adjust 0x4
+ldr w2, [x0, crfDoff] //get crfD value
+ldr w3, [x0, IMMoff] //get IMM value
+ldr w4, [x1, fpscr] //get FPSCR value
+//Set IMM as if it was replacing cr0
+lsl w3, w3, 28
+//Set Start Mask for crF field
+mov w5, 0xF0000000
+//Multiply crfD by 4
+lsl w2, w2, 2
+//Shift right Start mask with Multiplied amount
+lsr w5, w5, w2
+//Shift right IMM by Multiplied amount
+lsr w3, w3, w2
+//And FPSCR with !mask
+mvn w6, w5
+and w4, w4, w6
+//Orr in IMM
+orr w4, w4, w3
+//Write new FPSCR
+str w4, [x1, fpscr]
+//todo cr1 fp stuff
 ret
 
 .globl mtmsr_ppc

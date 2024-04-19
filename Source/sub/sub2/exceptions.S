@@ -1,19 +1,3 @@
-.set msr_le, 0x00000001
-.set msr_ri, 0x00000002
-.set msr_pm, 0x00000004
-.set msr_dr, 0x00000010
-.set msr_ir, 0x00000020
-.set msr_ip, 0x00000040
-.set msr_fe1, 0x00000100
-.set msr_be, 0x00000200
-.set msr_se, 0x00000400
-.set msr_fe0, 0x00000800
-.set msr_me, 0x00001000
-.set msr_fp, 0x00002000
-.set msr_pr, 0x00004000
-.set msr_ee, 0x00008000
-.set msr_ile, 0x00010000
-.set msr_pow, 0x00040000
 
 .set reset_srr1, 0x87C0FFFF
 .set mce_srr1, 0x0000FFFF //TODO implement code to output cause of machine check
@@ -28,12 +12,6 @@
 .set trace_srr1, 0x87C0FF73 //Can't find on Broadway manual, PPC PEM PDF says this is it. seems incorrect...
 .set pm_srr1, 0x87C0FFFF
 .set iabr_srr1, 0x87C0FFFF
-
-.set hid0_emcp, 0x80000000
-.set hid0_dbp, 0x40000000
-.set hid0_eba, 0x20000000
-.set hid0_ebd, 0x10000000
-.set hid0_nhr, 0x00010000
 
 .set allotherexceptions_msr_mask, msr_ile | msr_me | msr_ip //MSR mask for anything BUT machine check. NOTE there's no info on the mask for IABR in the broadway. best to assume its this.
 .set mcheck_msr_mask, msr_ile | msr_ip

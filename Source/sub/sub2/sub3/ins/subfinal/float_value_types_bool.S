@@ -9,7 +9,7 @@
 /*.set hid2_pse, 0x20000000 TODO put all HID stuff in own file*/
 
 .macro Get_hid2_pse wregister
-ldr \wregister, [x27, 0x20] /*reg bank ptr*/
+ldr \wregister, [x27, regbank_ptr] /*reg bank ptr*/
 ubfx \wregister, \wregister, 29, 1
 .endm
 

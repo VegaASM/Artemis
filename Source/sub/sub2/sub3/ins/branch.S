@@ -8,7 +8,6 @@ ret
 
 .globl ba_ppc
 ba_ppc:
-//TODO is this even right? does the absolute addr get sign extended????
 ldr w2, [x0, LI_SIMMoff] //Load 26-bit SIMM
 str w2, [x1, pc] //ba::ppc
 ret
@@ -25,7 +24,6 @@ ret
 
 .globl bla_ppc
 bla_ppc:
-//TODO is this even right? does the absolute addr get sign extended????
 ldr w2, [x0, LI_SIMMoff] //Load 26-bit SIMM
 ldr w3, [x1, pc]
 add w4, w3, 4

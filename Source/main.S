@@ -1,12 +1,13 @@
 .arch armv8.2-a /*To allow the bfc instruction*/
 
-#include "sub/submain.S"
+#include "sub/sub2/sub3/symbols_macros/generic_symbols.S"
+#include "sub/sub2/sub3/symbols_macros/cache_symbols.S"
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
-#include "sub/cache_symbols.S" /*Must be before hardreset.S*/
+#include "insert_bootdol.S"
 #include "insert_bootbin.S"
 #include "hardreset.S"
-#include "insert_bootdol.S"
+#include "sub/submain.S"
 
 pleasewaittxt:
 .asciz "Please wait...\n"
@@ -29,41 +30,33 @@ bl puts
 add x27, sp, 0x10
 
 /*Malloc for everything*/
-.set regbanksize, 0x344
-.set mem1bytesize, 0x01800000
-.set mem2bytesize, 0x04000000
-.set arttxtsize, 0x3000
-.set memtxtrowsize, 0x39
-.set memtxtrows, (mem1bytesize + mem2bytesize) / 16 /*Exclude title row*/
-.set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
-.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size
 movz w0, :abs_g1: grand_total_malloc
 movk w0, :abs_g0_nc: grand_total_malloc
 bl malloc
 cbz x0, cant_alloc_mainmemory
 
 /*Store Reg ptr, Mem1 ptr, Mem2 ptr, Artemis.txt, and memory.txt ptr*/
-str x0, [x27, 0x20] /*reg bank ptr*/
+str x0, [x27, regbank_ptr] /*reg bank ptr*/
 add x1, x0, regbanksize
-str x1, [x27, 0x28] /*mem1 ptr*/
+str x1, [x27, mem1_ptr] /*mem1 ptr*/
 movz w0, :abs_g1: mem1bytesize
 add x1, x1, x0
-str x1, [x27, 0x30] /*mem2 ptr*/
+str x1, [x27, mem2_ptr] /*mem2 ptr*/
 movz w0, :abs_g1: mem2bytesize
 add x1, x1, x0
-str x1, [x27, 0x38] /*artemis.txt ptr*/
+str x1, [x27, artemistxt_ptr] /*artemis.txt ptr*/
 add x1, x1, arttxtsize
-str x1, [x27, 0x40] /*memory.txt ptr*/
+str x1, [x27, memtxt_ptr] /*memory.txt ptr*/
 movz w0, :abs_g1: memtxtbytesize
 movk w0, :abs_g0_nc: memtxtbytesize
 add x1, x1, x0
-str x1, [x27, 0x48] /*L1 ICache table ptr*/
+str x1, [x27, L1_ins_ptr] /*L1 ICache table ptr*/
 add x1, x1, ICache_byte_size
-str x1, [x27, 0x50] /*L1 DCache table ptr*/
+str x1, [x27, L1_data_ptr] /*L1 DCache table ptr*/
 add x1, x1, DCache_byte_size
-str x1, [x27, 0x58] /*L2 Cache table ptr*/
+str x1, [x27, L2_ptr] /*L2 Cache table ptr*/
 add x1, x1, L2Cache_byte_size
-str x1, [x27, 0x60] /*Round Robin addr list ptr*/
+str x1, [x27, roundrobin_ptr] /*Round Robin addr list ptr*/
 
 /*Get boot.bin contents*/
 bl dump_bootbin

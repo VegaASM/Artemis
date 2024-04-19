@@ -1,18 +1,6 @@
-/*
-Array contents
-0x0 = Boot.bin pointer
-0x8 = boot.bin size; unsigned
-0x10 = Boot.dol pointer
-0x18 = boot.dol size; unsigned
-0x20 = Register Table ptr
-0x28 = Mem1 ptr
-0x30 = Mem2 ptr
-*/
-
 /*This func converts a sim addr to the REAL addr*/
 
-/*x27 saved non-volatile = array ptr
-w0 = fake mem addr
+/*w0 = fake mem addr
 x0 returns proper real addr*/
 
 .globl convert
@@ -30,7 +18,7 @@ cmp w1, 0
 beq mem1addr
 
 /*grab real mem2 base ptr*/
-ldr x2, [x27, 0x30]
+ldr x2, [x27, mem2_ptr]
 b calcmargin
 
 /*Convert high exception addr to mem1 physical addr*/
@@ -40,7 +28,7 @@ mov w1, 0 /*Need this cuz the above 'and' instruction wasn't executed in this pa
 
 /*grab real mem1 base ptr*/
 mem1addr:
-ldr x2, [x27, 0x28]
+ldr x2, [x27, mem1_ptr]
 
 /*Margin = Real mem1/2 base ptr - mem1/2 base ptr*/
 calcmargin:

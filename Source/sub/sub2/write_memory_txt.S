@@ -1,5 +1,6 @@
-#include "global/convertWordInt2ASCII.S"
-#include "global/convertByteInt2ASCII.S"
+#include "sub3/sub4/convertWordInt2ASCII.S"
+#include "sub3/sub4/convertByteInt2ASCII.S"
+/*TODO put in code to seek and write only responsible changes after a store instruction instead of doing fwrite on ENTIRE file*/
 
 memtxt1stline:
 .xword 0x2020202020202020
@@ -33,7 +34,7 @@ cbz x0, memtxtfopenEC
 mov x19, x0
 
 /*Grab mem.txt contents ptr from array*/
-ldr x20, [x27, 0x40]
+ldr x20, [x27, memtxt_ptr]
 mov x0, x20
 
 /*Very first line of memory.txt file*/

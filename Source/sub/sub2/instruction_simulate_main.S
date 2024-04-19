@@ -1,16 +1,12 @@
-/*#include "global/convert.S"*/ /*Already established in insert_bootdol.S*/
 #include "disassemble.S"
 #include "execute.S"
-/*#include "write_memory_txt.S"*/ /*Already established in submain.S*/
 #include "writeartemisstrings.S"
 #include "convertregisters.S"
 #include "write_artemis_txt.S"
 
-
 /*This func is the main overview of simulating (stepping) 1 instruction
 This is used at the very start of the emulation (but skipping execute.S)
 and used for every step
-x27 = array ptr
 x0 (only arg) is a bool
 0 = no execute
 1 = execute
@@ -32,9 +28,6 @@ mov fp, sp
 /*Backup arg*/
 mov w19, w0
 
-#TODO fix shit to "jump" into boot.bin and all that shit
-#We could insert boot.bin at 0x100. first ofc.
-#Also another free failure at this point
 /*Grab ppc-mem address from PC and convert to real address*/
 ldr x0, [x27, 0x20]
 ldr w0, [x0, pc]
@@ -110,7 +103,7 @@ bl writeartemisstrings /*No error checks for this func*/
 /*x0 arg = artemis.txt pointer*/
 /*x0 = 0 success; anything else is pointer to print*/
 /*if x0 = 0 then w1 returns size*/
-ldr x0, [x27, 0x38]
+ldr x0, [x27, artemistxt_ptr]
 bl convertregisters
 cbnz x0, ins_sim_main_epilogue
 
@@ -118,7 +111,7 @@ cbnz x0, ins_sim_main_epilogue
 /*w1 is w1 arg for write_artemis_txt*/
 /*Func to file write artemis.txt since all info is now written to its malloc space*/
 /*Func will get size and then call fwrite*/
-ldr x0, [x27, 0x38]
+ldr x0, [x27, artemistxt_ptr]
 bl write_artemis_txt
 /*Return this func's return code directly back to parent*/
 

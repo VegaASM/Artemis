@@ -30,18 +30,20 @@ ubfx w11, w8, 28, 1 //Get V flag
 eor w12, w9, w11
 bfi w5, w12, 3, 1
 //Is Z low && N==V? If so, set GT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bic w12, w12, w10 //and w/ complement, smart!
+eon w12, w9, w11 //eqv aka xnor
+bic w12, w12, w10 //and w/ complement
 bfi w5, w12, 2, 1
 //Set Z bit as EQ bit
 bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
+//Copy XER[SO] to crF[SO]
+ldr w13, [x1, xer]
+bfxil w5, w13, 31, 1
 //New CR has been created, now rotate it back to where it was
 add w6, w6, 32
 ror w5, w5, w6
 //Write new CR value!
 str w5, [x1, cr]
+//
 pc_adjust 0x4
 ret
 
@@ -72,13 +74,14 @@ ubfx w11, w8, 28, 1 //Get V flag
 eor w12, w9, w11
 bfi w5, w12, 3, 1
 //Is Z low && N==V? If so, set GT, otherwise clear it
-eon w12, w9, w11 //eqv aka xnor, smart!
-bic w12, w12, w10 //and w/ complement, smart!
+eon w12, w9, w11 //eqv aka xnor
+bic w12, w12, w10 //and w/ complement
 bfi w5, w12, 2, 1
 //Set Z bit as EQ bit
 bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
+//Copy XER[SO] to crF[SO]
+ldr w13, [x1, xer]
+bfxil w5, w13, 31, 1
 //New CR has been created, now rotate it back to where it was
 add w6, w6, 32
 ror w5, w5, w6
@@ -119,8 +122,9 @@ bfi w5, w12, 3, 1
 bfi w5, w10, 2, 1
 //Set Z bit as EQ bit
 bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
+//Copy XER[SO] to crF[SO]
+ldr w13, [x1, xer]
+bfxil w5, w13, 31, 1
 //New CR has been created, now rotate it back to where it was
 add w6, w6, 32
 ror w5, w5, w6
@@ -159,8 +163,9 @@ bfi w5, w12, 3, 1
 bfi w5, w10, 2, 1
 //Set Z bit as EQ bit
 bfi w5, w9, 1, 1
-//Set V bit as SO bit
-bfi w5, w11, 0, 1
+//Copy XER[SO] to crF[SO]
+ldr w13, [x1, xer]
+bfxil w5, w13, 31, 1
 //New CR has been created, now rotate it back to where it was
 add w6, w6, 32
 ror w5, w5, w6

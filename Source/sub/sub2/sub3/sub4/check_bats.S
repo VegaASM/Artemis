@@ -1,6 +1,4 @@
 
-.set sbe_hid4, 0x01000000
-
 .globl check_bats
 check_bats:
 /*Extract BEPI & place as proper 32-bit address*/

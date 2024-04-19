@@ -28,9 +28,10 @@ bic w12, w12, w14 //and w/ complement, smart!
 bfi w16, w12, 30, 1
 //Is Z high? If so set cr0 EQ, other clear cr0 EQ
 bfi w16, w14, 29, 1
-//Is V high? if so set cr0 SO, otherwise clear cr0 SO
-bfi w16, w15, 28, 1
-//TODO above 99% wrong in regards to V flag. According to PPC manuals, crfX SO bit is a copy of Xer SO (sticky overflow) bit. Double check this before editing this one macro
+//Copy XER[SO] to cr0[SO]
+ldr w11, [x1, xer]
+ubfx w11, w11, 31, 1
+bfi w16, w11, 28, 1
 //Write new CR value to register bank
 str w16, [x17, cr]
 .endm

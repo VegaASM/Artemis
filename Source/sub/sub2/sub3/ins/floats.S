@@ -14,6 +14,8 @@
 //fmr HID2 PSE high = ps0 for input & output. ps1 left UNCHANGED
 //fabs, fnabs, fneg (HID2 PSE doesn't matter) = bit0 of whole FPR is only thing that gets edited
 
+//fyi floal_legal_check not only checks for legality but it also executes the approriate exception if illegal and then returns back
+
 //fabs fD, fB
 .globl fabs_ppc
 fabs_ppc:

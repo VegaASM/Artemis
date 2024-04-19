@@ -1,20 +1,8 @@
-#include "sub/sub2/global/convert.S"
-/*#include "sub/sub2/global/registerbankmap.S" Already in hardreset.S*/
+#include "sub/convert.S"
 
 /*
 x0 returns 0 = success
 x0 returns insertdolEC ptr for error
-*/
-
-/*
-x27 Array contents
-0x0 = Boot.bin pointer
-0x8 = boot.bin size; unsigned
-0x10 = Boot.dol pointer
-0x18 = boot.dol size; unsigned
-0x20 = Register Table ptr
-0x28 = Mem1 ptr
-0x30 = Mem2 ptr
 */
 
 insertdolBSSec:
@@ -32,7 +20,7 @@ stp x21, x22, [sp, 0x20]
 stp x23, x24, [sp, 0x30]
 
 /*Grab boot.dol ptr from x27 array*/
-ldr x0, [x27, 0x10]
+ldr x0, [x27, bootdol_ptr]
 
 /*Save Arg 2 times*/
 mov x19, x0
@@ -121,7 +109,7 @@ cmp w0, w1
 bhs invalid_entry_point //unsigned greater than or equal to
 
 /*Set PC to Entry point addr*/
-ldr x1, [x27, 0x20]
+ldr x1, [x27, regbank_ptr]
 str w0, [x1, pc]
 
 /*Success, free boot.dol malloc'd memory and return 0*/

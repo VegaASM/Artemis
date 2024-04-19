@@ -35,14 +35,13 @@ lsr w8, w8, w6
 //And both masks together to get instruction's actual mask
 and_temp_masksrlwimi:
 and w7, w7, w8
-//w7 has Mask, now temporarily ANd it with what's in rS
-and w9, w3, w7
-//Now logically flip this temp value
-mvn w9, w9
-//Now take this flipped value, and AND it with what's in rS to clear its clear qualified bits determined by the Mask
-and w9, w3, w9
-//All we got to do now is OR the Mask into rS to get rA result and we're done
-orr w3, w3, w9
+//w7 has Mask, load rA
+ldr w10, [x1, x2]
+//newrA = (rA & mask) | (rS & !mask)
+and w10, w10, w7
+mvn w7, w7
+and w3, w3, w7
+orr w3, w10, w3
 str w3, [x1, x2] //rlwimi::ppc
 pc_adjust 0x4
 ret
@@ -84,14 +83,13 @@ lsr w8, w8, w6
 //And both masks together to get instruction's actual mask
 and_temp_masksrlwimiRC:
 and w7, w7, w8
-//w7 has Mask, now temporarily ANd it with what's in rS
-and w9, w3, w7
-//Now logically flip this temp value
-mvn w9, w9
-//Now take this flipped value, and AND it with what's in rS to clear its clear qualified bits determined by the Mask
-and w9, w3, w9
-//All we got to do now is OR the Mask into rS to get rA result and we're done
-orr w3, w3, w9
+//w7 has Mask, load rA
+ldr w10, [x1, x2]
+//newrA = (rA & mask) | (rS & !mask)
+and w10, w10, w7
+mvn w7, w7
+and w3, w3, w7
+orr w3, w10, w3
 str w3, [x1, x2] //rlwimiRC::ppc
 record_feature w3
 pc_adjust 0x4

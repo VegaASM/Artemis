@@ -13,14 +13,14 @@ mov fp, sp
 mov w19, w0
 
 /*Check MSR for Data Address Translation*/
-ldr x1, [x27, 0x20] //reg bank ptr
+ldr x1, [x27, regbank_ptr]
 ldr w2, [x1, msr]
 tst w2, msr_dr
 beq verify_physical_data_ea
 
 /*Check if secondary bats are enabled*/
 ldr w2, [x1, hid4]
-tst w2, sbe_hid4
+tst w2, hid4_sbe
 beq 0xC
 
 /*Set loop count of 8*/
