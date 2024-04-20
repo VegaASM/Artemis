@@ -511,16 +511,71 @@ ret
 
 .globl ps_madds1_ppc
 ps_madds1_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_madds1_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+fmul v6.2s, v3.2s, v4.2s //do the ps1 multiply
+fadd v6.2s, v6.2s, v5.2s //do the ps1 add
+dup v4.2s, v4.s[1] //place fC ps1 into into its ps0 slot
+fmul v7.2s, v3.2s, v4.2s //do fA ps0 x fc "ps1"
+fadd v3.2s, v7.2s, v5.2s //add result to fB ps0
+ins v3.s[0], v6.s[0] //merge both sub-results. First sub result (v6) is ps1, 2nd (v3) is ps0
+str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+ps_madds1_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_madds1RC_ppc
 ps_madds1RC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_madds1RC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+fmul v6.2s, v3.2s, v4.2s //do the ps1 multiply
+fadd v6.2s, v6.2s, v5.2s //do the ps1 add
+dup v4.2s, v4.s[1] //place fC ps1 into into its ps0 slot
+fmul v7.2s, v3.2s, v4.2s //do fA ps0 x fc "ps1"
+fadd v3.2s, v7.2s, v5.2s //add result to fB ps0
+ins v3.s[0], v6.s[0] //merge both sub-results. First sub result (v6) is ps1, 2nd (v3) is ps0
+str d3, [x1, x2] //Write fD's value
+//todo cr1 fp stuff
 pc_adjust 0x4
+ps_madds1RC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_merge00_ppc
@@ -896,30 +951,120 @@ ret
 
 .globl ps_muls0_ppc
 ps_muls0_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_muls0_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+fmul v5.2s, v3.2s, v4.2s //do fA ps0 x fC ps0
+dup v4.2s, v4.s[0] //do fA ps1 x fC ps0; first place fC ps0 into ps1 slot so we can do the multiply
+fmul v3.2s, v3.2s, v4.2s
+ins v3.s[1], v5.s[1] //merge both sub-results.
+str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+ps_muls0_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_muls0RC_ppc
 ps_muls0RC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_muls0RC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+fmul v5.2s, v3.2s, v4.2s //do fA ps0 x fC ps0
+dup v4.2s, v4.s[0] //do fA ps1 x fC ps0; first place fC ps0 into ps1 slot so we can do the multiply
+fmul v3.2s, v3.2s, v4.2s
+ins v3.s[1], v5.s[1] //merge both sub-results.
+str d3, [x1, x2] //Write fD's value
+//todo cr1 stuff
 pc_adjust 0x4
+ps_muls0RC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_muls1_ppc
 ps_muls1_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_muls1_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+fmul v5.2s, v3.2s, v4.2s //do fA ps1 x fC ps1
+dup v3.2s, v3.s[0] //do fA ps0 x fC ps1; first place fA ps0 into ps1 slot so we can do the multiply
+fmul v3.2s, v3.2s, v4.2s
+ins v3.s[1], v5.s[1] //merge both sub-results.
+str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+ps_muls1_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_muls1RC_ppc
 ps_muls1RC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_muls1RC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+fmul v5.2s, v3.2s, v4.2s //do fA ps1 x fC ps1
+dup v3.2s, v3.s[0] //do fA ps0 x fC ps1; first place fA ps0 into ps1 slot so we can do the multiply
+fmul v3.2s, v3.2s, v4.2s
+ins v3.s[1], v5.s[1] //merge both sub-results.
+str d3, [x1, x2] //Write fD's value
+//todo cr1 fp stuff
 pc_adjust 0x4
+ps_muls1RC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_nabs_ppc
@@ -1240,16 +1385,85 @@ ret
 
 .globl ps_sel_ppc
 ps_sel_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_sel_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+movi d6, 0 //Place 0.0's in v6
+ins v7.s[0], v3.s[1] //extract fA ps0
+fcmp s7, s6 //do fA ps0 vs 0.0
+blt 0xC
+ins v8.s[1], v4.s[1] //fC ps0 placed into fD ps0
+b 0x8
+ins v8.s[1], v5.s[1]//fB ps0 placed into fD ps0
+fcmp s3, s6 //do fA ps1 vs 0.0
+blt 0xC
+ins v3.s[0], v4.s[0] //place fC ps1 into fD ps1
+b 0x8
+ins v3.s[0], v5.s[0] //place fB ps1 into temp fD ps1
+ins v3.2s[1], v8.s[1] //merge temp results results
+str d3, [x1, x2] //Write fD's value
 pc_adjust 0x4
+ps_sel_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_selRC_ppc
 ps_selRC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_selRC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+movi d6, 0 //Place 0.0's in v6
+ins v7.s[0], v3.s[1] //extract fA ps0
+fcmp s7, s6 //do fA ps0 vs 0.0
+blt 0xC
+ins v8.s[1], v4.s[1] //fC ps0 placed into fD ps0
+b 0x8
+ins v8.s[1], v5.s[1]//fB ps0 placed into fD ps0
+fcmp s3, s6 //do fA ps1 vs 0.0
+blt 0xC
+ins v3.s[0], v4.s[0] //place fC ps1 into fD ps1
+b 0x8
+ins v3.s[0], v5.s[0] //place fB ps1 into temp fD ps1
+ins v3.2s[1], v8.s[1] //merge temp results results
+str d3, [x1, x2] //Write fD's value
+//todo cr1 fp stuff
 pc_adjust 0x4
+ps_selRC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_sub_ppc
@@ -1307,28 +1521,133 @@ ret
 
 .globl ps_sum0_ppc
 ps_sum0_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_sum0_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+//do fA ps0 + fB ps1; first place fB ps1 into its ps0 slot
+dup v5.2s, v5.s[0]
+fadd v3.2s, v3.2s, v5.2s
+//place fC ps1 into fD ps1 slot; then write new fD
+ins v3.s[0], v4.s[0]
+str d3, [x1, x2]
 pc_adjust 0x4
+ps_sum0_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_sum0RC_ppc
 ps_sum0RC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_sum0RC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+//do fA ps0 + fB ps1 = fD ps0; first place fB ps1 into its ps0 slot
+dup v5.2s, v5.s[0]
+fadd v3.2s, v3.2s, v5.2s
+//place fC ps1 into fD ps1 slot; then write new fD
+ins v3.s[0], v4.s[0]
+str d3, [x1, x2]
+//todo cr1 fp stuff
 pc_adjust 0x4
+ps_sum0RC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_sum1_ppc
 ps_sum1_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_sum1_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+//do fA ps0 + fB ps1 = fD ps1; first place fA ps0 into its ps1 slot
+dup v3.2s, v3.s[1]
+fadd v3.2s, v3.2s, v5.2s
+//place fC ps0 into fD ps0 slot; then write new fD
+ins v3.s[1], v4.s[1]
+str d3, [x1, x2]
 pc_adjust 0x4
+ps_sum1_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
 
 .globl ps_sum1RC_ppc
 ps_sum1RC_ppc:
+stp fp, lr, [sp, -0x20]!
+stp x19, x20, [sp, 0x10]
+mov fp, sp
+mov x19, x0
+mov x20, x1
 bl ps_general_legal_check
-cbnz w0, 0x8
+cbnz w0, ps_sum1RC_ppc_epilogue
+add x1, x20, fpr0 //set x1 ptr to start at fpr part of reg bank
+ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
+ldr w3, [x19, fAoff] //load fA number
+lsl w3, w3, 3
+ldr w4, [x19, fCoff] //load fC number
+lsl w4, w4, 3
+ldr w5, [x19, fBoff] //load fB number
+lsl w5, w5, 3
+ldr d3, [x1, x3] //Grab fA's value
+ldr d4, [x1, x4] //Grab fC's value
+ldr d5, [x1, x5] //Grab fB's value
+//do fA ps0 + fB ps1 = fD ps1; first place fA ps0 into its ps1 slot
+dup v3.2s, v3.s[1]
+fadd v3.2s, v3.2s, v5.2s
+//place fC ps0 into fD ps0 slot; then write new fD
+ins v3.s[1], v4.s[1]
+str d3, [x1, x2]
 pc_adjust 0x4
+ps_sum1RC_ppc_epilogue:
+ldp x19, x20, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret

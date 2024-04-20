@@ -7,7 +7,7 @@ bl convert
 
 /*Get boot.bin ptr & size*/
 ldr x1, [x27, bootbin_ptr]
-ldr w2, [x27, 0xC] /*Size can never exceed 32-bits in width*/
+ldr w2, [x27, bootbin_size] /*Size can never exceed 32-bits in width*/
 
 /*Transfer the contents, no need for rev (le to be conversion) since we are transferring via bytes*/
 ldrb w3, [x1], 1
