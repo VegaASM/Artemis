@@ -309,7 +309,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl psq_lx_ppc
-psq_lx_ppc: //todo rA literal zero rule
+psq_lx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -319,15 +319,17 @@ bl ps_general_legal_check
 cbnz w0, psq_lx_ppc_epilogue
 add x1, x20, fpr0
 ldr w2, [x19, fDoff] //load fD number
-ldr w3, [x19, rAoff] //load rA number
 ldr w4, [x19, rBoff] //load rB number
 lsl w2, w2, 3
-lsl w3, w3, 2
 lsl w4, w4, 2
-ldr w5, [x20, x3] //load rA value
-ldr w6, [x20, x4] //load rB value
+ldr w3, [x19, rAoff] //load rA number
+cmp w3, 0
+beq 0xC
+lsl w3, w3, 2
+ldr w3, [x20, x3] //load rA value
+ldr w4, [x20, x4] //load rB value
 //Calc EA and convert to real mem addr
-add w0, w5, w6
+add w0, w3, w4
 bl convert
 //x0 = "real" EA
 //Get GQR

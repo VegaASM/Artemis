@@ -314,10 +314,24 @@ ldr w3, [x0, rSoff] //get rS number
 lsl w3, w3, 2
 ldr w4, [x0, rBoff] //get rB number
 lsl w4, w4, 2
-ldr w3, [x1, x3] //grab rS's value
+ldr w5, [x1, x3] //grab rS's value
 ldr w4, [x1, x4] //grab rB's value
-asr w3, w3, w4 //sraw::ppc
+asr w3, w5, w4 //sraw::ppc
 str w3, [x1, x2] //write rA
+//Update Xer[CA]
+ldr w0, [x1, xer]
+//Find lsb high bit of rS
+//Count trailing zeroes
+rbit w5, w5
+clz w5, w5
+//Does rB shift amount exceed trailing zeroes of rS?
+//If so, set CA. Otherwise clear
+cmp w4, w5
+bhi 0xC
+bfc w0, 29, 1
+b 0x8
+orr w0, w0, 0x20000000
+str w0, [x1, xer]
 pc_adjust 0x4
 ret
 
@@ -334,6 +348,20 @@ ldr w3, [x1, x3] //grab rS's value
 ldr w4, [x1, x4] //grab rB's value
 asr w3, w3, w4 //srawRC::ppc
 str w3, [x1, x2] //write rA
+//Update Xer[CA]
+ldr w0, [x1, xer]
+//Find lsb high bit of rS
+//Count trailing zeroes
+rbit w5, w5
+clz w5, w5
+//Does rB shift amount exceed trailing zeroes of rS?
+//If so, set CA. Otherwise clear
+cmp w4, w5
+bhi 0xC
+bfc w0, 29, 1
+b 0x8
+orr w0, w0, 0x20000000
+str w0, [x1, xer]
 record_feature w3
 pc_adjust 0x4
 ret
@@ -349,6 +377,20 @@ ldr w4, [x0, SHoff] //get SH value
 ldr w3, [x1, x3] //grab rS's value
 asr w3, w3, w4 //srawi::ppc
 str w3, [x1, x2] //write rA
+//Update Xer[CA]
+ldr w0, [x1, xer]
+//Find lsb high bit of rS
+//Count trailing zeroes
+rbit w5, w5
+clz w5, w5
+//Does SH shift amount exceed trailing zeroes of rS?
+//If so, set CA. Otherwise clear
+cmp w4, w5
+bhi 0xC
+bfc w0, 29, 1
+b 0x8
+orr w0, w0, 0x20000000
+str w0, [x1, xer]
 pc_adjust 0x4
 ret
 
@@ -363,6 +405,20 @@ ldr w4, [x0, SHoff] //get SH value
 ldr w3, [x1, x3] //grab rS's value
 asr w3, w3, w4 //srawi::ppc
 str w3, [x1, x2] //write rA
+//Update Xer[CA]
+ldr w0, [x1, xer]
+//Find lsb high bit of rS
+//Count trailing zeroes
+rbit w5, w5
+clz w5, w5
+//Does SH shift amount exceed trailing zeroes of rS?
+//If so, set CA. Otherwise clear
+cmp w4, w5
+bhi 0xC
+bfc w0, 29, 1
+b 0x8
+orr w0, w0, 0x20000000
+str w0, [x1, xer]
 record_feature w3
 pc_adjust 0x4
 ret

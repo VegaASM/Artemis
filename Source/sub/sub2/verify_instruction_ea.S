@@ -19,16 +19,11 @@ tst w2, msr_ir
 beq verify_physical_instruction_ea
 
 /*Check if secondary bats are enabled*/
+/*Use sbe bit to shift base value of 4 (loop count aka number of ibats)*/
 ldr w2, [x1, hid4]
-tst w2, hid4_sbe
-beq 0xC
-
-/*Set loop count of 8*/
-mov w18, 8
-b 0x8
-
-/*set loop count of 4*/
 mov w18, 4
+ubfx w2, w2, 25, 1
+lsl w18, w18, w2
 
 /*Check all qualified IBats*/
 add x17, x1, ibat0u

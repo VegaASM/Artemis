@@ -1,4 +1,4 @@
-//todo verify-ea on all ins funcs, but we need to rewrite and write a bunch of funcs like is_dis_met? and is_isi_met, isi_mce_met? etc etc
+//todo verify-ea on all
 
 .globl lbz_ppc
 lbz_ppc:
@@ -74,19 +74,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lbzx_ppc
-lbzx_ppc: //todo add in rA literal 0 rule
+lbzx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldrb w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number
@@ -179,19 +181,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhax_ppc
-lhax_ppc: //todo add in rA literal 0 rule
+lhax_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldrh w0, [x0]
 rev16 w0, w0
@@ -206,19 +210,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhbrx_ppc
-lhbrx_ppc: //todo add in rA literal zero rule
+lhbrx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldrh w0, [x0]
 rev16 w0, w0
@@ -303,19 +309,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhzx_ppc
-lhzx_ppc: //todo add in rA literal zero rule
+lhzx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldrh w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number
@@ -424,19 +432,21 @@ lwarx_ppc:
 b lwzx_ppc
 
 .globl lwbrx_ppc
-lwbrx_ppc: //todo rA literal zero rule
+lwbrx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w0, [x0]
 rev w0, w0
@@ -521,19 +531,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lwzx_ppc
-lwzx_ppc: //todo rA literal zero rule
+lwzx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number

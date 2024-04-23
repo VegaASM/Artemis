@@ -112,7 +112,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lfdx_ppc
-lfdx_ppc: //todo rA literal zero rule
+lfdx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -120,13 +120,15 @@ bl float_legal_check
 cbnz w0, lfdx_ppc_epilogue
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr d3, [x0]
 ldr w2, [x19, fDoff] //grab fD number
@@ -249,7 +251,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lfsx_ppc
-lfsx_ppc: //todo rA literal zero rule
+lfsx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -257,13 +259,15 @@ bl float_legal_check
 cbnz w0, lfsx_ppc_epilogue
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr s3, [x0]
 ldr w2, [x19, fDoff] //grab fD number

@@ -74,19 +74,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl stbx_ppc
-stbx_ppc: //todo rA literal zero rule
+stbx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w1, [x19, rDoff] //grab rD number
 lsl w1, w1, 2
@@ -122,19 +124,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl sthbrx_ppc
-sthbrx_ppc: //todo rA literal zero rule
+sthbrx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w1, [x19, rDoff] //grab rD number
 lsl w1, w1, 2
@@ -195,19 +199,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl sthx_ppc
-sthx_ppc: //todo rA literal zero rule
+sthx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w1, [x19, rDoff] //grab rD number
 lsl w1, w1, 2
@@ -335,19 +341,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl stwbrx_ppc
-stwbrx_ppc: //todo rA literal zero rule
+stwbrx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w1, [x19, rDoff] //grab rD number
 lsl w1, w1, 2
@@ -414,19 +422,21 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl stwx_ppc
-stwx_ppc: //todo rA literal zero rule
+stwx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
 mov x19, x0
 mov x20, x1
-ldr w2, [x0, rAoff] //get rA number
-lsl w2, w2, 2
 ldr w3, [x0, rBoff] //get rB number
 lsl w3, w3, 2
-ldr w4, [x1, x2] //grab rA value
-ldr w5, [x1, x3] //grab rB value
-add w0, w4, w5 //calc EA
+ldr w2, [x0, rAoff] //get rA number
+cmp w2, 0
+beq 0xC
+lsl w2, w2, 2
+ldr w2, [x1, x2] //grab rA value
+ldr w3, [x1, x3] //grab rB value
+add w0, w2, w3 //calc EA
 bl convert
 ldr w1, [x19, rDoff] //grab rD number
 lsl w1, w1, 2

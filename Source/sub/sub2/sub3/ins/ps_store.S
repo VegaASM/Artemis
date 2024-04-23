@@ -200,7 +200,7 @@ cbnz w0, psq_stux_ppc_epilogue
 add x1, x20, fpr0
 ldr w2, [x19, fDoff] //load fS number
 ldr w3, [x19, rAoff] //load rA number
-ldr w4, [x19, rBoff] //load rA number
+ldr w4, [x19, rBoff] //load rB number
 lsl w2, w2, 3
 lsl w3, w3, 2
 lsl w4, w4, 2
@@ -285,7 +285,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl psq_stx_ppc
-psq_stx_ppc: //todo rA literal zero rule
+psq_stx_ppc:
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -295,17 +295,19 @@ bl ps_general_legal_check
 cbnz w0, psq_stx_ppc_epilogue
 add x1, x20, fpr0
 ldr w2, [x19, fDoff] //load fS number
-ldr w3, [x19, rAoff] //load rA number
-ldr w4, [x19, rBoff] //load rA number
+ldr w4, [x19, rBoff] //load rB number
 lsl w2, w2, 3
-lsl w3, w3, 2
 lsl w4, w4, 2
 ldr d6, [x1, x2] //load fS value
 ins v5.s[1], v6.s[1] //extract fS value ps0. s5 = ps0, s6 = ps1
-ldr w7, [x20, x3] //load rA value
-ldr w8, [x20, x4] //load rB value
+ldr w3, [x19, rAoff] //load rA number
+cmp w3, 0
+beq 0xC
+lsl w3, w3, 2
+ldr w3, [x20, x3] //load rA value
+ldr w4, [x20, x4] //load rB value
 //Calc EA and convert to real mem addr
-add w0, w7, w8
+add w0, w3, w4
 bl convert
 //x0 = "real" EA
 //Check for W
