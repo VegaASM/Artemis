@@ -132,21 +132,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 and w6, w6, w7 //crand::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -164,21 +163,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 bic w6, w6, w7 //crandc::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -196,21 +194,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 eon w6, w6, w7 //creqv::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -228,22 +225,21 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 and w6, w6, w7 //crnand::ppc
-mvn w6, w6
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+mvn w6, w6 //crnand::ppc
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -261,22 +257,21 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 orr w6, w6, w7 //crnor::ppc
-mvn w6, w6
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+mvn w6, w6 //crnor::ppc
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -294,21 +289,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 orr w6, w6, w7 //cror::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -326,21 +320,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 orn w6, w6, w7 //crorc::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32
@@ -358,21 +351,20 @@ ldr w2, [x0, crbDoff] //get crBd number
 ldr w3, [x0, crbAoff] //get crBa number
 ldr w4, [x0, crbBoff] //get crBb number
 ldr w5, [x1, cr] //grab ppc CR value
-//We need to flip all big endian crB values to little endian
+//Get ror amounts for all 3 numbers
 sub w8, w2, 31 //need w2 og value for later
 sub w3, w3, 31
 sub w4, w4, 31
 neg w8, w8
 neg w3, w3
 neg w4, w4
-//Extract crBa and crBb and execute the operation
-and w6, w5, w3 
-and w7, w5, w4
+//place a and b into lsb then perform the operation
+ror w6, w5, w3
+ror w7, w5, w4
 eor w6, w6, w7 //crxor::ppc
-//Insert new crBd result
-ror w5, w5, w8 //Put crBd slot into LSB slot
-and w5, w5, 0xFFFFFFFE //Remove current crBd value
-orr w5, w5, w6 //Insert new result
+//place result into bit d when bit d is ror'd to be lsb
+ror w5, w5, w8
+bfxil w5, w6, 0, 1
 //Rotate back to where we were
 add w2, w2, 1
 cmp w2, 32

@@ -11,9 +11,11 @@ bl ps_general_legal_check
 cbnz w0, psq_l_ppc_epilogue
 add x1, x20, fpr0
 ldr w2, [x19, fDoff] //load fD number
+lsl w2, w2, 3
 ldr w3, [x19, SIMMoff] //load SIMM value
 ldr w4, [x19, rAoff] //load rA number
-lsl w2, w2, 3
+cmp w4, 0
+beq 0xC
 lsl w4, w4, 2
 ldr w4, [x20, x4] //load rA value
 //Calc EA and convert to real mem addr
@@ -307,7 +309,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl psq_lx_ppc
-psq_lx_ppc:
+psq_lx_ppc: //todo rA literal zero rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp

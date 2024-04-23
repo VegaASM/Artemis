@@ -9,16 +9,11 @@ mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
 ldr w3, [x0, rAoff] //get rA number
+cmp w3, 0
+beq 0xC
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
-bl verify_data_ea
-cbz w0, 0x10
-//Call exception address that was returned back
-mov w1, w19
-blr x0
-b lbz_ppc_epilogue
-//EA is good, continue with instruction
 bl convert
 ldrb w0, [x0]
 ldr w2, [x19, rDoff] //grab rD number
@@ -79,7 +74,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lbzx_ppc
-lbzx_ppc:
+lbzx_ppc: //todo add in rA literal 0 rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -111,6 +106,8 @@ mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
 ldr w3, [x0, rAoff] //get rA number
+cmp w3, 0
+beq 0xC
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
@@ -182,7 +179,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhax_ppc
-lhax_ppc:
+lhax_ppc: //todo add in rA literal 0 rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -209,7 +206,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhbrx_ppc
-lhbrx_ppc:
+lhbrx_ppc: //todo add in rA literal zero rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -242,6 +239,8 @@ mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
 ldr w3, [x0, rAoff] //get rA number
+cmp w3, 0
+beq 0xC
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
@@ -304,7 +303,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lhzx_ppc
-lhzx_ppc:
+lhzx_ppc: //todo add in rA literal zero rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -336,7 +335,9 @@ mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
 ldr w3, [x0, rAoff] //get rA number
-lsl w3, w21, 2
+cmp w3, 0
+beq 0xC
+lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
 bl convert
@@ -365,6 +366,8 @@ mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w0, [x0, rAoff] //get rA number, save in non-volatile register
+cmp w0, 0
+beq 0xC
 lsl w0, w0, 2
 ldr w0, [x1, x0] //grab rA value
 bl convert
@@ -392,6 +395,8 @@ mov fp, sp
 mov x19, x0
 mov x20, x1
 ldr w0, [x0, rAoff] //get rA number, save in non-volatile register
+cmp w0, 0
+beq 0xC
 lsl w0, w0, 2
 ldr w0, [x1, x0] //grab rA value
 bl convert
@@ -419,7 +424,7 @@ lwarx_ppc:
 b lwzx_ppc
 
 .globl lwbrx_ppc
-lwbrx_ppc:
+lwbrx_ppc: //todo rA literal zero rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp
@@ -452,6 +457,8 @@ mov x19, x0
 mov x20, x1
 ldr w2, [x0, doff] //get SIMM value
 ldr w3, [x0, rAoff] //get rA number
+cmp w3, 0
+beq 0xC
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
@@ -514,7 +521,7 @@ ldp fp, lr, [sp], 0x20
 ret
 
 .globl lwzx_ppc
-lwzx_ppc:
+lwzx_ppc: //todo rA literal zero rule
 stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
 mov fp, sp

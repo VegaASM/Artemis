@@ -257,10 +257,8 @@ addic_ppc:
 ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
-cmp w3, 0 //literal 0 rule for rA
 lsl w3, w3, 2
 ldr w4, [x0, SIMMoff] //get SIMM
-beq 0x8
 ldr w3, [x1, x3] //grab rA's value
 add w3, w3, w4 //addic::ppc
 str w3, [x1, x2] //write rD
@@ -278,10 +276,8 @@ addicRC_ppc:
 ldr w2, [x0, rDoff] //get rD number
 lsl w2, w2, 2
 ldr w3, [x0, rAoff] //get rA number
-cmp w3, 0 //literal 0 rule for rA
 lsl w3, w3, 2
 ldr w4, [x0, SIMMoff] //get SIMM
-beq 0x8
 ldr w3, [x1, x3] //grab rA's value
 add w3, w3, w4 //addicRC::ppc
 str w3, [x1, x2] //write rD
