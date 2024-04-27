@@ -1,33 +1,60 @@
+/*This func will verify...
+If EA is within a BAT and..
+if the Supervisor/User has access
+*/
+
+/*w0 = EA
+x1 = BAT (full upper and lower)
+w0 returns 1 = hit
+w0 returns 0 = miss
+x1 always returns back intact BAT (no change)
+*/
 
 .globl check_bats
 check_bats:
-/*Extract BEPI & place as proper 32-bit address*/
-lsr x2, x1, 32
-bfc w2, 0, 17
+/*Extract BEPI's first 4 bits*/
+ubfx x2, x1, 60, 4
 
-/*Set a scratch register to 128KB (lowest BAT size possible)*/
-mov w3, 0x20000
+/*Extract EA's first 4 bits*/
+ubfx w3, w0, 28, 4
 
-/*Extract BL bits*/
-ubfx x4, x1, 40, 11
+/*Compare*/
+cmp w2, w3
+bne bat_array_miss
 
-/*Figure out amount to adjust to w3 based on BL's high/flipped MSB (first high bit found)*/
-clz w5, w4
-sub w5, w5, 32
-/*Get adder amount by shifting w3 via w5 result*/
-lsl w3, w3, w5
-/*Add it to get virtual addr range end*/
-add w4, w2, w3
+/*Extract BEPI's last 11 bits*/
+ubfx x2, x1, 49, 11
 
-/*Is EA within w2 and w3 (start addr & end addr range)?*/
-cmp w0, w2
-blo throw_neg_one
-cmp w0, w4
-bhi throw_neg_one
+/*Extract EA's Big Endian bits 4 thru 14*/
+ubfx w3, w0, 17, 11
 
-mov w0, 0
+/*Extract BL bits, then invert*/
+ubfx x4, x1, 34, 11
+mvn w4, w4
+
+/*Logically AND EA bits w/ inverted BL bits*/
+and w5, w3, w3
+
+/*Result must be equal to BEPI's last 11 bits, if not BAT is NOT in range*/
+cmp w2, w5
+bne bat_array_miss
+
+/*Get MSR Privilege Mode Bit*/
+ldr x2, [x27, regbank_ptr]
+ldr w2, [x2, msr]
+tst w2, msr_pr
+beq 0x10
+
+/*If Supervisor, XOR it with Vs, then return*/
+ubfx x3, x1, 1, 1
+eor w0, w2, w3
 ret
 
-throw_neg_one:
-mov w0, -1
+/*If User, eqv it with Vp, then return*/
+ubfx x3, x1, 0, 1
+eon w0, w2, w3
+ret
+
+bat_array_miss:
+mov w0, 0
 ret

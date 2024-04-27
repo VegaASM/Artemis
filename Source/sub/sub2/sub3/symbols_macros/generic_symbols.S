@@ -9,6 +9,10 @@
 
 //Offsets relative to Array Pointer
 .set bootbin_ptr, 0x0
+.set checkstop_flag, 0x8
+.set load_flag, 0x9
+.set store_flag, 0xA
+.set touch_flag, 0xB
 .set bootbin_size, 0xC //Because size can only 32-bits in width
 .set bootdol_ptr, 0x10
 .set bootdol_size, 0x1C //Because size can only 32-bits in width
@@ -21,3 +25,8 @@
 .set L1_data_ptr, 0x50
 .set L2_ptr, 0x58
 .set roundrobin_ptr, 0x60
+
+.set mem1_base, 0
+.set mem1_top, 0x017FFFFF
+.set mem2_base, 0x10000000
+.set mem2_top, 0x13FFFFFF

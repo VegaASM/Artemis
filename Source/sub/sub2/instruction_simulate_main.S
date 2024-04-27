@@ -68,6 +68,7 @@ beq call_write_art_strings
 
 /*Step/execute the instruction!*/
 /*x0 = extracted ppc items ptr; w1 = instruction "key"*/
+/*w0 returns checkstop flag. 0 = no; 1 = yes, do checkstop*/
 mov x0, x22
 mov w1, w23
 bl execute

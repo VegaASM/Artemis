@@ -2,8 +2,11 @@
 #include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
 #include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_instruction_ea.S
 #include "sub3/sub4/check_bats.S" //Must be before both verify's
+#include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
+#include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
 #include "verify_instruction_ea.S" //Must be established before any instruction func
 #include "verify_data_ea.S" //Must be established before any load, store, or paired single file
+#include "set_loadstoretouch_flags.S"
 #include "sub3/ins/branch.S"
 #include "sub3/ins/floats.S"
 #include "sub3/ins/load_float.S"
@@ -389,24 +392,23 @@ mov fp, sp
 mov x19, x0
 mov w20, w1
 
-/*Hacky hacky, cba to put mov w0, 0 on a shit ton of instruction funcs for now*/
-/*Preset non-checkstop flag*/
-/*Checkstop within MCE will set this flag to 1*/
-/*use boot.bin space within array table*/
+/*Preset hacky checkstop flag*/
 mov w0, 0
-strb w0, [x27, 0x8]
+strb w0, [x27, checkstop_flag]
 
 /*Check if PC (instruction addr) is valid*/
 bl verify_instruction_ea
-cbz w0, get_instruction_func_addr
+cbz w0, 0x10
 
 /*EA was bad, called the return addr that was given back*/
 blr x0
 b 0x1C
 
+/*Set hacky other flags*/
+bl set_loadstoretouch_flags
+
 /*Take the w1 value and multiply by 8*/
 /*Then add that result to func_table index to get exact function addr to call*/
-get_instruction_func_addr:
 lsl w20, w20, 3
 adr x2, func_table
 ldr x2, [x2, x20]
@@ -415,7 +417,7 @@ mov x0, x19
 blr x2 /*x0 now set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
 
 /*Grab checkstop flag to return to parent*/
-ldrb w0, [x27, 0x8]
+ldrb w0, [x27, checkstop_flag]
 
 /*Epilogue*/
 ldp fp, lr, [sp], 0x20

@@ -51,7 +51,7 @@ reset_exception_vector:
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -86,10 +86,15 @@ ldp fp, lr, [sp], 0x10
 ret
 
 //void func
+//NOTE this func also acts as a proxy force-checkstop routine
 .globl machine_check_exception_vector
 machine_check_exception_vector:
+//Check custom flag to see if we're forcing checkstop no matter what
+ldrb w0, [x27]
+cmp w0, 1
+beq do_checkstop
 //Is ME high on MSR?
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, msr]
 tst w1, msr_me
 beq do_checkstop
@@ -99,11 +104,11 @@ tst w1, hid0_emcp
 beq 0xC
 //Do a Checkstop, write hacky checkstop flag
 do_checkstop:
-mov w0, -1
-strb w0, [x27, 0x8]
+mov w0, 1
+strb w0, [x27, checkstop_flag]
 ret
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -138,7 +143,7 @@ dsi_exception_vector:
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
 //Copy EA (w0) to DAR
-ldr x1, [x27, 0x20] //get reg bank ptr
+ldr x1, [x27, regbank_ptr] //get reg bank ptr
 str w0, [x1, dar]
 //Copy PC to srr0
 ldr w0, [x1, pc]
@@ -174,7 +179,7 @@ ret
 .globl isi_exception_vector
 isi_exception_vector:
 //Copy PC to srr0
-ldr x1, [x27, 0x20] //get reg bank ptr
+ldr x1, [x27, regbank_ptr] //get reg bank ptr
 ldr w0, [x1, pc]
 str w0, [x1, srr0]
 //Check IP bit of msr
@@ -207,7 +212,7 @@ ret
 .globl exinterrupt_exception_vector
 exinterrupt_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -240,7 +245,7 @@ ret
 .globl alignment_exception_vector
 alignment_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -273,7 +278,7 @@ ret
 .globl program_exception_vector
 program_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -306,7 +311,7 @@ ret
 .globl fp_exception_vector
 fp_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -339,7 +344,7 @@ ret
 .globl decrementer_exception_vector
 decrementer_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -372,7 +377,7 @@ ret
 .globl syscall_exception_vector
 syscall_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -405,7 +410,7 @@ ret
 .globl trace_exception_vector
 trace_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -438,7 +443,7 @@ ret
 .globl pm_exception_vector
 pm_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr
@@ -471,7 +476,7 @@ ret
 .globl iabr_exception_vector
 iabr_exception_vector:
 //Copy PC to srr0
-ldr x0, [x27, 0x20] //get reg bank ptr
+ldr x0, [x27, regbank_ptr] //get reg bank ptr
 ldr w1, [x0, pc]
 str w1, [x0, srr0]
 //Check IP bit of msr

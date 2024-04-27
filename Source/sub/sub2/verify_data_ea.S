@@ -1,8 +1,8 @@
-
 /*w0 = EA*/
 /*return values
 w0 = 0 = good EA
 w0 = exception routine address to call&link if bad EA*/
+
 .globl verify_data_ea
 verify_data_ea:
 stp fp, lr, [sp, -0x20]!
@@ -19,16 +19,11 @@ tst w2, msr_dr
 beq verify_physical_data_ea
 
 /*Check if secondary bats are enabled*/
+/*Use sbe bit to shift base value of 4 (loop count aka number of ibats)*/
 ldr w2, [x1, hid4]
-tst w2, hid4_sbe
-beq 0xC
-
-/*Set loop count of 8*/
-mov w18, 8
-b 0x8
-
-/*set loop count of 4*/
 mov w18, 4
+ubfx w2, w2, 25, 1
+lsl w18, w18, w2
 
 /*Check all qualified DBats*/
 add x17, x1, dbat0u
@@ -36,43 +31,51 @@ add x17, x1, dbat0u
 mov w0, w19
 ldr x1, [x17], 8
 bl check_bats
-cbz w0, good_data_ea
+cbnz w0, check_dbat_pp
 subs w18, w18, 1
 bne -0x14
 
-/*TODO put in code for segment register / page tables check... crap....*/
-
-/*Virtual EA is bad*/
+/*Bat Array Miss or PP violation*/
+/*Raise DSI*/
+raise_dsi_for_dbat:
 adrp x0, dsi_exception_vector
 add x0, x0, :lo12: dsi_exception_vector
 b verify_data_ea_epilogue
 
-good_data_ea:
-mov w0, 0
+check_dbat_pp:
+/*Check BAT's PP bits*/
+/*x1 = read only, 10 = read/write*/
+//TODO for dcbt/dcbtst instruction, simply abort access (nop)
+tbnz x1, 0x3, raise_dsi_for_dbat //NOTE todo remember to implement dsisr bit stuff that's unique for PP violation
+tbz x1, 0x2, data_pp_read_and_write
 
-/*Done with verification*/
-verify_data_ea_epilogue:
-ldr x19, [sp, 0x10]
-ldp fp, lr, [sp], 0x20
-ret
+/*PP only allows reads (load instructions), check load_flag, if low, then it's PP violation*/
+ldrb w2, [x27, touch_flag]
+tbnz w2, 1, good_data_ea //simply abort access due to dcbt/dcbtst
+ldrb w2, [x27, load_flag]
+tbnz w2, 1, raise_dsi_for_dbat
 
+//Change virt EA to phys EA
+data_pp_read_and_write:
+bl bat_va_to_pa
+
+/*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
 verify_physical_data_ea:
-cmp w0, 0
-blo bad_physical_data_ea
-movz w2, 0x13FF, lsl 16
-movk w2, 0xFFFF
-cmp w0, w2
-bhi bad_physical_data_ea
-mov w2, 0x10000000
-cmp w0, w2
-bhi good_data_ea
-movz w2, 0x017F, lsl 16
-movk w2, 0xFFFF
-cmp w0, w2
-bls good_data_ea
+bl verify_physical_ea
+tbnz w0, 1, good_data_ea
 
 /*Bad physical data EA*/
 bad_physical_data_ea:
 adrp x0, machine_check_exception_vector
 add x0, x0, :lo12: machine_check_exception_vector
 b verify_data_ea_epilogue
+
+good_data_ea:
+mov w0, 0
+
+verify_data_ea_epilogue:
+ldr x19, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
+ret
+
+/*TODO put in code for segment register / page tables check... great...*/
