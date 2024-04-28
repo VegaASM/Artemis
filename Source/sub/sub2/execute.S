@@ -398,11 +398,11 @@ strb w0, [x27, checkstop_flag]
 
 /*Check if PC (instruction addr) is valid*/
 bl verify_instruction_ea
-cbz w0, 0x10
+cbz x1, 0x10 /*Need to check entire GPR*/
 
-/*EA was bad, called the return addr that was given back*/
-blr x0
-b 0x1C
+/*EA was bad, called the return addr that was given back in x18. w0+ will contain approriate arg*/
+blr x18
+b 0x20
 
 /*Set hacky other flags*/
 bl set_loadstoretouch_flags
@@ -412,7 +412,7 @@ bl set_loadstoretouch_flags
 lsl w20, w20, 3
 adr x2, func_table
 ldr x2, [x2, x20]
-ldr x1, [x27, 0x20] /*Get Reg Bank ptr*/
+ldr x1, [x27, regbank_ptr] /*Get Reg Bank ptr*/
 mov x0, x19
 blr x2 /*x0 now set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
 

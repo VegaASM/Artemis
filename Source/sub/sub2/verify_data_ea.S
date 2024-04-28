@@ -1,7 +1,7 @@
 /*w0 = EA*/
 /*return values
-w0 = 0 = good EA
-w0 = exception routine address to call&link if bad EA*/
+x1 = 0 if good EA; ignore w0 return value
+x1 = exception routine address to call&link if bad EA, with w0 being the arg for to-be function to call*/
 
 .globl verify_data_ea
 verify_data_ea:
@@ -38,8 +38,8 @@ bne -0x14
 /*Bat Array Miss or PP violation*/
 /*Raise DSI*/
 raise_dsi_for_dbat:
-adrp x0, dsi_exception_vector
-add x0, x0, :lo12: dsi_exception_vector
+adrp x18, dsi_exception_vector
+add x18, x18, :lo12: dsi_exception_vector
 b verify_data_ea_epilogue
 
 check_dbat_pp:
@@ -66,12 +66,12 @@ tbnz w0, 1, good_data_ea
 
 /*Bad physical data EA*/
 bad_physical_data_ea:
-adrp x0, machine_check_exception_vector
-add x0, x0, :lo12: machine_check_exception_vector
+adrp x18, machine_check_exception_vector
+add x18, x18, :lo12: machine_check_exception_vector
 b verify_data_ea_epilogue
 
 good_data_ea:
-mov w0, 0
+mov w1, 0
 
 verify_data_ea_epilogue:
 ldr x19, [sp, 0x10]

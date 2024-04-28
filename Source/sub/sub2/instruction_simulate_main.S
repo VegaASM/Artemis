@@ -29,7 +29,7 @@ mov fp, sp
 mov w19, w0
 
 /*Grab ppc-mem address from PC and convert to real address*/
-ldr x0, [x27, 0x20]
+ldr x0, [x27, regbank_ptr]
 ldr w0, [x0, pc]
 bl convert
 mov x20, x0
@@ -80,7 +80,7 @@ movz w1, 0x7374 /*st*/
 cmp w0, w1 /*Check for standard store instruction*/
 beq call_write_mem_txt
 movz w1, 0x69
-ldrb w0, [x21, 0x2]
+ldrb w0, [x21, 0x3]
 cmp w0, w1 /*Check for dcbi*/
 beq call_write_mem_txt
 mov w1, 0x7A

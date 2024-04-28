@@ -51,7 +51,7 @@ bl ftell
 mov w20, w0
 
 /*Size cannot exceed 24MB (0x01800000)*/
-movz w1, 0x0180, lsl 16
+mov w1, mem1bytesize
 cmp w0, w1 /*cmp w0, 0x01800000*/
 adr x0, bootdolsizeEC
 bhi dumpbootdol_epilogue

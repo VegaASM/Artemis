@@ -7,7 +7,7 @@
 .set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
 .set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size
 
-//Offsets relative to Array Pointer
+/*Offsets relative to Array Pointer*/
 .set bootbin_ptr, 0x0
 .set checkstop_flag, 0x8
 .set load_flag, 0x9
