@@ -2,7 +2,7 @@
 
 Created by Vega
 
-Version: 0.0-r047
+Version: 0.0-r048
 
 Status: Compiles. Untested. Most likely will just fault.
 
@@ -10,7 +10,7 @@ Status: Compiles. Untested. Most likely will just fault.
 
 **What is Artemis?**
 
-Artemis is a bare-bones PowerPC 32-bit Instruction Simulator completely written in ARM64 Assembly. Some properties of the Wii-Broadway PPC chip have been implemented into Artemis, such as Broadway's Graphics Instructions (Paired Singles).
+Artemis is a bare-bones PowerPC 32-bit Instruction Simulator completely written in ARM64 Assembly. Some properties of the Wii-Broadway PPC chip have been implemented into Artemis, such as Broadway's Graphics Instructions (Paired Singles), and 8 more BAT Registers.
 
 **Why write this in ARM64 Assembly?**
 
@@ -44,12 +44,12 @@ It is a pain, but this is bare-bones. There may be plans in the future to add in
 
 **Is there any other notes to be aware of?**
 
-Currently, Artemis can only execute basic instructions and execute in physical memory. Cache doesn't work, address translation doesn't work, effects from items such as HID bit(s) don't work, etc.
+Currently, Artemis can only execute basic instructions and execute in physical memory. I-Cache is configured and what not, but the MEI protocol isn't implemented yet. D-Cache simply doesn't work. Regarding address translation, IBAT's in theory work, but DBAT's and Page Tables do not. Effects from items such as HIDx SPR settings are not implemented yet. Anything FPSCR related hasn't been implemented yet.
 
 Valid simulated physical memory addresses are the following ranges
 * 0x00000000 thru 0x017FFFFF
 * 0x10000000 thru 0x13FFFFFF
-* IP bit high of vector addresses (i.e 0xFFF0_nnnn)
+* 0xFFF00100 thru 0xFFF0013F
 
 **What are the major goals for Artemis?**
 

@@ -25,10 +25,9 @@ x21 = malloc pointer*/
 
 .globl dump_bootbin
 dump_bootbin:
-//Prologue
-stp fp, lr, [sp, -0x30]!
+/*Prologue*/
+stp fp, lr, [sp, -0x20]!
 stp x19, x20, [sp, 0x10]
-str x21, [sp, 0x20]
 mov fp, sp
 
 /*Open boot.bin*/
@@ -60,14 +59,9 @@ bhi dumpbootbin_epilogue
 /*Rewind back to start of file & malloc memory for dump*/
 mov x0, x19
 bl rewind //No error check for this
-mov w0, w20
-bl malloc
-mov x21, x0
-adr x0, mallocbootbinEC
-cbz x21, dumpbootbin_epilogue
 
 /*Dump boot.bin*/
-mov x0, x21 //Where to dump
+ldr x0, [x27, bootbin_ptr] //Where to dump
 mov w1, 1 //Size
 mov w2, w20 //Count (real size)
 mov x3, x19 //File pointer
@@ -84,7 +78,6 @@ adr x0, fclosebootbinEC
 cbnz w1, dumpbootbin_epilogue
 
 /*Store boot.bin ptr and size to array*/
-str x21, [x27, bootbin_ptr]
 str w20, [x27, bootbin_size]
 
 /*Return back zero (success)*/
@@ -92,7 +85,6 @@ mov w0, 0
 
 /*Epilogue*/
 dumpbootbin_epilogue:
-ldr x21, [sp, 0x20]
 ldp x19, x20, [sp, 0x10]
-ldp fp, lr, [sp], 0x30
+ldp fp, lr, [sp], 0x20
 ret

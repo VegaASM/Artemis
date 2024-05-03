@@ -1,10 +1,10 @@
 #include "sub3/symbols_macros/spr_symbols.S"
 #include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
-#include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_instruction_ea.S
+#include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_PC_EA.S
 #include "sub3/sub4/check_bats.S" //Must be before both verify's
 #include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
-#include "verify_instruction_ea.S" //Must be established before any instruction func
+#include "verify_PC_EA.S" //Must be established before any instruction func
 #include "verify_data_ea.S" //Must be established before any load, store, or paired single file
 #include "set_loadstoretouch_flags.S"
 #include "sub3/ins/branch.S"
@@ -396,17 +396,20 @@ mov w20, w1
 mov w0, 0
 strb w0, [x27, checkstop_flag]
 
-/*Check if PC (instruction addr) is valid*/
-bl verify_instruction_ea
+/*Check if PC (instruction EA) is valid*/
+bl verify_PC_EA
 cbz x1, 0x10 /*Need to check entire GPR*/
 
-/*EA was bad, called the return addr that was given back in x18. w0+ will contain approriate arg*/
+/*EA was bad, called the return addr that was given back in x18. w2 will contain approriate arg if it exists*/
 blr x18
-b 0x20
+mov w0, w2
+b load_checkstop_flag
 
-/*Set hacky other flags*/
+/*PC's EA is valid, we can execute the instruction that's residing there*/
+/*Set hacky other flags, this is needed if for load/store EA BAT PP processing*/
 bl set_loadstoretouch_flags
 
+/*Execute the instruction!*/
 /*Take the w1 value and multiply by 8*/
 /*Then add that result to func_table index to get exact function addr to call*/
 lsl w20, w20, 3
@@ -417,8 +420,10 @@ mov x0, x19
 blr x2 /*x0 now set. x0 = extracted PPC off ptr, x1 = register bank ptr*/
 
 /*Grab checkstop flag to return to parent*/
+load_checkstop_flag:
 ldrb w0, [x27, checkstop_flag]
 
 /*Epilogue*/
+ldp x19, x20, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret

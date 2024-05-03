@@ -1,8 +1,13 @@
+#include "decode_pc_or_pc4.S"
 #include "disassemble.S"
 #include "execute.S"
 #include "writeartemisstrings.S"
 #include "convertregisters.S"
 #include "write_artemis_txt.S"
+
+nothing_to_disassemble:
+.asciz "No Memory Here."
+.align 2
 
 /*This func is the main overview of simulating (stepping) 1 instruction
 This is used at the very start of the emulation (but skipping execute.S)
@@ -17,7 +22,7 @@ instruction_simulate_main:
 /*Prologue*/
 /*0x40 thru 0x6F = buffer for 1st ins str
 0x70 thru 9F = buffer for 2nd ins str
-0xA0 thru 10F = buffer for extracted items from PPC instructions
+0xA0 thru 11F = buffer for extracted items from PPC instructions
 */
 stp fp, lr, [sp, -0x120]!
 stp x19, x20, [sp, 0x10]
@@ -28,41 +33,60 @@ mov fp, sp
 /*Backup arg*/
 mov w19, w0
 
-/*Grab ppc-mem address from PC and convert to real address*/
-ldr x0, [x27, regbank_ptr]
-ldr w0, [x0, pc]
-bl convert
-mov x20, x0
+/*Process PC EA and get PC Instruction's Real Mem Address*/
+ldr x1, [x27, regbank_ptr]
+ldr w20, [x1, pc]
+mov w0, w20
+bl decode_pc_or_pc4
+cbnz x0, disa_pc_ins
+
+/*EA couldn't translate to a REAL memory address*/
+adr x20, nothing_to_disassemble
+b decode_next
+
 /*Disassemble PC's instruction*/
 /*x0 = place to dump*/
 /*w1 = instruction to disassemble*/
 /*x2 = extracted PPC items dump spot*/
 /*w3 = store extracted items?*/
+disa_pc_ins:
 ldr w1, [x0]
+add x21, sp, 0x40 /*PC's instruction string buffer*/
+add x22, sp, 0xA0 /*Dump buffer for PC's instruction's extracted items*/
 rev w1, w1
-add x21, sp, 0x40
 mov x0, x21
-add x22, sp, 0xA0
 mov x2, x22
 mov w3, 1
 bl disassemble
 cbnz w0, ins_sim_main_epilogue /*r0 always returns as non-extended*/
 mov w23, w1
 
+/*Process the EA of PC+4 & get the Instruction*/
+decode_next:
+add w0, w20, 4
+bl decode_pc_or_pc4 /*Must run seperately for PC+4 just incase of crossing a mem boundary*/
+cbnz x0, disa_pc4_ins
+
+/*EA couldn't translate to a REAL memory address*/
+adr x24, nothing_to_disassemble
+b check_execute_flag
+
 /*Disassemble instruction directly below PC*/
 /*x0 = place to dump*/
 /*w1 = instruction to disassemble*/
-/*x2 = extracted PPC items dump spot*/
+/*x2 = extracted PPC items dump spot; ignored if w3 = 0*/
 /*w3 = store extracted items?*/
+disa_pc4_ins:
 ldr w1, [x20, 0x4]
-rev w1, w1
 add x24, sp, 0x70
+rev w1, w1
 mov x0, x24
 mov w3, 0
 bl disassemble
 cbnz w0, ins_sim_main_epilogue /*r0 always returns as non-extended*/
 
 /*Check don't execute flag*/
+check_execute_flag:
 cmp w19, 0
 beq call_write_art_strings
 
@@ -79,11 +103,13 @@ ldrh w0, [x21]
 movz w1, 0x7374 /*st*/
 cmp w0, w1 /*Check for standard store instruction*/
 beq call_write_mem_txt
-movz w1, 0x69
-ldrb w0, [x21, 0x3]
+movz w1, 0x6463, lsl 16
+movk w1, 0x6269
+ldr w0, [x21]
 cmp w0, w1 /*Check for dcbi*/
 beq call_write_mem_txt
-mov w1, 0x7A
+bfc w1, 0, 16
+movk w1, 0x627A
 cmp w0, w1 /*Check for dcbz and dcbz_l*/
 bne call_write_art_strings
 
@@ -96,7 +122,7 @@ cbnz x0, ins_sim_main_epilogue
 /*x0 arg = 1st disassembled ins str pointer*/
 /*x1 arg = 2nd disassembled ins str pointer*/
 call_write_art_strings:
-mov x0, x21
+mov x0, x20
 mov x1, x24
 bl writeartemisstrings /*No error checks for this func*/
 

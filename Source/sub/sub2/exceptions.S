@@ -185,7 +185,12 @@ bfi w0, w1, 0, 1
 str w0, [x2, msr]
 ret
 
-//w0 = SRR1 Reason bits
+/*w0 = SRR1 Reason bits
+0x40000000 = VA not found in IBAT or Page Tash Primary nor Secondary Hash
+0x10000000 = IBAT G was high or fetch was on Direct Segment when prohibited
+0x08000000 = IBAT PP violation
+NOTE Manuals say if I BAT has W high then undefined behavior occurs, for now... we'll do ISI)
+*/
 .globl isi_exception_vector
 isi_exception_vector:
 //Copy PC to srr0

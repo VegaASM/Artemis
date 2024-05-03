@@ -144,6 +144,15 @@
 .set sdr1_htaborg, 0xFFFF0000
 .set sdr1_htabmask, 0x000001FFF
 
+//L2CR
+.set l2cr_l2e, 0x80000000
+.set l2cr_l2ce, 0x40000000
+.set l2cr_l2do, 0x00400000
+.set l2cr_l2i, 0x00200000
+.set l2cr_l2wt, 0x00080000
+.set l2cr_l2ts, 0x00040000
+.set l2cr_l2ip, 0x00000001
+
 //DABR
 .set dabr_bt, 0x00000004
 .set dabr_dw, 0x00000002
@@ -152,4 +161,3 @@
 //EAR
 .set ear_e, 0x80000000
 .set ear_rid, 0x0000003F
-

@@ -1,9 +1,9 @@
 /*This func will verify...
-If EA is within a BAT and..
+If VA is within a BAT and..
 if the Supervisor/User has access
 */
 
-/*w0 = EA
+/*w0 = VA
 x1 = BAT (full upper and lower)
 w0 returns 1 = hit
 w0 returns 0 = miss
@@ -43,7 +43,7 @@ bne bat_array_miss
 ldr x2, [x27, regbank_ptr]
 ldr w2, [x2, msr]
 tst w2, msr_pr
-beq 0x10
+beq vp_bit
 
 /*If Supervisor, XOR it with Vs, then return*/
 ubfx x3, x1, 1, 1
@@ -51,6 +51,7 @@ eor w0, w2, w3
 ret
 
 /*If User, eqv it with Vp, then return*/
+vp_bit:
 ubfx x3, x1, 0, 1
 eon w0, w2, w3
 ret

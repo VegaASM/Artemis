@@ -5,7 +5,7 @@
 .set memtxtrowsize, 0x39
 .set memtxtrows, (mem1bytesize + mem2bytesize) / 16 /*Exclude title row*/
 .set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
-.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size
+.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size /*TODO fix me*/
 
 /*Offsets relative to Array Pointer*/
 .set bootbin_ptr, 0x0
@@ -30,3 +30,5 @@
 .set mem1_top, 0x017FFFFF
 .set mem2_base, 0x10000000
 .set mem2_top, 0x13FFFFFF
+.set ip_base, 0xFFF00100
+.set ip_top, 0xFFF0013F

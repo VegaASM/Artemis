@@ -19,7 +19,7 @@ mainmallocmemEC:
 .globl main
 main:
 /*Prologue*/
-stp fp, lr, [sp, -0x80]! /*Create 0x70 space for Array Table*/
+stp fp, lr, [sp, -0xC0]! /*0x10 thru 0x7F = Array Table; 0x80 thru BF = IP memory*/
 mov fp, sp
 
 /*First message*/
@@ -35,7 +35,7 @@ movk w0, :abs_g0_nc: grand_total_malloc
 bl malloc
 cbz x0, cant_alloc_mainmemory
 
-/*Store Reg ptr, Mem1 ptr, Mem2 ptr, Artemis.txt, and memory.txt ptr*/
+/*Store all ptr's*/
 str x0, [x27, regbank_ptr] /*reg bank ptr*/
 add x1, x0, regbanksize
 str x1, [x27, mem1_ptr] /*mem1 ptr*/
@@ -55,8 +55,8 @@ add x1, x1, ICache_byte_size
 str x1, [x27, L1_data_ptr] /*L1 DCache table ptr*/
 add x1, x1, DCache_byte_size
 str x1, [x27, L2_ptr] /*L2 Cache table ptr*/
-add x1, x1, L2Cache_byte_size
-str x1, [x27, roundrobin_ptr] /*Round Robin addr list ptr*/
+add x0, sp, 0x80
+str x0, [x27, bootbin_ptr] /*IP mem pointer*/
 
 /*Get boot.bin contents*/
 bl dump_bootbin
@@ -105,5 +105,5 @@ bl puts
 /*Epilogue, exit program*/
 epilogue_main:
 mov w0, 0
-ldp fp, lr, [sp], 0x80
+ldp fp, lr, [sp], 0xC0
 ret

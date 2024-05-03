@@ -3,6 +3,8 @@
 x1 = 0 if good EA; ignore w0 return value
 x1 = exception routine address to call&link if bad EA, with w0 being the arg for to-be function to call*/
 
+/*TODO fix me since we've done the instruction side of things sort of correctly now*/
+
 .globl verify_data_ea
 verify_data_ea:
 stp fp, lr, [sp, -0x20]!
