@@ -1259,7 +1259,8 @@ bfi w9, w7, 0, 1
 //scrap register will be used to do Logical AND with TO field
 //if *ANY* bit remains high after ANDing, then Trap!
 tst w9, w4
-beq 0x8
+beq 0xC
+mov w0, 0x00020000
 bl program_exception_vector
 pc_adjust 0x4
 ldp x19, x20, [sp, 0x10]
@@ -1299,7 +1300,8 @@ bfi w9, w7, 0, 1
 //scrap register will be used to do Logical AND with TO field
 //if *ANY* bit remains high after ANDing, then Trap!
 tst w9, w4
-beq 0x8
+beq 0xC
+mov w0, 0x00020000
 bl program_exception_vector
 pc_adjust 0x4
 ldp x19, x20, [sp, 0x10]
@@ -1310,6 +1312,7 @@ ret
 invalid_ppc:
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
+mov w0, 0x00080000
 bl program_exception_vector
 ldp fp, lr, [sp], 0x10
 ret

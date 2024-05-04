@@ -297,7 +297,7 @@ str w0, [x2, msr]
 ret
 
 //w0 = srr1 reason bits
-//todo figure out srr0 stuff
+//todo figure out srr0 stuff for times when EA isn't suppose to be in srr0
 .globl program_exception_vector
 program_exception_vector:
 //Copy PC to srr0
