@@ -398,11 +398,11 @@ strb w0, [x27, checkstop_flag]
 
 /*Check if PC (instruction EA) is valid*/
 bl verify_PC_EA
-cbz x1, 0x10 /*Need to check entire GPR*/
+cbz w0, 0x10
 
-/*EA was bad, called the return addr that was given back in x18. w2 will contain approriate arg if it exists*/
+/*EA was bad, called the return addr that was given back in x18. w1 will contain approriate arg if it exists*/
+mov w0, w1
 blr x18
-mov w0, w2
 b load_checkstop_flag
 
 /*PC's EA is valid, we can execute the instruction that's residing there*/
