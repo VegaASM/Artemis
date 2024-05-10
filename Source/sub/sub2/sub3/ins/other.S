@@ -16,12 +16,12 @@ ldr w2, [x1, x2] //grab rA value
 ldr w3, [x1, x3] //grab rB value
 add w0, w2, w3 //calc & save EA
 mov w19, w0
-bl verify_data_ea
+bl data_ea_to_pa_plus_verify //x1 already set
 cbz w0, 0x14
 //Call exception address that was returned back
-mov x1, x0
-mov w0, w19
-blr x1
+mov w0, w1
+mov x18, x0
+blr x18
 b 0x8
 //Is EA 4-byte aligned?
 tbz w19, 3, 0x10
@@ -49,13 +49,13 @@ lsl w3, w3, 2
 ldr w2, [x1, x2] //grab rA value
 ldr w3, [x1, x3] //grab rB value
 add w0, w2, w3 //calc & save EA
-mov w19, w0
-bl verify_data_ea
+mov w19, w0 //x1 already set
+bl data_ea_to_pa_plus_verify
 cbz w0, 0x14
 //Call exception address that was returned back
-mov x1, x0
-mov w0, w19
-blr x1
+mov w0, w1
+mov x18, x0
+blr x18
 b 0x8
 //Is EA 4-byte aligned?
 tbz w19, 3, 0x10

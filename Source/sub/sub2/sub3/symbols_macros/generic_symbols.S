@@ -5,7 +5,7 @@
 .set memtxtrowsize, 0x39
 .set memtxtrows, (mem1bytesize + mem2bytesize) / 16 /*Exclude title row*/
 .set memtxtbytesize, (memtxtrows * memtxtrowsize) + memtxtrowsize /*Calc size and add in title row*/
-.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_byte_size + Total_Cache_word_size /*TODO fix me*/
+.set grand_total_malloc, regbanksize + mem1bytesize + mem2bytesize + arttxtsize + memtxtbytesize + Total_Cache_everything
 
 /*Offsets relative to Array Pointer*/
 .set bootbin_ptr, 0x0
@@ -21,10 +21,15 @@
 .set mem2_ptr, 0x30
 .set artemistxt_ptr, 0x38
 .set memtxt_ptr, 0x40
-.set L1_ins_ptr, 0x48
-.set L1_data_ptr, 0x50
-.set L2_ptr, 0x58
-.set roundrobin_ptr, 0x60
+.set L1_data_ptr, 0x48
+.set L1_ins_ptr, 0x50
+.set L2_data_ptr, 0x58
+.set L2_ins_ptr, 0x60
+.set L1_data_entries_ptr, 0x68
+.set L1_ins_entries_ptr, 0x70
+.set L2_data_entries_ptr, 0x78
+.set L2_ins_entries_ptr, 0x80
+.set batsave_ptr, 0x88
 
 .set mem1_base, 0
 .set mem1_top, 0x017FFFFF
@@ -32,3 +37,6 @@
 .set mem2_top, 0x13FFFFFF
 .set ip_base, 0xFFF00100
 .set ip_top, 0xFFF0013F
+
+.set ip_size, (ip_top - ip_base) + 1
+.set main_stack_buffer_size, (batsave_ptr + 16) + ip_size /*8 bytes for final ptr and another 8 bytes for x27 storage*/

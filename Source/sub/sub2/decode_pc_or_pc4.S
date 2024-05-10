@@ -77,14 +77,14 @@ tst w3, hid0_ice
 beq is_l2_on
 
 /*Check L1 ins cache*/
-ldr x3, [x27, L1_ins_ptr]
-mov w4, ICache_word_size /*TODO fix me*/
+ldr x3, [x27, L1_ins_entries_ptr]
+mov w4, L1_ins_number_entries
 L1_ins_cache_check:
 ldr w5, [x3], 12 /*Get PA-32 from Cache*/
 and w6, w5, 0xFFFFFFE0 /*Remove TMEI bits*/
 cmp w6, w2
 bne 0xC
-tst w5, TMEI_I
+tst w5, LTMEI_I
 beq in_cache
 subs w4, w4, 1
 bne L1_ins_cache_check
@@ -100,16 +100,16 @@ tst w3, l2cr_l2do
 bne physical_fetch
 
 /*Check L2 cache*/
-ldr x3, [x27, L2_ptr]
-mov w4, L2Cache_word_size /*TODO fix me*/
+ldr x3, [x27, L2_data_entries_ptr]
+mov w4, L2_ins_number_entries
 L2_cache_check:
 ldr w5, [x3], 12 /*Get PA-32 from Cache*/
 and w6, w5, 0xFFFFFFE0 /*Remove TMEI bits*/
 cmp w6, w2
 bne 0x14
-tst w5, TMEI_T /*T = 1 for ins-type, 0 for data*/
+tst w5, LTMEI_T /*T = 1 for ins-type, 0 for data*/
 beq 0xC
-tst w5, TMEI_I
+tst w5, LTMEI_I
 beq in_cache
 subs w4, w4, 1
 bne L2_cache_check

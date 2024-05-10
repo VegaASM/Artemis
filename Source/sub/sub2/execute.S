@@ -4,8 +4,10 @@
 #include "sub3/sub4/check_bats.S" //Must be before both verify's
 #include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
-#include "verify_PC_EA.S" //Must be established before any instruction func
-#include "verify_data_ea.S" //Must be established before any load, store, or paired single file
+#include "sub3/sub4/is_pa_in_dcache.S" //Must be before both verify's and cache.S
+#include "sub3/sub4/is_pa_in_icache.S" //Must be before both verify's and cache.S
+#include "ins_ea_to_pa_plus_verify.S" //Must be established before any instruction func
+#include "data_ea_to_pa_plus_verify.S" //Must be established before any load, store, or paired single file
 #include "set_loadstoretouch_flags.S"
 #include "sub3/ins/branch.S"
 #include "sub3/ins/floats.S"
@@ -397,10 +399,12 @@ mov w0, 0
 strb w0, [x27, checkstop_flag]
 
 /*Check if PC (instruction EA) is valid*/
-bl verify_PC_EA
-cbz w0, 0x10
+ldr x1, [x27, regbank_ptr]
+ldr w0, [x1, pc]
+bl ins_ea_to_pa_plus_verify
+cbnz w0, 0x10
 
-/*EA was bad, called the return addr that was given back in x18. w1 will contain approriate arg if it exists*/
+/*EA is bad, called the return addr that was given back in x18. w1 will contain approriate arg if it exists*/
 mov w0, w1
 blr x18
 b load_checkstop_flag

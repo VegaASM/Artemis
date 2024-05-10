@@ -1,31 +1,19 @@
-/*What this func does...
-This func will attempt to change the EA to a valid PA.
-As long as PA is valid, func will return 0
-If not, func returns an Exception Function to call in x18 with optional arg in w2
-*/
+/*w0 = PA, x1 = reg bank ptr
+w0 return 0 if zero, -1 if not*/
 
-/*w0 = EA (PC*/
-/*w0 returns 1 if good*/
-/*w0 = 0 if no good, x18 = exception to call, w1 = exception arg*/
-
-.globl verify_PC_EA
-verify_PC_EA:
+.globl ins_ea_to_pa_plus_verify
+ins_ea_to_pa_plus_verify:
 stp fp, lr, [sp, -0x20]!
-stp x19, x20, [sp, 0x10]
+str x19, [sp, 0x10]
 mov fp, sp
 
-/*Get PC's EA, save it*/
-ldr x1, [x27, regbank_ptr]
-ldr w0, [x1, pc]
+/*Backup EA, save it*/
 mov w19, w0
 
 /*Check MSR for Instruction Address Translation*/
-ldr x1, [x27, regbank_ptr]
 ldr w2, [x1, msr]
 tst w2, msr_ir
-mov w20, 1 /*Force I bit high*/
 beq verify_physical_instruction_ea
-mov w20, 0
 
 /*Check if secondary bats are enabled*/
 /*Use sbe bit to shift base value of 4 (loop count aka number of ibats)*/
@@ -55,9 +43,10 @@ bne undefined_ibat
 
 /*Check BAT's PP bits*/
 /*Anything not 00 is good to go for instruction fetching*/
-tbz x1, 0x3, ibat_pp_denied //NOTE todo remember to implement srr1 bit 4 stuff
+tbz x1, 0x3, ibat_pp_denied
 
 /*Change virt EA to phys EA*/
+str x1, [x27, batsave_ptr] /*Need this for other funcs later, hacky*/
 bl bat_va_to_pa
 
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
@@ -69,8 +58,8 @@ tbz w0, 1, BAD_phys_instruction_ea
 
 mov w0, 1 /*All good*/
 
-process_PC_EA_epilogue:
-ldp x19, x20, [sp, 0x10]
+ins_ea_to_pa_plus_verify_epi:
+ldr x19, [sp, 0x10]
 ldp fp, lr, [sp], 0x20
 ret
 
@@ -87,7 +76,7 @@ raise_isi_for_ibat:
 adrp x18, isi_exception_vector
 add x18, x18, :lo12: isi_exception_vector
 mov w0, 0
-b process_PC_EA_epilogue
+b ins_ea_to_pa_plus_verify_epi
 
 /*Bad physical instruction EA*/
 BAD_phys_instruction_ea:
@@ -95,4 +84,4 @@ mov w1, 0
 adrp x18, machine_check_exception_vector
 add x18, x18, :lo12: machine_check_exception_vector
 mov w0, 0
-b process_PC_EA_epilogue
+b ins_ea_to_pa_plus_verify_epi
