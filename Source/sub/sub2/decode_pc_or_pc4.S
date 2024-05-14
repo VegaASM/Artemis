@@ -53,6 +53,7 @@ b process_pc_pc4_epilogue
 
 /*Change virt EA to phys EA*/
 mov x21, x1 /*backup BAT*/
+str x1, [x27, batsave_ptr] /*Also need to backup to array, a way later function needs this value*/
 bl bat_va_to_pa
 
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/

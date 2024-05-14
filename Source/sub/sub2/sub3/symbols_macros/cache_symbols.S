@@ -22,7 +22,7 @@
 
 /*PA final 5 bits
 L = Locked (only applicable to L1 Cache)
-T = Type (High = Ins, Low = Data, need this if L2 L2DO is low)
+T = Type (High = Data, Low = Ins, need this if L2 L2DO is low)
 MEI = MEI protocol (For I-Cache, low I = high V)
 */
 .set LTMEI_L, 0b10000

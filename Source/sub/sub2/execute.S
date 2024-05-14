@@ -4,10 +4,10 @@
 #include "sub3/sub4/check_bats.S" //Must be before both verify's
 #include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
-#include "sub3/sub4/is_pa_in_dcache.S" //Must be before both verify's and cache.S
-#include "sub3/sub4/is_pa_in_icache.S" //Must be before both verify's and cache.S
 #include "ins_ea_to_pa_plus_verify.S" //Must be established before any instruction func
 #include "data_ea_to_pa_plus_verify.S" //Must be established before any load, store, or paired single file
+#include "sub3/sub4/is_pa_in_dcache.S" //icache func is established within icache_update.S
+#include "icache_update.S"
 #include "set_loadstoretouch_flags.S"
 #include "sub3/ins/branch.S"
 #include "sub3/ins/floats.S"
@@ -413,9 +413,16 @@ b load_checkstop_flag
 /*Set hacky other flags, this is needed if for load/store EA BAT PP processing*/
 bl set_loadstoretouch_flags
 
+/*Update everything ICache related*/
+ldr x1, [x27, batsave_ptr]
+tst x1, bat_wimg_i
+beq __execute
+bl icache_update
+
 /*Execute the instruction!*/
 /*Take the w1 value and multiply by 8*/
 /*Then add that result to func_table index to get exact function addr to call*/
+__execute:
 lsl w20, w20, 3
 adr x2, func_table
 ldr x2, [x2, x20]

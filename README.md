@@ -2,7 +2,7 @@
 
 Created by Vega
 
-Version: 0.0-r051
+Version: 0.0-r052
 
 Status: Compiles. Untested. Most likely will just fault.
 
@@ -44,7 +44,7 @@ It is a pain, but this is bare-bones. There may be plans in the future to add in
 
 **Is there any other notes to be aware of?**
 
-Currently, Artemis can only execute basic instructions and execute in physical memory. I-Cache is configured and what not, but the MEI protocol isn't implemented yet. D-Cache simply doesn't work. Regarding address translation, IBAT's in theory work, but DBAT's and Page Tables do not. Effects from items such as HIDx SPR settings are not implemented yet. Anything FPSCR related hasn't been implemented yet.
+Currently, Artemis can only execute basic instructions and execute in physical memory. Cache is partially configured but has not yet been implemented. Regarding address translation, IBAT's in theory work, but DBAT's and Page Tables do not. Effects from items such as HIDx SPR settings are not implemented yet. Anything FPSCR related hasn't been implemented yet.
 
 Valid simulated physical memory addresses are the following ranges
 * 0x00000000 thru 0x017FFFFF
