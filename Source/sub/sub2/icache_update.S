@@ -11,10 +11,10 @@ stp fp, lr, [sp, -0x20]!
 str x19, [sp, 0x10]
 mov fp, lr
 
-/*Is PA in I-Cache?
-w0 = PA
-x0 returns ptr to cache entry buffer if found
-x0 = 0 if not found*/
+/*Save Arg*/
+mov w19, w0
+
+/*Is PA in I-Cache?*/
 bl is_pa_in_icache
 cbz x0, 0xC
 

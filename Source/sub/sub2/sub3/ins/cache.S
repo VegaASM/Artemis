@@ -20,10 +20,10 @@ cbnz x0, dcbf_epilogue
 /*Already in Cache, update MEI*/
 ldr w1, [x0]
 /*M is only state that gets changed, from M to I*/
-tbz w1, LTMEI_M, dcbf_epilogue
+tbz w1, LMEI_M, dcbf_epilogue
 bfc w1, 0, 5
-orr w1, w1, LTMEI_I //TODO what about locking and type bits?
-str w1, [x0] //TODO update entry/algo number
+orr w1, w1, LMEI_I /*TODO what about locking and type bits?*/
+str w1, [x0] /*TODO update entry/algo number*/
 /*Was I high, if so, skip the write from virtual to physical*/
 ldr x1, [x27, batsave_ptr]
 tst x1, bat_wimg_i
@@ -65,7 +65,7 @@ cbz x0, dcbi_epilogue /*If not in cache, do a nop*/
 /*Already in Cache, update MEI*/
 ldr w1, [x0]
 bfc w1, 0, 5
-orr w1, w1, LTMEI_I //TODO what about locking and type bits?
+orr w1, w1, LMEI_I //TODO what about locking and type bits?
 str w1, [x0] //TODO update entry/algo number
 /*Epilogue*/
 dcbi_epilogue:
@@ -120,7 +120,7 @@ cbz x0, icbi_epilogue /*If not in cache, do a nop*/
 /*Already in Cache, update MEI*/
 ldr w1, [x0]
 bfc w1, 0, 5
-orr w1, w1, LTMEI_I //TODO what about locking and type bits?
+orr w1, w1, LMEI_I //TODO what about locking and type bits?
 str w1, [x0] //TODO update entry/algo number
 /*Epilogue*/
 icbi_epilogue:

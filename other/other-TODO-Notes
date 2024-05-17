@@ -1,4 +1,6 @@
 ﻿do we need to fix revs on int stores? we need them as Big Endian when residing in mem.txt, or does mem.txt do it for us. check l8r
+should mem.txt include Data Cache? probably
+when blocks in L1 get casted out , they get sent to the L2 as invalid*/
 fix conversions on ps loads and stores, what about max's being exceeded???
 put in fake values for pvr and chip id SPRs
 put in fake HID1 values

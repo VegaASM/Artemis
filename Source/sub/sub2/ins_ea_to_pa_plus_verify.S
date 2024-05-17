@@ -1,5 +1,5 @@
 /*w0 = PA, x1 = reg bank ptr
-w0 return 0 if zero, -1 if not*/
+w0 return 1 if all good, 0 if not*/
 
 .globl ins_ea_to_pa_plus_verify
 ins_ea_to_pa_plus_verify:
@@ -48,6 +48,7 @@ tbz x1, 0x3, ibat_pp_denied
 /*Change virt EA to phys EA*/
 str x1, [x27, batsave_ptr] /*Need this for other funcs later, hacky*/
 bl bat_va_to_pa
+mov w19, w0 /*Save PA*/
 
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
 verify_physical_instruction_ea:
@@ -57,6 +58,7 @@ tbz w0, 1, BAD_phys_instruction_ea
 /*TODO put in code for Page Tables.... lol*/
 
 mov w0, 1 /*All good*/
+mov w1, w19
 
 ins_ea_to_pa_plus_verify_epi:
 ldr x19, [sp, 0x10]

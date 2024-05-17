@@ -99,18 +99,21 @@ bl execute
 cbnz x0, ins_sim_main_epilogue
 
 /*Check if a store instruction of any kind was executed (this includes some cache ops fyi). If not, skip memory.txt crap*/
-ldrh w0, [x21]
-movz w1, 0x7374 /*st*/
-cmp w0, w1 /*Check for standard store instruction*/
+cmp w23, stwx_ident
+bhi call_write_art_strings
+cmp w23, dcbi_ident
+blo call_write_art_strings
+cmp w23, stb_ident
+bhi call_write_mem_txt
+cmp w23, psq_st_ident
+blo 0xC
+cmp w23, psq_stx_ident
+bls call_write_mem_txt
+cmp w23, dcbi_ident
 beq call_write_mem_txt
-movz w1, 0x6463, lsl 16
-movk w1, 0x6269
-ldr w0, [x21]
-cmp w0, w1 /*Check for dcbi*/
+cmp w23, dcbz_ident
 beq call_write_mem_txt
-bfc w1, 0, 16
-movk w1, 0x627A
-cmp w0, w1 /*Check for dcbz and dcbz_l*/
+cmp w23, dcbz_l_ident
 bne call_write_art_strings
 
 /*Func that handles creating memory.txt and writes all to it*/

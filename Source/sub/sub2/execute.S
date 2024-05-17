@@ -6,7 +6,9 @@
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
 #include "ins_ea_to_pa_plus_verify.S" //Must be established before any instruction func
 #include "data_ea_to_pa_plus_verify.S" //Must be established before any load, store, or paired single file
-#include "sub3/sub4/is_pa_in_dcache.S" //icache func is established within icache_update.S
+#include "sub3/sub4/is_pa_in_dcache.S" //is_pa_in_icache func is established within icache_update.S
+#include "sub3/sub4/reset_PLRU_and_update_cache_block.S" //must be before PLRU
+#include "sub3/sub4/PLRU.S" //must be before icache_update and before any loads/stores ins funcs
 #include "icache_update.S"
 #include "set_loadstoretouch_flags.S"
 #include "sub3/ins/branch.S"
@@ -409,15 +411,15 @@ mov w0, w1
 blr x18
 b load_checkstop_flag
 
-/*PC's EA is valid, we can execute the instruction that's residing there*/
+/*Update everything ICache related*/
+ldr x2, [x27, batsave_ptr]
+tst x2, bat_wimg_i
+beq __execute
+mov w0, w1 /*arg = PA*/
+bl icache_update
+
 /*Set hacky other flags, this is needed if for load/store EA BAT PP processing*/
 bl set_loadstoretouch_flags
-
-/*Update everything ICache related*/
-ldr x1, [x27, batsave_ptr]
-tst x1, bat_wimg_i
-beq __execute
-bl icache_update
 
 /*Execute the instruction!*/
 /*Take the w1 value and multiply by 8*/

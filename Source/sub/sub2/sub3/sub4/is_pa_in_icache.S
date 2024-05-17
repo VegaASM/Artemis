@@ -1,54 +1,58 @@
+/*w0 = PA
+w0 returns 1 for found
+w0 returns 0 for not found, or found but locked TODO fix stuff for locked cache*/
 .globl is_pa_in_icache
 is_pa_in_icache:
 /*Prologue*/
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
 
-/*Convert PA to PA-32, clear least significant 5 bits*/
-bfc w0, 0, 5
+/*is L1 ICache enabled?*/
+ldr x1, [x27, regbank_ptr]
+ldr w2, [x1, hid0]
+tst w2, hid0_ice
+bfc w0, 0, 5 /*Convert PA to PA-32, clear least significant 5 bits*/
+beq 0x24
 
-/*Check L1 I-Cache*/
-ldr x2, [x27, L1_ins_entries_ptr]
+/*Check L1 ICache*/
+ldr x2, [x27, L1_ICache_ptr]
 
-mov w3, L1_ins_number_entries
-ldr w3, [x2], cache_entry_width
-bfc w3, 0, 5
-cmp w0, w3
-beq found
+movz w3, :abs_g0: L1_ICache_entries
+ldr w4, [x2], L1_way_size
+bfc w4, 0, 5
+cmp w0, w4
+beq found_in_icache
 subs w3, w3, 1
 bne -0x10
 
-/*Check L2 Ins_Cache*/
-ldr x2, [x27, regbank_ptr]
-ldr w2, [x2, l2cr]
+/*Check L2 Ins_Cache, check L2 status first*/
+ldr w2, [x1, l2cr]
 tst w2, l2cr_l2e
 beq not_in_any_icache
 tst w2, l2cr_l2do
 bne not_in_any_icache
 
-/*L2 I-Cache can be used, check it*/
-ldr x2, [x27, L2_ins_entries_ptr]
+/*L2 ICache can be used, search thru it*/
+ldr x2, [x27, L2_ICache_ptr]
 
-mov w3, L2_ins_number_entries
-ldr w3, [x2], cache_entry_width
-and w4, w3, 0xFFFFFFE0
+mov w3, L2_ICache_entries
+ldr w4, [x2], L2_block_size
+bfc w4, 0, 5
 cmp w0, w4
-bne 0xC
-tst w3, LTMEI_T
-bne found
+beq found_in_icache
 subs w3, w3, 1
 bne -0x10
 
-/*Not in any i-cache, return null ptr*/
+/*Not in any i-cache, return false*/
 not_in_any_icache:
 mov w0, 0
 b is_pa32_in_i_cache_epilogue
 
-/*Return ptr to cache entry block*/
-found:
-sub x0, x2, cache_entry_width
+/*Return true*/
+found_in_icache:
+mov w0, 1
 
+/*Epilogue*/
 is_pa32_in_i_cache_epilogue:
 ldp fp, lr, [sp], 0x10
 ret
-

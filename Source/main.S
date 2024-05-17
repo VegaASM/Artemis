@@ -1,7 +1,7 @@
 .arch armv8.2-a /*To allow the bfc instruction*/
 
-#include "sub/sub2/sub3/symbols_macros/generic_symbols.S"
 #include "sub/sub2/sub3/symbols_macros/cache_symbols.S"
+#include "sub/sub2/sub3/symbols_macros/generic_symbols.S"
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
 #include "insert_bootdol.S"
@@ -19,7 +19,7 @@ mainmallocmemEC:
 .globl main
 main:
 /*Prologue*/
-stp fp, lr, [sp, -(main_stack_buffer_size)]! /*0x18 thru 0x8F = Array Table; 0x90+ = IP memory*/
+stp fp, lr, [sp, -(main_stack_buffer_size)]! /*0x18 thru 0x77 = Array Table; 0x78 thru 87 = PLRU masks, 0x88+ = IP memory*/
 str x27, [sp, 0x10]
 mov fp, sp
 
@@ -36,7 +36,7 @@ movk w0, :abs_g0_nc: grand_total_malloc
 bl malloc
 cbz x0, cant_alloc_mainmemory
 
-/*Store all ptr's*/
+/*Store all ptrs*/
 str x0, [x27, regbank_ptr]
 add x1, x0, regbanksize
 str x1, [x27, mem1_ptr]
@@ -51,26 +51,23 @@ str x1, [x27, memtxt_ptr]
 movz w0, :abs_g1: memtxtbytesize
 movk w0, :abs_g0_nc: memtxtbytesize
 add x1, x1, x0
-str x1, [x27, L1_data_ptr]
-add x1, x1, L1_DCache_byte_size
-str x1, [x27, L1_ins_ptr]
-add x1, x1, L1_ICache_byte_size
-str x1, [x27, L2_data_ptr]
-add x1, x1, (L2_Cache_byte_size >> 1)
-str x1, [x27, L2_ins_ptr]
-add x1, x1, (L2_Cache_byte_size >> 1)
-str x1, [x27, L1_data_entries_ptr]
-add x1, x1, L1_data_number_entries_size
-str x1, [x27, L1_ins_entries_ptr]
-add x1, x1, L1_ins_number_entries_size
-str x1, [x27, L2_data_entries_ptr]
-add x1, x1, L2_data_number_entries_size
-str x1, [x27, L2_ins_entries_ptr]
-add x1, x1, L1_data_number_entries_size
+str x1, [x27, bootbin_ptr]
+add x1, x1, ip_memsize
 str x1, [x27, batsave_ptr]
-
-add x0, sp, (main_stack_buffer_size - ip_size)
-str x0, [x27, bootbin_ptr] /*IP mem pointer*/
+add x1, x1, bat_size
+str x1, [x27, PLRU_masks_ptr]
+add x1, x1, PLRU_masks_size
+str x1, [x27, L1_DCache_ptr]
+movz w0, :abs_g0: L1_DCache_size
+add x1, x1, x0
+str x1, [x27, L1_ICache_ptr]
+movz w0, :abs_g0: L1_ICache_size
+add x1, x1, x0
+str x1, [x27, L2_DCache_ptr]
+movz w0, :abs_g1: L2_DCache_size
+movk w0, :abs_g0_nc: L2_DCache_size
+add x1, x1, x0
+str x1, [x27, L2_ICache_ptr]
 
 /*Get boot.bin contents*/
 bl dump_bootbin
@@ -87,6 +84,18 @@ cbnz x0, output_console
 /*Place boot.bin into simulated reset vector*/
 bl insert_bootbin
 
+/*Write the PLRU masks constants to their spot in the malloc'd memory*/
+movz x0, :abs_g3: LX_masks_bit_clear
+movk x0, :abs_g2_nc: LX_masks_bit_clear
+movk x0, :abs_g1_nc: LX_masks_bit_clear
+movk x0, :abs_g0_nc: LX_masks_bit_clear
+movz x1, :abs_g3: LX_masks_bit_set
+movk x1, :abs_g2_nc: LX_masks_bit_set
+movk x1, :abs_g1_nc: LX_masks_bit_set
+movk x1, :abs_g0_nc: LX_masks_bit_set
+str x0, [x27, PLRU_masks_ptr] /*Can't use stp because of possible alignment fault since there's no guarantee EA is divisible by 0x10*/
+str x1, [x27, PLRU_masks_ptr + 8]
+
 /*Do a hard reset*/
 bl hardreset /*Does *NOT* return an error, always works*/
 
@@ -97,7 +106,7 @@ bl submain
 output_console:
 bl puts
 /*Free allocated memory*/
-ldr x0, [x27, 0x20]
+ldr x0, [x27, regbank_ptr]
 bl free
 b epilogue_main
 

@@ -7,70 +7,74 @@ touch flag = dcbt or dcbtst
 
 /*dcbi, dcbz, and dcbz_l are stores, all other cache-ops are loads*/
 
-//TODO no need for store flag, not used anywhere else (so far....)
+/*NOTE: no need for store flag, not used anywhere else (so far....)*/
 
-/*Fyi w20 = PPC Ident*/
+/*w20 = PPC Ident*/
 .globl set_loadstoretouch_flags
 set_loadstoretouch_flags:
+/*Prologue*/
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
 
-//Preset flag values
+/*Preset flag values*/
 mov w0, 0 //load
 mov w1, 0 //store
 mov w2, 0 //touch
 
-//Check for general
-cmp w20, 56
-bls update_flags
-cmp w20, 319
-bhs update_flags
-
-//check for int and float store
-cmp w20, 292
-bhs store
-//Check for paired single store
-cmp w20, 218
-blo could_be_load
-cmp w20, 221
-bls load
-
-//check for load
-could_be_load:
-cmp w20, 137
-blo check_cache_ops
-cmp w20, 166
-bls load
-
-//only 57 thru 136 are possible values left
-check_cache_ops:
-cmp w20, 63
+/*Check for general*/
+cmp w20, dcbf_ident
+blo update_flags
+cmp w20, stwx_ident
 bhi update_flags
 
-//only cache ops left
-cmp w20, 57
+/*Check for int and float store*/
+cmp w20, stb_ident
+bhs store
+/*Check for paired single store*/
+cmp w20, psq_st_ident
+blo could_be_load
+cmp w20, psq_stx_ident
+bls load
+
+/*Check for load*/
+could_be_load:
+cmp w20, lbz_ident
+blo check_cache_ops
+cmp w20, lwzx_ident
+bls load
+
+/*only ppc idents 57 thru 136 are possible values left*/
+check_cache_ops:
+cmp w20, dcbz_l_ident
+bhi update_flags
+
+/*Only cache ops left*/
+cmp w20, dcbf_ident
 beq store
-cmp w20, 62
+cmp w20, dcbz_ident
 bhs store
 
-//load
+/*Load*/
 load:
 mov w0, 1
-//check for touch
-cmp w20, 60
+/*check for touch*/
+cmp w20, dcbt_ident
 beq 0xC
-cmp w20, 61
+cmp w20, dcbtst_ident
 bne update_flags
 mov w2, 1
 b update_flags
 
+/*Store*/
 store:
 mov w1, 1
 
+/*Write flags*/
 update_flags:
 strb w0, [x27, load_flag]
 strb w1, [x27, store_flag]
 strb w2, [x27, touch_flag]
 
+/*Epilogue*/
 ldp fp, lr, [sp], 0x10
 ret
