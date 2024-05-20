@@ -5,7 +5,6 @@
 #include "dump_bootbin.S"
 #include "dump_bootdol.S"
 #include "insert_bootdol.S"
-#include "insert_bootbin.S"
 #include "hardreset.S"
 #include "sub/submain.S"
 
@@ -80,9 +79,6 @@ cbnz x0, output_console
 /*Attempt to place the boot.dol into simulated mem1*/
 bl insert_bootdol
 cbnz x0, output_console
-
-/*Place boot.bin into simulated reset vector*/
-bl insert_bootbin
 
 /*Write the PLRU masks constants to their spot in the malloc'd memory*/
 movz x0, :abs_g3: LX_masks_bit_clear

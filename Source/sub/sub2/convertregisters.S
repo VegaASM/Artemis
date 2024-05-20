@@ -1,3 +1,4 @@
+/*NOTE null bytes after every string is find because of how I use the sprintf return value to increment the cursor. All null bytes get overwritten.*/
 
 GPRs:
 .asciz "r%d: 0x%08X r%d: 0x%08X\n"

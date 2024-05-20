@@ -2,7 +2,7 @@
 
 Created by Vega
 
-Version: 0.0-r053
+Version: 0.0-r054
 
 Status: Compiles. Untested. Most likely will just fault.
 
@@ -18,7 +18,7 @@ After learning ARM64, I wanted to complete a decent size project using the langu
 
 **What do I need to do before running Artemis?**
 
-You will need a boot.bin file placed in the Artemis/boot folder. Boot.bin contains the PPC instructions that will be executed at the Reset Vector with its source residing in the Artemis/boot-source/bootbin.S file. The boot sequence will begin after a simulated hard reset meaning only the IP bit will be high in the Machine State Register. This means execution begins at simulated physical address of 0xFFF00100. Boot.bin cannot exceed more than 0x40 bytes in size.
+You'll need a boot.bin file placed in the Artemis/boot folder. Boot.bin contains the PPC instructions that will be executed at the Reset Vector with its source residing in the Artemis/boot-source/bootbin.S file. The boot sequence will begin after a simulated hard reset meaning only the IP bit will be high in the Machine State Register. This means execution begins at simulated physical address of 0xFFF00100. Boot.bin cannot exceed more than 0x40 bytes in size.
 
 The Repo includes a boot.bin file already present in the Artemis/boot folder. Its PPC instructions are this...
 
