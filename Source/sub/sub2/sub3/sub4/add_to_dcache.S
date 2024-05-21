@@ -45,7 +45,7 @@ mov x6, x1
 /*Now run thru the 8 ways. Use first one that's invalid & UNlocked
 If all are valid or locked, do L2 searching. But if L2 is disabled, do L1 PLRU*/
 ldr w4, [x1], L1_way_size
-tbz w4, LMEI_I | LMEI_L, found_invalid_dway
+tbnz w4, 0, found_invalid_dway /*Check LMEI_I bit*/
 subs w5, w5, 1
 bne -0xC
 b __add_to_dcache_L2check
@@ -87,7 +87,7 @@ lsl w2, w3, w2
 ldr x18, [x27, L2_DCache_ptr]
 
 ldr w0, [x18], L2_block_size
-tbnz w0, LMEI_I, found_in_L2_DCache
+tbnz w0, 0, found_in_L2_DCache /*Check LMEI_I*/
 subs w2, w2, 1
 bne -0xC
 

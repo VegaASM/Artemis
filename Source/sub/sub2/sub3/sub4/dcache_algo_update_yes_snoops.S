@@ -41,41 +41,41 @@ ret
 
 __dcache_algo_update_yes_snoops:
 //Is PA locked?
-tbnz w4, LTMEI_L, -0x14
+tbnz w4, 3, -0x14 /*LMEI_L*/
 
 //Update MEI
 //If Modified then..
 //Snoop Hit on Cacheable Read/Write -> I
 //Any other Snoop Hit -> E
 //Miss or any other scenario -> M (nop)
-tbz w4, LTMEI_M, 0x30
-tbz w1, 1, __dcache_algo_update_yes_snoops_loop_decrementer
+tbz w4, 3, 0x30 /*LMEI_L*/
+tbz w1, 0, __dcache_algo_update_yes_snoops_loop_decrementer
 ldr x5 [x27, batsave_ptr]
 tst x5, bat_wimg_i
 bfc w4, 0, 3
 bne 0x14
 //Change to E
-orr w4, w4, LTMEI_E
+orr w4, w4, LMEI_E
 str w4, [x3], -(cache_entry_width)
 b __dcache_algo_update_yes_snoops_loop_decrementer
 //Change to I
-orr w4, w4, LTMEI_I
+orr w4, w4, LMEI_I
 str w4, [x3], -(cache_entry_width)
 b __dcache_algo_update_yes_snoops_loop_decrementer
 
 //Exclusive or Invalid
-tbz w4, LTMEI_E, __dcache_algo_update_yes_snoops_loop_decrementer
+tbz w4, 1, __dcache_algo_update_yes_snoops_loop_decrementer /*LMEI_E*/
 //Exclusive
 //Snoop Hit on Cacheable Read/Write -> I
 //Snoop Hit on Cache-Inhib'd Read -> E (nop)
 //Any other Hit or a miss -> E (nop)
-tbz w1, 1, __dcache_algo_update_yes_snoops_loop_decrementer
+tbz w1, 0, __dcache_algo_update_yes_snoops_loop_decrementer
 ldr x5 [x27, batsave_ptr]
 tst x5, bat_wimg_i
 bfc w4, 0, 3
 beq __dcache_algo_update_yes_snoops_loop_decrementer
 //Change to I
-orr w4, w4, LTMEI_I
+orr w4, w4, LMEI_I
 str w4, [x3], -(cache_entry_width)
 b __dcache_algo_update_yes_snoops_loop_decrementer
 

@@ -15,6 +15,8 @@ XXXXXXXX (x8) Cache Block
 .set L1_ICache_size, L1_set_size << 7 /*Set size times 128*/
 .set L1_DCache_size, L1_ICache_size
 
+.set L1_Cache_size, L1_DCache_size + L1_ICache_size
+
 /*Custom L2 Cache Tag/Block/Line Layout
 XXXXXXXX PA (last 3 bits are MEI)
 XXXXXXXX (x16) Cache Block
@@ -25,7 +27,7 @@ XXXXXXXX (x16) Cache Block
 .set L2_ICache_size, L2_DCache_size
 .set L2_Cache_size, L2_DCache_size + L2_ICache_size
 
-.set Total_Cache_everything, L1_DCache_size + L2_Cache_size
+.set Total_Cache_everything, L1_Cache_size + L2_Cache_size
 
 /*Following is for cache loop iterations*/
 .set L1_DCache_entries, 1024

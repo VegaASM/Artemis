@@ -41,22 +41,22 @@ ret
 
 __dcache_algo_update_no_snoops:
 //Is PA locked?
-tbnz w4, LTMEI_L, -0x14
+tbnz w4, 3, -0x14 /*LMEI_L*/
 
 //Update MEI
 //If Modified then nop...
-tbnz w4, LTMEI_M, __dcache_algo_update_no_snoops_loop_decrementer
+tbnz w4, 2, __dcache_algo_update_no_snoops_loop_decrementer /*LMEI_M*/
 
 //Exclusive or Invalid
-tbnz w4, LTMEI_I, 0x20
+tbnz w4, 0, 0x20 /*LMEI_I*/
 //Exclusive
 //Write Hit -> M
 //Read Hit -> E (nop)
 //Miss -> E (nop)
-tbz w1, 1, __dcache_algo_update_no_snoops_loop_decrementer
+tbz w1, 0, __dcache_algo_update_no_snoops_loop_decrementer
 //Update MEI
 bfc w4, 0, 3 //Clear out current MEI, keep L and T intact
-mov w5, LTMEI_E
+mov w5, LMEI_E
 lsl w5, w5, w2
 orr w4, w4, w5
 str w4, [x3], -(cache_entry_width)
@@ -66,10 +66,10 @@ b __dcache_algo_update_no_snoops_loop_decrementer
 //Any Hit = nop
 //Write Miss = Add to Cache w/ M
 //Read Miss = Add to Cache w/ to E
-tbnz w1, 1, __dcache_algo_update_no_snoops_loop_decrementer
+tbnz w1, 0, __dcache_algo_update_no_snoops_loop_decrementer
 //Update MEI
 bfc w4, 0, 3 //Clear out current MEI, keep L and T intact
-mov w5, LTMEI_E
+mov w5, LMEI_E
 lsl w5, w5, w2
 orr w4, w4, w5
 str w4, [x3], -(cache_entry_width)

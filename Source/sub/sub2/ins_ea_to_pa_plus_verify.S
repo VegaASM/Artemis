@@ -43,7 +43,8 @@ bne undefined_ibat
 
 /*Check BAT's PP bits*/
 /*Anything not 00 is good to go for instruction fetching*/
-tbz x1, 0x3, ibat_pp_denied
+tst x1, 0x3
+beq ibat_pp_denied
 
 /*Change virt EA to phys EA*/
 str x1, [x27, batsave_ptr] /*Need this for other funcs later, hacky*/
@@ -53,7 +54,7 @@ mov w19, w0 /*Save PA*/
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
 verify_physical_instruction_ea:
 bl verify_physical_ea
-tbz w0, 1, BAD_phys_instruction_ea
+cbz w0, BAD_phys_instruction_ea
 
 /*TODO put in code for Page Tables.... lol*/
 

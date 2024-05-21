@@ -21,7 +21,7 @@ ret
 /*Is B2 low?*/
 checkb2:
 mov w0, 4
-tbnz w0, PLRU_B2, checkb6
+tbnz w0, 4, checkb6 /*PLRU_B2*/
 
 /*Is B5 low? If so replace L4. If not Replace L5*/
 ubfx w0, w0, 30, 1

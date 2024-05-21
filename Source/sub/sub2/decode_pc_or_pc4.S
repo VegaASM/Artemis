@@ -54,7 +54,7 @@ bl bat_va_to_pa
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
 verify_physical_ins_ea:
 bl verify_physical_ea
-tbz w0, 1, process_pc_pc4_epilogue /*0 is for error for Parent func, so we can directly return!*/
+cbz w0, process_pc_pc4_epilogue /*0 is for error for Parent func, so we can directly return!*/
 
 /*Change PA to PA-32*/
 and w2, w0, 0xFFFFFFE0

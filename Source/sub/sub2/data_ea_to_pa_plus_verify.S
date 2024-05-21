@@ -40,15 +40,16 @@ b raise_dsi_for_dbat
 check_dbat_pp:
 /*Check BAT's PP bits*/
 /*x1 = read only, 10 = read/write*/
-//TODO we have to implement something for dcbt/dcbtst instruction, simply abort access (nop)
-tbnz x1, 0x3, dbat_pp_denied //NOTE todo remember to implement dsisr bit stuff that's unique for PP violation
-tbz x1, 0x2, change_dva_to_dpa
+/*TODO we have to implement something for dcbt/dcbtst instruction, simply abort access (nop)*/
+tst x1, 0x3
+beq dbat_pp_denied /*NOTE todo remember to implement dsisr bit stuff that's unique for PP violation*/
+tbz x1, 1, change_dva_to_dpa
 
 /*PP only allows reads (load instructions), check load_flag, if low, then it's PP violation*/
 ldrb w2, [x27, touch_flag]
-tbnz w2, 1, change_dva_to_dpa //simply abort access due to dcbt/dcbtst; TODO
+cbnz w2, change_dva_to_dpa //simply abort access due to dcbt/dcbtst; TODO
 ldrb w2, [x27, load_flag]
-tbnz w2, 1, dbat_pp_denied
+cbz w2, dbat_pp_denied
 
 /*Change virt EA to phys EA
 w0 = EA
@@ -61,7 +62,7 @@ bl bat_va_to_pa
 /*Check Physical Range, if NOT then raise MCE, if no MCE, raise checkstop*/
 verify_physical_data_ea:
 bl verify_physical_ea
-tbz w0, 1, bad_physical_instruction_dea /*0 is for error for Parent func, so we can directly return!*/
+cbz w0, bad_physical_instruction_dea /*0 is for error for Parent func, so we can directly return!*/
 
 /*TODO put in code for Page Tables.... lol*/
 
