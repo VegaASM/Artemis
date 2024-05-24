@@ -32,6 +32,9 @@
 .set hid0_bht, 0x00000004
 .set hid0_noopti, 0x00000002
 
+.set hid0_ice_b, 15
+.set hid0_dce_b, 14
+
 //HID1
 .set hid1_pc0, 0x80000000
 .set hid1_pc1, 0x40000000
@@ -89,6 +92,10 @@
 .set msr_ile, 0x00010000
 .set msr_pow, 0x00040000
 
+.set msr_pr_b, 14
+.set msr_ir_b, 5
+.set msr_dr_b, 4
+
 //XER
 .set xer_so, 0x80000000
 .set xer_ov, 0x40000000
@@ -140,6 +147,11 @@
 .set bat_wimg_g, 0x0000000000000008
 .set bat_pp, 0x0000000000000003
 
+.set bat_wimg_w_b, 6
+.set bat_wimg_i_b, 5
+.set bat_wimg_m_b, 4
+.set bat_wimg_g_b, 3
+
 //SDR1
 .set sdr1_htaborg, 0xFFFF0000
 .set sdr1_htabmask, 0x000001FFF
@@ -152,6 +164,9 @@
 .set l2cr_l2wt, 0x00080000
 .set l2cr_l2ts, 0x00040000
 .set l2cr_l2ip, 0x00000001
+
+.set l2cr_l2e_b, 31
+.set l2cr_l2do_b, 22
 
 //DABR
 .set dabr_bt, 0x00000004

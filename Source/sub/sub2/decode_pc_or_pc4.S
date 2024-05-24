@@ -20,9 +20,8 @@ mov w19, w0
 /*Check MSR for Instruction Address Translation*/
 ldr x1, [x27, regbank_ptr]
 ldr w2, [x1, msr]
-tst w2, msr_ir
 mov w20, 1 /*Force I bit BAT reading high*/
-beq verify_physical_ins_ea
+tbz w2, msr_ir_b, verify_physical_ins_ea
 mov w20, 0
 
 /*Check if secondary bats are enabled*/
@@ -60,17 +59,15 @@ cbz w0, process_pc_pc4_epilogue /*0 is for error for Parent func, so we can dire
 and w2, w0, 0xFFFFFFE0
 
 /*Check real mode flag*/
-cbnz w20, 0xC
+cbnz w20, 0x8
 
 /*Is IBAT I high?*/
-tst x21, bat_wimg_i
-beq physical_fetch
+tbnz x21, bat_wimg_i_b, physical_fetch
 
 /*Is HID0 ICE low? aka is L1 I-Cache on/off*/
 ldr x3, [x27, regbank_ptr]
 ldr w3, [x3, hid0]
-tst w3, hid0_ice
-beq is_l2_on
+tbz w3, hid0_ice_b, is_l2_on
 
 /*Check L1 ICache*/
 ldr x3, [x27, L1_ICache_ptr]
@@ -79,9 +76,8 @@ L1_ins_cache_check:
 ldr w5, [x3], L1_way_size /*Get PA-32 from Cache*/
 and w6, w5, 0xFFFFFFE0 /*Remove LMEI bits*/
 cmp w6, w2
-bne 0xC
-tst w5, LMEI_I
-beq in_cache
+bne 0x8
+tbz w5, LMEI_I_b, in_cache
 subs w4, w4, 1
 bne L1_ins_cache_check
 
@@ -89,10 +85,8 @@ bne L1_ins_cache_check
 is_l2_on:
 ldr x3, [x27, regbank_ptr]
 ldr w3, [x3, l2cr]
-tst w3, l2cr_l2e
-beq physical_fetch
-tst w3, l2cr_l2do
-bne physical_fetch
+tbz w3, l2cr_l2e_b, physical_fetch
+tbnz w3, l2cr_l2do_b, physical_fetch
 
 /*Check L2 cache*/
 ldr x3, [x27, L2_ICache_ptr]
@@ -101,9 +95,8 @@ L2_cache_check:
 ldr w5, [x3], L2_block_size /*Get PA-32 from Cache*/
 and w6, w5, 0xFFFFFFE0 /*Remove LMEI bits*/
 cmp w6, w2
-bne 0xC
-tst w5, LMEI_I
-beq in_cache /*If invalid high, we don't grab from cache, we grab from physical*/
+bne 0x8
+tbz w5, LMEI_I_b, in_cache /*If invalid high, we don't grab from cache, we grab from physical*/
 subs w4, w4, 1
 bne L2_cache_check
 

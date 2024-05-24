@@ -15,8 +15,7 @@ mov w19, w0
 /*Is L1 ICache enabled?*/
 ldr x17, [x27, regbank_ptr]
 ldr w18, [x17, hid0]
-tst w18, hid0_ice
-beq __add_to_icache_L2check
+tbz w18, hid0_ice_b, __add_to_icache_L2check
 
 /*Get Base PTR of L1 ICache aka set0+way0 ptr*/
 ldr x1, [x27, L1_ICache_ptr]
@@ -75,10 +74,8 @@ If not, then go back to l1 cache and do PLRU to determine which to do.
 if both l2 and l1 disabled, return back -1*/
 __add_to_icache_L2check:
 ldr w2, [x17, l2cr]
-tst w2, l2cr_l2e
-beq do_plru_L1_ICache
-tst w2, l2cr_l2do
-bne do_plru_L1_ICache
+tbz w2, l2cr_l2e_b, do_plru_L1_ICache
+tbnz w2, l2cr_l2do_b, do_plru_L1_ICache
 
 /*Find first I block in L2 ICache*/
 ldr x18, [x27, L2_ICache_ptr]
@@ -92,7 +89,7 @@ bne -0xC
 /*No I block found, so replace very first block of L2 TODO what to do here hmm...*/
 ldr x18, [x27, L2_ICache_ptr]
 prep_for_L2_Iblock_push:
-and w0, w19, 0xFFFFFFE0
+and w0, w19, 0xFFFFFFC0
 str w0, [x18] /*LMEI all low*/
 add x18, x18, 9
 bl convert
@@ -107,8 +104,7 @@ mov w0, 0
 b add_to_icache_eplilogue
 
 do_plru_L1_ICache:
-tst w18, hid0_ice /*Just in case....*/
-bne error_add_to_icache
+tbz w18, hid0_ice_b, error_add_to_icache /*Just in case....*/
 bl PLRU
 b need_to_reset_iplru
 

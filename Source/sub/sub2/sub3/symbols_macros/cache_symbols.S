@@ -44,6 +44,11 @@ MEI = MEI protocol (For I-Cache, low I = high V)
 .set LMEI_E, 0b00010
 .set LMEI_I, 0b00001
 
+.set LMEI_L_b, 4
+.set LMEI_M_b, 3
+.set LMEI_E_b, 2
+.set LMEI_I_b, 1
+
 /*Masks use to start the reset a PLRU byte*/
 .set LX_masks_bit_clear, 0x6868646452525151 /*Each byte is a mask*/
 
@@ -51,10 +56,10 @@ MEI = MEI protocol (For I-Cache, low I = high V)
 .set LX_masks_bit_set, 0x6860646012100100 /*Each byte is a mask*/
 
 /*PLRU bits*/
-.set PLRU_B0, 0x40
-.set PLRU_B1, 0x20
-.set PLRU_B2, 0x10
-.set PLRU_B3, 0x08
-.set PLRU_B4, 0x04
-.set PLRU_B5, 0x02
-.set PLRU_B6, 0x01
+.set PLRU_B0, 6
+.set PLRU_B1, 5
+.set PLRU_B2, 4
+.set PLRU_B3, 3
+.set PLRU_B4, 2
+.set PLRU_B5, 1
+.set PLRU_B6, 0

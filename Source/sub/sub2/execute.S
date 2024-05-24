@@ -1,4 +1,3 @@
-#include "sub3/symbols_macros/spr_symbols.S"
 #include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
 #include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_PC_EA.S
 #include "sub3/sub4/check_bats.S" //Must be before both verify's

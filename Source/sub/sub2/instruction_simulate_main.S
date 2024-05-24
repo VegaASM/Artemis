@@ -1,3 +1,4 @@
+#include "sub3/symbols_macros/spr_symbols.S" //Must be established before decode_pc_or_pc4.S
 #include "decode_pc_or_pc4.S"
 #include "disassemble.S"
 #include "execute.S"

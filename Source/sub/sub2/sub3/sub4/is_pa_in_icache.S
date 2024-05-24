@@ -10,9 +10,8 @@ mov fp, sp
 /*is L1 ICache enabled?*/
 ldr x1, [x27, regbank_ptr]
 ldr w2, [x1, hid0]
-tst w2, hid0_ice
 bfc w0, 0, 5 /*Convert PA to PA-32, clear least significant 5 bits*/
-beq 0x24
+tbz w2, hid0_ice_b, 0x24
 
 /*Check L1 ICache*/
 ldr x2, [x27, L1_ICache_ptr]
@@ -27,10 +26,8 @@ bne -0x10
 
 /*Check L2 Ins_Cache, check L2 status first*/
 ldr w2, [x1, l2cr]
-tst w2, l2cr_l2e
-beq not_in_any_icache
-tst w2, l2cr_l2do
-bne not_in_any_icache
+tbz w2, l2cr_l2e_b, not_in_any_icache
+tbnz w2, l2cr_l2do_b, not_in_any_icache
 
 /*L2 ICache can be used, search thru it*/
 ldr x2, [x27, L2_ICache_ptr]

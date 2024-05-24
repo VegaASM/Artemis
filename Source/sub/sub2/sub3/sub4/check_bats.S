@@ -42,8 +42,7 @@ bne bat_array_miss
 /*Get MSR Privilege Mode Bit*/
 ldr x2, [x27, regbank_ptr]
 ldr w2, [x2, msr]
-tst w2, msr_pr
-beq vp_bit
+tbz w2, msr_pr_b, vp_bit
 
 /*If Supervisor, XOR it with Vs, then return*/
 ubfx x3, x1, 1, 1

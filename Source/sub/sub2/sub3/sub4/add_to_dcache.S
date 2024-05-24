@@ -15,8 +15,7 @@ mov w19, w0
 /*Is L1 DCache enabled?*/
 ldr x17, [x27, regbank_ptr]
 ldr w18, [x17, hid0]
-tst w18, hid0_dce
-beq __add_to_dcache_L2check
+tbz w18, hid0_dce_b, __add_to_dcache_L2check
 
 /*Get Base PTR of L1 DCache aka set0+way0 ptr*/
 ldr x1, [x27, L1_DCache_ptr]
@@ -76,8 +75,7 @@ If not, then go back to l1 cache and do PLRU to determine which to do.
 if both l2 and l1 disabled, return back -1*/
 __add_to_dcache_L2check:
 ldr w2, [x17, l2cr]
-tst w2, l2cr_l2e
-beq do_plru_L1_DCache
+tbz w2, l2cr_l2e_b, do_plru_L1_DCache
 /*Loop amount depends on L2DO bit*/
 ubfx w2, w2, 22, 1
 mov w3, L2_DCache_entries
@@ -94,7 +92,7 @@ bne -0xC
 /*No I block found, so replace very first block of L2 TODO what to do here hmm...*/
 ldr x18, [x27, L2_DCache_ptr]
 prep_for_L2_Dblock_push:
-and w0, w19, 0xFFFFFFE0
+and w0, w19, 0xFFFFFFC0
 orr w0, w0, LMEI_M
 str w0, [x18]
 add x18, x18, 9
@@ -110,8 +108,7 @@ mov w0, 0
 b add_to_dcache_eplilogue
 
 do_plru_L1_DCache:
-tst w18, hid0_dce /*Just in case....*/
-bne error_add_to_dcache
+tbz w18, hid0_dce_b, error_add_to_dcache /*Just in case....*/
 bl PLRU
 b need_to_reset_dplru
 

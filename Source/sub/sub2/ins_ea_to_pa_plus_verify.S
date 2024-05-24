@@ -12,8 +12,7 @@ mov w19, w0
 
 /*Check MSR for Instruction Address Translation*/
 ldr w2, [x1, msr]
-tst w2, msr_ir
-beq verify_physical_instruction_ea
+tbz w2, msr_ir_b, verify_physical_instruction_ea
 
 /*Check if secondary bats are enabled*/
 /*Use sbe bit to shift base value of 4 (loop count aka number of ibats)*/
@@ -43,7 +42,7 @@ bne undefined_ibat
 
 /*Check BAT's PP bits*/
 /*Anything not 00 is good to go for instruction fetching*/
-tst x1, 0x3
+tst x1, bat_pp
 beq ibat_pp_denied
 
 /*Change virt EA to phys EA*/

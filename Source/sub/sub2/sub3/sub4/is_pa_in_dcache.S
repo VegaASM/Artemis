@@ -1,11 +1,17 @@
+/*w0 = PA
+w0 returns 1 for found
+w0 returns 0 for not found, or found but locked TODO fix stuff for locked cache*/
 .globl is_pa_in_dcache
 is_pa_in_dcache:
 /*Prologue*/
 stp fp, lr, [sp, -0x10]!
 mov fp, sp
 
-/*Convert PA to PA-32, clear least significant 5 bits*/
-bfc w0, 0, 5
+/*is L1 DCache enabled?*/
+ldr x1, [x27, regbank_ptr]
+ldr w2, [x1, hid0]
+bfc w0, 0, 5 /*Convert PA to PA-32, clear least significant 5 bits*/
+tbz w2, hid0_dce_b, 0x24
 
 /*Check L1 D-Cache*/
 ldr x2, [x27, L1_DCache_ptr]
@@ -21,11 +27,10 @@ bne -0x10
 /*Check L2 Data_Cache*/
 ldr x2, [x27, regbank_ptr]
 ldr w2, [x2, l2cr]
-tst w2, l2cr_l2e
-beq not_in_any_icache
+tbz w2, l2cr_l2e_b, not_in_any_icache
 
 /*Loop amount depends on l2do bit, extract bit*/
-ubfx w4, w2, 22, 1
+ubfx w4, w2, l2cr_l2do_b, 1
 mov w3, L2_DCache_entries /*Incurs no l2do*/
 lsl w4, w3, w4 /*If l2do, mulli loop amount by 2*/
 

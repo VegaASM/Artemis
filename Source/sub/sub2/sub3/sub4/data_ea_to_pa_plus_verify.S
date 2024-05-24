@@ -12,8 +12,7 @@ mov w19, w0
 
 /*Check MSR for Data Address Translation*/
 ldr w2, [x1, msr]
-tst w2, msr_dr
-beq verify_physical_data_ea
+tbz w2, msr_dr_b, verify_physical_data_ea
 
 /*Check if secondary bats are enabled*/
 /*Use sbe bit to shift base value of 4 (loop count aka number of ibats)*/
@@ -41,7 +40,7 @@ check_dbat_pp:
 /*Check BAT's PP bits*/
 /*x1 = read only, 10 = read/write*/
 /*TODO we have to implement something for dcbt/dcbtst instruction, simply abort access (nop)*/
-tst x1, 0x3
+tst x1, bat_pp
 beq dbat_pp_denied /*NOTE todo remember to implement dsisr bit stuff that's unique for PP violation*/
 tbz x1, 1, change_dva_to_dpa
 

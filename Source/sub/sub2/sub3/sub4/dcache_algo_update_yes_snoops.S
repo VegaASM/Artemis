@@ -26,11 +26,10 @@ bl __dcache_algo_update_yes_snoops
 Is L2 on?*/
 ldr x4, [x27, regbank_ptr]
 ldr w4, [x4, l2cr]
-tst w4, l2cr_l2e
-beq dcache_algo_update_yes_snoops_epilogue
+tbz w4, l2cr_l2e_b, dcache_algo_update_yes_snoops_epilogue
 
 /*Set Loop Amount based on L2D0 bit*/
-ubfx w4, w4, 22, 1
+ubfx w4, w4, l2cr_l2do_b, 1
 mov w5, L2_DCache_entries /*Incurs no l2do*/
 lsl w7, w4, w5
 
@@ -53,19 +52,18 @@ ret
 
 __dcache_algo_update_yes_snoops:
 /*Is PA locked?*/
-tbnz w4, 3, -0x14 /*LMEI_L*/
+tbnz w4, LMEI_L_b, -0x14
 
 /*Update MEI
 If Modified then..
 Snoop Hit on Cacheable Read/Write -> I
 Any other Snoop Hit -> E
 Miss or any other scenario -> M (nop)*/
-tbz w4, 3, 0x30 /*LMEI_L*/
+tbz w4, LMEI_M_b, 0x30
 tbz w1, 0, __dcache_algo_update_yes_snoops_loop_decrementer
 ldr x5, [x27, batsave_ptr]
-tst x5, bat_wimg_i
 bfc w4, 0, 3
-bne 0x14
+tbnz x5, bat_wimg_i_b, 0x10
 /*Change to E*/
 orr w4, w4, LMEI_E
 str w4, [x3, x18]
@@ -76,16 +74,15 @@ str w4, [x3, x18]
 b __dcache_algo_update_yes_snoops_loop_decrementer
 
 /*Exclusive or Invalid*/
-tbz w4, 1, __dcache_algo_update_yes_snoops_loop_decrementer /*LMEI_E*/
+tbz w4, LMEI_E_b, __dcache_algo_update_yes_snoops_loop_decrementer
 /*Exclusive
 Snoop Hit on Cacheable Read/Write -> I
 Snoop Hit on Cache-Inhib'd Read -> E (nop)
 Any other Hit or a miss -> E (nop)*/
 tbz w1, 0, __dcache_algo_update_yes_snoops_loop_decrementer
 ldr x5, [x27, batsave_ptr]
-tst x5, bat_wimg_i
 bfc w4, 0, 3
-beq __dcache_algo_update_yes_snoops_loop_decrementer
+tbz x5, bat_wimg_i_b, __dcache_algo_update_yes_snoops_loop_decrementer
 //Change to I
 orr w4, w4, LMEI_I
 str w4, [x3, x18]

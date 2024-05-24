@@ -26,11 +26,10 @@ bl __dcache_algo_update_no_snoops
 Is L2 on?*/
 ldr x4, [x27, regbank_ptr]
 ldr w4, [x4, l2cr]
-tst w4, l2cr_l2e
-beq dcache_algo_update_no_snoops_epilogue
+tbz w4, l2cr_l2e_b, dcache_algo_update_no_snoops_epilogue
 
 /*Set Loop Amount based on L2D0 bit*/
-ubfx w4, w4, 22, 1
+ubfx w4, w4, l2cr_l2do_b, 1
 mov w5, L2_DCache_entries /*Incurs no l2do*/
 lsl w7, w4, w5
 
@@ -53,14 +52,14 @@ ret
 
 __dcache_algo_update_no_snoops:
 /*Is PA locked?*/
-tbnz w4, 3, -0x14 /*LMEI_L*/
+tbnz w4, LMEI_L_b, -0x14
 
 /*Update MEI
 If Modified then nop...*/
-tbnz w4, 2, __dcache_algo_update_no_snoops_loop_decrementer /*LMEI_M*/
+tbnz w4, LMEI_M_b, __dcache_algo_update_no_snoops_loop_decrementer
 
 /*Exclusive or Invalid*/
-tbnz w4, 0, 0x20 /*LMEI_I*/
+tbnz w4, LMEI_I_b, 0x20
 /*Exclusive
 Write Hit -> M
 Read Hit -> E (nop)
