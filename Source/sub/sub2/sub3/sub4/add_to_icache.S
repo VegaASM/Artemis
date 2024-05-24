@@ -1,5 +1,6 @@
 /*w0 = PA
-NOTE return values present but unused*/
+NOTE return values present but unused
+*/
 
 .globl add_to_icache
 add_to_icache:

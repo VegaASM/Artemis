@@ -1,5 +1,5 @@
 /*w0 = PA, x1 = reg bank ptr
-w0 return 0 if zero, -1 if not*/
+w0 return 1 if good, 0 if not*/
 
 .globl data_ea_to_pa_plus_verify
 data_ea_to_pa_plus_verify:

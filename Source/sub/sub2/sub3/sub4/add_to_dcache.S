@@ -1,6 +1,6 @@
 /*w0 = PA
 NOTE return values present but unused
-NOTE this func is currently unused*/
+*/
 
 .globl add_to_dcache
 add_to_dcache:
@@ -64,7 +64,7 @@ need_to_reset_dplru:
 and w3, w19, 0xFFFFFFE0
 add x1, x1, -(L1_way_size)
 mov x2, x6
-orr r3, r3, LMEI_M
+orr w3, w3, LMEI_M
 bl reset_PLRU_and_update_cache_block
 
 /*All done!*/
@@ -79,7 +79,7 @@ ldr w2, [x17, l2cr]
 tst w2, l2cr_l2e
 beq do_plru_L1_DCache
 /*Loop amount depends on L2DO bit*/
-ubfx w2, w2, xx, 1
+ubfx w2, w2, 22, 1
 mov w3, L2_DCache_entries
 lsl w2, w3, w2
 
