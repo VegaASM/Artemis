@@ -1,7 +1,9 @@
 #include "sub3/symbols_macros/spr_symbols.S" //Must be established before decode_pc_or_pc4.S
 #include "decode_pc_or_pc4.S"
 #include "disassemble.S"
+#include "exceptions.S" //Must be established before execute.S & timers.S
 #include "execute.S"
+#include "timers.S"
 #include "writeartemisstrings.S"
 #include "convertregisters.S"
 #include "write_artemis_txt.S"
@@ -98,6 +100,15 @@ mov x0, x22
 mov w1, w23
 bl execute
 cbnz x0, ins_sim_main_epilogue
+
+/*Decrement Instruction Counter*/
+subs w26, w26, 1
+bne 0x10
+
+/*Update Timers and call Decrementer if required*/
+bl update_timebase
+bl update_decrementer
+mov w26, 4
 
 /*Check if a store instruction of any kind was executed (this includes some cache ops fyi). If not, skip memory.txt crap*/
 cmp w23, stwx_ident

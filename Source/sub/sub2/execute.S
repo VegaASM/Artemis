@@ -1,5 +1,4 @@
-#include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction funcs below
-#include "exceptions.S" //Must be established before instruction funcs below and must be before verify_data_ea.S & verify_PC_EA.S
+#include "sub3/ins/subfinal/pcrcoe.S" //Must be established before instruction all ins funcs
 #include "sub3/sub4/check_bats.S" //Must be before both verify's
 #include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's

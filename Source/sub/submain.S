@@ -19,7 +19,7 @@ program_killed:
 successOUTPUT:
 .asciz "Instruction has been simulated/stepped. View/refresh www/artemis.txt & www/memory txt for changes.\n\n"
 welcomeMSG:
-.asciz "Welcome to Artemis!\n\nVersion: 0.0-r057\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
+.asciz "Welcome to Artemis!\n\nVersion: 0.0-r058\n\nEnter 's' to simulate one instruction (step in). Enter 'e' to exit.\n\n"
 fgets_error:
 .asciz "Error! The fgets function failed when retrieving the Console's input.\n\n"
 .align 2
@@ -27,7 +27,8 @@ fgets_error:
 .globl submain
 submain:
 /*Prologue*/
-stp fp, lr, [sp, -0x10]!
+stp fp, lr, [sp, -0x20]!
+str x26, [sp, 0x10]
 mov fp, sp
 
 /*Delete & Create new artemis.txt*/
@@ -42,6 +43,9 @@ bl fclose
 /*Delete & Create new memory.txt. Then fill it with all of memory contents. This takes awhile*/
 bl write_memory_txt
 cbnz x0, cant_remake_memory_txt
+
+/*Reset instruction counter (decrementer)*/
+mov w26, 4
 
 /*Welcome Message*/
 adr x0, welcomeMSG
@@ -92,5 +96,6 @@ adr x0, artopenshit
 
 /*Epilogue*/
 submain_epilogue:
-ldp fp, lr, [sp], 0x10
+ldr x26, [sp, 0x10]
+ldp fp, lr, [sp], 0x20
 ret
