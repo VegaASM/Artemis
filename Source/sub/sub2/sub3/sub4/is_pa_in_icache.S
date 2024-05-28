@@ -31,10 +31,11 @@ tbnz w2, l2cr_l2do_b, not_in_any_icache
 
 /*L2 ICache can be used, search thru it*/
 ldr x2, [x27, L2_ICache_ptr]
+bfc w0, 0, 6
 
 mov w3, L2_ICache_entries
 ldr w4, [x2], L2_block_size
-bfc w4, 0, 5
+bfc w4, 0, 6
 cmp w0, w4
 beq found_in_icache
 subs w3, w3, 1

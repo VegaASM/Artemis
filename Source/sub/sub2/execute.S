@@ -3,8 +3,10 @@
 #include "sub3/sub4/bat_va_to_pa.S" //Must be before both verify's
 #include "sub3/sub4/verify_physical_ea.S" //Must be before both verify's
 #include "ins_ea_to_pa_plus_verify.S" //Must be established before any instruction func
-#include "sub3/sub4/reset_PLRU_and_update_cache_block.S" //must be before PLRU
 #include "sub3/sub4/PLRU.S" //must be before icache_update and before any loads/stores ins funcs
+#include "sub3/sub4/reset_PLRU.S"
+#include "sub3/sub4/push_into_cache.S"
+#include "sub3/sub4/push_into_l2cache.S"
 #include "icache_update.S"
 #include "sub3/sub4/dcache_main.S" //Must be established before all ins cache, stores, and loads
 #include "set_loadstoretouch_flags.S"

@@ -8,8 +8,9 @@
 
 .globl lfd_ppc
 lfd_ppc:
-stp fp, lr, [sp, -0x20]!
+stp fp, lr, [sp, -0x30]!
 stp x19, x20, [sp, 0x10]
+str x21, [sp, 0x20]
 mov fp, sp
 mov x19, x0
 mov x20, x1
@@ -22,7 +23,10 @@ beq 0xC
 lsl w3, w3, 2
 ldr w3, [x1, x3] //grab rA value
 add w0, w2, w3 //calc EA
-bl convert
+mov w1, 1
+mov w21, w0
+bl dcache_main
+cbz x0, lfd_ppc_epilogue
 ldr d3, [x0]
 ldr w2, [x19, fDoff] //grab fD number
 lsl w2, w2, 3
@@ -37,8 +41,9 @@ ins v3.s[0], v4.s[0] //place in undefined value
 str d3, [x20, x2] //"load" double into fD, lfd::ppc, yes this is STR!
 pc_adjust 0x4
 lfd_ppc_epilogue:
+ldr x21, [sp, 0x20]
 ldp x19, x20, [sp, 0x10]
-ldp fp, lr, [sp], 0x20
+ldp fp, lr, [sp], 0x30
 ret
 
 .globl lfdu_ppc

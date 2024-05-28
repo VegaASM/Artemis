@@ -74,7 +74,7 @@
 .set st_scale, 0x00003F00
 .set st_type, 0x00000007
 
-//MSR
+//MSR masks
 .set msr_le, 0x00000001
 .set msr_ri, 0x00000002
 .set msr_pm, 0x00000004
@@ -92,9 +92,23 @@
 .set msr_ile, 0x00010000
 .set msr_pow, 0x00040000
 
-.set msr_pr_b, 14
-.set msr_ir_b, 5
+//MSR bits
+.set msr_le_b, 0
+.set msr_ri_b, 1
+.set msr_pm_b, 2
 .set msr_dr_b, 4
+.set msr_ir_b, 5
+.set msr_ip_b, 6
+.set msr_fe1_b, 8
+.set msr_be_b, 9
+.set msr_se_b, 10
+.set msr_fe0_b, 11
+.set msr_me_b, 12
+.set msr_fp_b, 13
+.set msr_pr_b, 14
+.set msr_ee_b, 15
+.set msr_ile_b, 16
+.set msr_pow_b, 18
 
 //XER
 .set xer_so, 0x80000000
@@ -102,7 +116,7 @@
 .set xer_ca, 0x20000000
 .set xer_bytecount, 0x0000007F
 
-//FPSCR
+//FPSCR masks
 .set fpscr_fx, 0x80000000
 .set fpscr_fex, 0x40000000
 .set fpscr_vx, 0x20000000
@@ -129,6 +143,32 @@
 .set fpscr_xe, 0x00000008
 .set fpscr_ni, 0x00000004
 .set fpscr_rn, 0x00000003
+
+//FPSCR bits
+.set fpscr_fx_b, 31
+.set fpscr_fex_b, 30
+.set fpscr_vx_b, 29
+.set fpscr_ox_b, 28
+.set fpscr_ux_b, 27
+.set fpscr_zx_b, 26
+.set fpscr_xx_b, 25
+.set fpscr_vxsnan_b, 24
+.set fpscr_vxisi_b, 23
+.set fpscr_vxidi_b, 22
+.set fpscr_vxzdz_b, 21
+.set fpscr_vximz_b, 20
+.set fpscr_vxvc_b, 19
+.set fpscr_fr_b, 18
+.set fpscr_fi_b, 17
+.set fpscr_vxsoft_b, 10
+.set fpscr_vxsqrt_b, 9
+.set fpscr_vxcvi_b, 8
+.set fpscr_ve_b, 7
+.set fpscr_oe_b, 6
+.set fpscr_ue_b, 5
+.set fpscr_ze_b, 4
+.set fpscr_xe_b, 3
+.set fpscr_ni_b, 2
 
 //PVR
 .set pvr_version, 0xFFFF0000
